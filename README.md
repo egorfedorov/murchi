@@ -20,11 +20,21 @@
 
 <p align="center">
   <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg">
-    <img src="https://img.shields.io/badge/DOWNLOAD_MURCHI.DMG-34d399?style=for-the-badge&logo=apple&logoColor=white&labelColor=0a0a1a" alt="Download DMG" height="48">
+    <img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F_DOWNLOAD_MURCHI.DMG-34d399?style=for-the-badge&logoColor=white&labelColor=0a0a1a" alt="Download DMG" height="48">
   </a>
 </p>
 <p align="center">
   <sub>Open DMG &rarr; drag to Applications &rarr; done. macOS 12+ required.</sub>
+</p>
+
+<br>
+
+---
+
+<br>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/demo.svg" alt="Murchi Demo — cat on desktop with speech bubble, hearts, stats" width="700">
 </p>
 
 <br>
@@ -43,60 +53,51 @@
 <tr>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/video-game_1f3ae.png"><br><br>
-<strong>25+ Behaviors</strong><br>
+<h3>🎮 25+ Behaviors</h3>
 <sub>Walk, sleep, zoomies, groom, chase butterflies, watch birds, knock glasses off tables</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/meat-on-bone_1f356.png"><br><br>
-<strong>Feed & Care</strong><br>
+<h3>🍖 Feed & Care</h3>
 <sub>Fish, milk, treats. 6 stats: hunger, happiness, energy, social, hygiene, health</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/yarn_1f9f6.png"><br><br>
-<strong>Toys & Accessories</strong><br>
+<h3>🧶 Toys & Accessories</h3>
 <sub>Mouse, yarn, laser. Hats, bow ties, crowns, glasses, flowers</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/open-book_1f4d6.png"><br><br>
-<strong>Cat Diary</strong><br>
+<h3>📖 Cat Diary</h3>
 <sub>Personal blog about meals, play, sickness, butterflies, birthdays</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/sparkles_2728.png"><br><br>
-<strong>Particle Magic</strong><br>
+<h3>✨ Particle Magic</h3>
 <sub>Hearts, stars, sparkles, paw prints, sleep Z particles, confetti</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/desktop-computer_1f5a5-fe0f.png"><br><br>
-<strong>Lives on Your Dock</strong><br>
+<h3>🖥️ Lives on Your Dock</h3>
 <sub>Walks on macOS Dock as a physical platform with gravity</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/chart-increasing_1f4c8.png"><br><br>
-<strong>Level Up</strong><br>
+<h3>📈 Level Up</h3>
 <sub>XP system, 5 evolution stages: Baby to Cosmic Murchi</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/speech-balloon_1f4ac.png"><br><br>
-<strong>Speech Bubbles</strong><br>
+<h3>💬 Speech Bubbles</h3>
 <sub>Murchi talks, reacts to petting, greets you when you return</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="40" src="https://em-content.zobj.net/source/apple/391/butterfly_1f98b.png"><br><br>
-<strong>Cute Events</strong><br>
+<h3>🦋 Cute Events</h3>
 <sub>Butterflies, birds, gifts, glass knocking, birthday celebrations</sub><br><br>
 </td>
 </tr>
@@ -110,7 +111,7 @@
 
 <h2 align="center">How it works</h2>
 
-<p align="center"><sub>Everything lives in <strong>one file</strong> &mdash; Murchi.swift (~4000 lines)</sub></p>
+<p align="center"><sub>Everything lives in <strong>one file</strong> — Murchi.swift (~4000 lines)</sub></p>
 
 <br>
 
@@ -158,20 +159,17 @@ docs/                   murchi.pet website
 <tr>
 <td align="center" width="33%">
 <br>
-<img width="30" src="https://em-content.zobj.net/source/apple/391/rocket_1f680.png"><br>
-<strong>v2.1 &mdash; Soon</strong><br><br>
+<h3>🚀 v2.1 — Soon</h3>
 <sub>15+ new accessories<br>New food types<br>Mini-games<br>Seasonal events</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="30" src="https://em-content.zobj.net/source/apple/391/globe-showing-americas_1f30e.png"><br>
-<strong>v2.2 &mdash; Next</strong><br><br>
+<h3>🌍 v2.2 — Next</h3>
 <sub>Visit friends' cats<br>Room decorations<br>Cat furniture<br>Photo sharing</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<img width="30" src="https://em-content.zobj.net/source/apple/391/crystal-ball_1f52e.png"><br>
-<strong>v3.0 &mdash; Future</strong><br><br>
+<h3>🔮 v3.0 — Future</h3>
 <sub>Dogs, hamsters, birds<br>Worlds &amp; biomes<br>Multiplayer<br>App Store release</sub><br><br>
 </td>
 </tr>
@@ -192,20 +190,20 @@ docs/                   murchi.pet website
 <br>
 
 <p align="center">
-  <code>4000+</code> lines of Swift &nbsp;&bull;&nbsp;
-  <code>25+</code> behaviors &nbsp;&bull;&nbsp;
-  <code>6</code> stats &nbsp;&bull;&nbsp;
-  <code>5</code> evolution stages &nbsp;&bull;&nbsp;
+  <code>4000+</code> lines of Swift &nbsp;•&nbsp;
+  <code>25+</code> behaviors &nbsp;•&nbsp;
+  <code>6</code> stats &nbsp;•&nbsp;
+  <code>5</code> evolution stages &nbsp;•&nbsp;
   <code>0</code> dependencies
 </p>
 
 <p align="center">
   <sub>
-    Murchi remembers everything between launches &nbsp;&#x1f4be;<br>
-    Murchi writes a personal diary about its day &nbsp;&#x1f4d6;<br>
-    Murchi celebrates its birthday with confetti &nbsp;&#x1f389;<br>
-    Murchi knocks your glass off the table if bored &nbsp;&#x1f610;<br>
-    Murchi poops if you forget to feed it &nbsp;&#x1f4a9;
+    💾 Murchi remembers everything between launches<br>
+    📖 Murchi writes a personal diary about its day<br>
+    🎉 Murchi celebrates its birthday with confetti<br>
+    😐 Murchi knocks your glass off the table if bored<br>
+    💩 Murchi poops if you forget to feed it
   </sub>
 </p>
 
@@ -215,10 +213,8 @@ docs/                   murchi.pet website
 
 <br>
 
-<h2 align="center">Star history</h2>
-
 <p align="center">
-  <sub>If you enjoy Murchi, give it a star &mdash; it helps a lot!</sub>
+  <sub>If you enjoy Murchi, give it a ⭐ — it helps a lot!</sub>
 </p>
 
 <p align="center">
@@ -230,10 +226,6 @@ docs/                   murchi.pet website
     <img src="https://img.shields.io/github/forks/egorfedorov/murchi?style=for-the-badge&color=64748b&logo=github&label=forks" alt="Forks">
   </a>
 </p>
-
-<br>
-
----
 
 <br>
 

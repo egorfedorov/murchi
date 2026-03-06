@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340">
+  <defs>
+    <linearGradient id="deskBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a3e"/>
+      <stop offset="100%" style="stop-color:#0f0f2e"/>
+    </linearGradient>
+    <linearGradient id="dockBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.12)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/>
+    </linearGradient>
+    <filter id="g1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/></filter>
+  </defs>
+
+  <!-- Desktop background -->
+  <rect width="700" height="340" rx="12" fill="url(#deskBg)"/>
+  <rect width="700" height="340" rx="12" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- macOS menu bar -->
+  <rect width="700" height="24" rx="12" fill="rgba(0,0,0,0.4)"/>
+  <rect y="12" width="700" height="12" fill="rgba(0,0,0,0.4)"/>
+  <circle cx="18" cy="12" r="2.5" fill="#ff5f57"/>
+  <circle cx="30" cy="12" r="2.5" fill="#febc2e"/>
+  <circle cx="42" cy="12" r="2.5" fill="#28c840"/>
+  <text x="350" y="16" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)" text-anchor="middle" font-weight="500">Murchi</text>
+
+  <!-- Stars in background -->
+  <g opacity="0.4">
+    <circle cx="80" cy="60" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="200" cy="90" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/></circle>
+    <circle cx="500" cy="70" r="1.2" fill="white"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="4s" repeatCount="indefinite"/></circle>
+    <circle cx="620" cy="100" r="0.7" fill="white"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="400" cy="50" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="150" cy="150" r="0.6" fill="white"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/></circle>
+    <circle cx="550" cy="140" r="0.9" fill="white"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- Dock -->
+  <rect x="150" y="278" width="400" height="52" rx="14" fill="url(#dockBg)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+  <!-- Dock icons (simple colored squares) -->
+  <rect x="175" y="290" width="28" height="28" rx="7" fill="#3b82f6" opacity="0.7"/>
+  <rect x="215" y="290" width="28" height="28" rx="7" fill="#f97316" opacity="0.7"/>
+  <rect x="255" y="290" width="28" height="28" rx="7" fill="#8b5cf6" opacity="0.7"/>
+  <rect x="295" y="290" width="28" height="28" rx="7" fill="#10b981" opacity="0.7"/>
+  <rect x="335" y="290" width="28" height="28" rx="7" fill="#ef4444" opacity="0.7"/>
+  <rect x="375" y="290" width="28" height="28" rx="7" fill="#eab308" opacity="0.7"/>
+  <rect x="415" y="290" width="28" height="28" rx="7" fill="#06b6d4" opacity="0.7"/>
+  <rect x="455" y="290" width="28" height="28" rx="7" fill="#ec4899" opacity="0.7"/>
+  <rect x="495" y="290" width="28" height="28" rx="7" fill="#64748b" opacity="0.7"/>
+
+  <!-- Pixel Cat on dock — 16x12 grid, 5px pixels -->
+  <g transform="translate(305, 198) scale(5)" filter="url(#g1)">
+    <!-- Walking frame with right paw up -->
+    <!-- Ears -->
+    <rect x="2" y="0" width="2" height="1" fill="#2D2D3F"/>
+    <rect x="11" y="0" width="2" height="1" fill="#2D2D3F"/>
+    <rect x="1" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="1" width="2" height="1" fill="#9898B0"/>
+    <rect x="4" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="10" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="11" y="1" width="2" height="1" fill="#9898B0"/>
+    <rect x="13" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Head -->
+    <rect x="1" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="3" y="2" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="4" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="5" y="2" width="4" height="1" fill="#2D2D3F"/>
+    <rect x="10" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="11" y="2" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="12" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="13" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="1" y="3" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="3" width="12" height="1" fill="#9898B0"/>
+    <rect x="13" y="3" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Eyes -->
+    <rect x="1" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="4" width="2" height="1" fill="#9898B0"/>
+    <rect x="4" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="5" y="4" width="1" height="1" fill="#88DD88"/>
+    <rect x="6" y="4" width="4" height="1" fill="#9898B0"/>
+    <rect x="10" y="4" width="1" height="1" fill="#88DD88"/>
+    <rect x="11" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="12" y="4" width="2" height="1" fill="#9898B0"/>
+    <!-- Blink -->
+    <rect x="5" y="4" width="1" height="1" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="10" y="4" width="1" height="1" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Muzzle + Nose -->
+    <rect x="2" y="5" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="5" width="3" height="1" fill="#9898B0"/>
+    <rect x="6" y="5" width="2" height="1" fill="#F0F0F8"/>
+    <rect x="8" y="5" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="5" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="6" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="6" width="3" height="1" fill="#9898B0"/>
+    <rect x="6" y="6" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="7" y="6" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="8" y="6" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="6" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Collar -->
+    <rect x="4" y="7" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="5" y="7" width="5" height="1" fill="#FFDD33"/>
+    <rect x="10" y="7" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Body -->
+    <rect x="3" y="8" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="4" y="8" width="3" height="1" fill="#9898B0"/>
+    <rect x="7" y="8" width="1" height="1" fill="#55AAFF"/>
+    <rect x="8" y="8" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="8" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="9" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="9" width="10" height="1" fill="#9898B0"/>
+    <rect x="12" y="9" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Paws -->
+    <rect x="2" y="10" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="10" width="2" height="1" fill="#F0F0F8"/>
+    <rect x="5" y="10" width="5" height="1" fill="#9898B0"/>
+    <rect x="10" y="10" width="2" height="1" fill="#F0F0F8"/>
+    <rect x="12" y="10" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="11" width="10" height="1" fill="#2D2D3F"/>
+  </g>
+
+  <!-- Cat breathing animation -->
+  <animateTransform xlink:href="#catGroup" attributeName="transform" type="translate" values="0,0;0,-2;0,0" dur="2.5s" repeatCount="indefinite"/>
+
+  <!-- Speech bubble -->
+  <g filter="url(#shadow)">
+    <rect x="400" y="150" width="160" height="44" rx="12" fill="white" opacity="0.95"/>
+    <polygon points="400,178 385,195 410,180" fill="white" opacity="0.95"/>
+    <text x="480" y="170" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#1a1a2e" text-anchor="middle" font-weight="600">I love fish! 🐟</text>
+    <text x="480" y="186" font-family="system-ui, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">*purrs happily*</text>
+    <!-- Bubble appears and disappears -->
+    <animate attributeName="opacity" values="0;0;1;1;1;1;1;0;0;0" dur="6s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Floating hearts -->
+  <g filter="url(#g1)">
+    <text x="370" y="185" font-size="16" fill="#ff5a80" opacity="0.8">
+      <animate attributeName="y" values="185;160;185" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite"/>
+      &#9829;
+    </text>
+    <text x="355" y="170" font-size="11" fill="#ff5a80" opacity="0.6">
+      <animate attributeName="y" values="170;148;170" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.5s" repeatCount="indefinite"/>
+      &#9829;
+    </text>
+    <text x="382" y="195" font-size="9" fill="#a78bfa" opacity="0.5">
+      <animate attributeName="y" values="195;175;195" dur="3.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.15;0.5" dur="3.5s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+  </g>
+
+  <!-- Sparkle particles around cat -->
+  <g>
+    <text x="290" y="220" font-size="8" fill="#fbbf24" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0.8;0;0;0;0" dur="5s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+    <text x="420" y="230" font-size="6" fill="#a78bfa" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0.7;0;0" dur="5s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+    <text x="340" y="200" font-size="7" fill="#34d399" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.6;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+  </g>
+
+  <!-- Stats HUD (top right) -->
+  <g transform="translate(560, 40)" opacity="0.85">
+    <rect width="110" height="80" rx="8" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+    <text x="10" y="18" font-family="system-ui, sans-serif" font-size="8" fill="#94a3b8" font-weight="600">MURCHI LV.3</text>
+    <!-- Hunger -->
+    <text x="10" y="32" font-family="system-ui, sans-serif" font-size="7" fill="#f472b6">&#9829;</text>
+    <rect x="22" y="26" width="50" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+    <rect x="22" y="26" width="40" height="4" rx="2" fill="#f472b6">
+      <animate attributeName="width" values="40;35;40" dur="10s" repeatCount="indefinite"/>
+    </rect>
+    <text x="78" y="31" font-family="system-ui, sans-serif" font-size="6" fill="#94a3b8">80%</text>
+    <!-- Happiness -->
+    <text x="10" y="44" font-family="system-ui, sans-serif" font-size="7" fill="#fbbf24">&#9733;</text>
+    <rect x="22" y="38" width="50" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+    <rect x="22" y="38" width="45" height="4" rx="2" fill="#fbbf24"/>
+    <text x="78" y="43" font-family="system-ui, sans-serif" font-size="6" fill="#94a3b8">90%</text>
+    <!-- Energy -->
+    <text x="10" y="56" font-family="system-ui, sans-serif" font-size="7" fill="#34d399">&#9889;</text>
+    <rect x="22" y="50" width="50" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+    <rect x="22" y="50" width="30" height="4" rx="2" fill="#34d399">
+      <animate attributeName="width" values="30;25;30" dur="8s" repeatCount="indefinite"/>
+    </rect>
+    <text x="78" y="55" font-family="system-ui, sans-serif" font-size="6" fill="#94a3b8">60%</text>
+    <!-- XP bar -->
+    <rect x="10" y="64" width="90" height="3" rx="1.5" fill="rgba(255,255,255,0.08)"/>
+    <rect x="10" y="64" width="55" height="3" rx="1.5" fill="#a78bfa">
+      <animate attributeName="width" values="55;58;55" dur="12s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Butterfly -->
+  <g>
+    <text x="180" y="160" font-size="16" fill="#f472b6">
+      <animate attributeName="x" values="180;220;200;160;180" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="160;130;150;140;160" dur="8s" repeatCount="indefinite"/>
+      &#127803;
+    </text>
+  </g>
+
+  <!-- Label -->
+  <text x="350" y="336" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="middle">murchi.pet — Desktop Tamagotchi Cat for macOS</text>
+</svg>

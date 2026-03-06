@@ -1655,6 +1655,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             return cachedDockRect
         }
         lastDockCheck = Date()
+        detectDockBarBounds()
 
         // Use visibleFrame to detect Dock — most reliable method
         guard let screen = NSScreen.main else {
@@ -1672,11 +1673,39 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         return .zero
     }
 
+    var cachedDockBarLeft: CGFloat = 0
+    var cachedDockBarRight: CGFloat = 1440
+
+    func detectDockBarBounds() {
+        // Use CGWindowList to find the actual Dock bar window bounds
+        guard let winList = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] else { return }
+        for win in winList {
+            guard let owner = win[kCGWindowOwnerName as String] as? String, owner == "Dock",
+                  let name = win[kCGWindowName as String] as? String, name == "Dock",
+                  let bounds = win[kCGWindowBounds as String] as? [String: CGFloat],
+                  let x = bounds["X"], let w = bounds["Width"], let h = bounds["Height"] else { continue }
+            // The actual dock bar (not desktop wallpaper) has a specific height matching dock
+            if h < 200 && h > 20 {
+                cachedDockBarLeft = x
+                cachedDockBarRight = x + w
+                return
+            }
+        }
+    }
+
     func groundYForPet() -> CGFloat {
         let dock = dockRect
         guard dock.height > 4 else { return floorY }
         // Cat walks on top of the Dock — add offset so cat is above icons
         let dockTop = dock.maxY + 8
+
+        // Check if cat is within the dock bar horizontal bounds
+        // Dock bar is centered, not full width
+        let catCenter = petX + petSize / 2
+        if catCenter < cachedDockBarLeft - 20 || catCenter > cachedDockBarRight + 20 {
+            return floorY
+        }
+
         return min(dockTop, 200)
     }
     var velocityY: CGFloat = 0
@@ -2508,10 +2537,14 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         switch b {
         case .walking:
-            walkTargetX = CGFloat.random(in: safeRange(50, screenW - 50))
+            let lo = max(50, cachedDockBarLeft - 10)
+            let hi = min(screenW - 50, cachedDockBarRight - petSize + 10)
+            walkTargetX = CGFloat.random(in: safeRange(lo, hi))
             facingRight = (walkTargetX ?? petX) > petX
         case .running:
-            walkTargetX = CGFloat.random(in: safeRange(50, screenW - 50))
+            let lo = max(50, cachedDockBarLeft - 10)
+            let hi = min(screenW - 50, cachedDockBarRight - petSize + 10)
+            walkTargetX = CGFloat.random(in: safeRange(lo, hi))
             facingRight = (walkTargetX ?? petX) > petX
         case .chasingCursor:
             facingRight = NSEvent.mouseLocation.x > petX
@@ -2553,6 +2586,17 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if let hideTime = bubbleHideTime, Date() > hideTime {
             bubbleWindow.orderOut(nil)
             bubbleHideTime = nil
+        }
+
+        // Clean up stale event windows (safety net)
+        if behavior != .openingGift, let gw = giftWindow, gw.isVisible {
+            gw.orderOut(nil)
+        }
+        if behavior != .chasingButterfly, let bw = butterflyWindow, bw.isVisible {
+            bw.orderOut(nil)
+        }
+        if behavior != .knockingGlass, let gw = glassWindow, gw.isVisible {
+            gw.orderOut(nil)
         }
 
         // Behavior timeout
