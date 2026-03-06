@@ -599,6 +599,85 @@
         }
         footer a { color: var(--purple-light); text-decoration: none; }
 
+        /* Roadmap */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .roadmap-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .roadmap-card:hover { border-color: rgba(124, 92, 191, 0.25); }
+        .roadmap-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+        .roadmap-card.soon::before { background: linear-gradient(90deg, var(--green), #2dd4bf); }
+        .roadmap-card.next::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+        .roadmap-card.future::before { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
+        .roadmap-phase {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+        .roadmap-card.soon .roadmap-phase {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--green);
+        }
+        .roadmap-card.next .roadmap-phase {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--blue);
+        }
+        .roadmap-card.future .roadmap-phase {
+            background: rgba(244, 114, 182, 0.12);
+            color: var(--pink);
+        }
+        .roadmap-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .roadmap-list {
+            list-style: none;
+            padding: 0;
+        }
+        .roadmap-list li {
+            font-size: 13px;
+            color: var(--text-dim);
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .roadmap-list li::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 10px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text-dim);
+        }
+        .roadmap-card.soon .roadmap-list li.done::before {
+            background: var(--green);
+            border-color: var(--green);
+        }
+
         /* Scroll reveal */
         .reveal {
             opacity: 0;
@@ -749,6 +828,53 @@
                 <div class="bento-icon">🖥️</div>
                 <h3 data-i18n="f8_title">Lives on Your Dock</h3>
                 <p data-i18n="f8_desc">Walks on the macOS Dock as a physical platform. Falls off the edges!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Roadmap -->
+<section class="section reveal">
+    <div class="container">
+        <h2 class="section-title" data-i18n="roadmap_title">Roadmap</h2>
+        <p class="section-subtitle" data-i18n="roadmap_subtitle">What's coming next for Murchi</p>
+        <div class="roadmap-grid">
+            <div class="roadmap-card soon">
+                <div class="roadmap-phase" data-i18n="roadmap_v21">v2.1 — Coming Soon</div>
+                <h3 data-i18n="roadmap_v21_title">More Items & Mini-Games</h3>
+                <ul class="roadmap-list">
+                    <li class="done" data-i18n="r1_1">25+ cat behaviors</li>
+                    <li class="done" data-i18n="r1_2">Cat diary with blog entries</li>
+                    <li class="done" data-i18n="r1_3">5 accessories (hat, bow tie, crown, glasses, flower)</li>
+                    <li data-i18n="r1_4">15+ new accessories (scarves, sunglasses, bandanas...)</li>
+                    <li data-i18n="r1_5">New foods: sushi, cake, pizza, ice cream</li>
+                    <li data-i18n="r1_6">Mini-games: catch the fish, dodge the vacuum</li>
+                    <li data-i18n="r1_7">Seasonal events (Halloween, Christmas, New Year)</li>
+                </ul>
+            </div>
+            <div class="roadmap-card next">
+                <div class="roadmap-phase" data-i18n="roadmap_v22">v2.2 — Next Up</div>
+                <h3 data-i18n="roadmap_v22_title">Social & Multiplayer</h3>
+                <ul class="roadmap-list">
+                    <li data-i18n="r2_1">Visit friends' cats on their desktops</li>
+                    <li data-i18n="r2_2">Cat mood music & ambient sounds</li>
+                    <li data-i18n="r2_3">Desktop widgets (stats, diary preview)</li>
+                    <li data-i18n="r2_4">iCloud sync between Macs</li>
+                    <li data-i18n="r2_5">Custom color skins & patterns</li>
+                    <li data-i18n="r2_6">Photo mode with custom backgrounds</li>
+                </ul>
+            </div>
+            <div class="roadmap-card future">
+                <div class="roadmap-phase" data-i18n="roadmap_v3">v3.0 — The Future</div>
+                <h3 data-i18n="roadmap_v3_title">New Pets & Worlds</h3>
+                <ul class="roadmap-list">
+                    <li data-i18n="r3_1">New pet types: dog, hamster, parrot, bunny</li>
+                    <li data-i18n="r3_2">Pet houses & furniture decorating</li>
+                    <li data-i18n="r3_3">Multi-pet households</li>
+                    <li data-i18n="r3_4">iOS companion app</li>
+                    <li data-i18n="r3_5">AI personality — unique dialog for each cat</li>
+                    <li data-i18n="r3_6">Community marketplace for accessories</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -1234,6 +1360,23 @@ const translations = {
         charity_note: "50% of every donation goes to animal shelters and rescue organizations",
         donations_title: "Donation Wall",
         donations_empty: "Be the first to support Murchi and help animals!",
+        roadmap_title: "Roadmap",
+        roadmap_subtitle: "What's coming next for Murchi",
+        roadmap_v21: "v2.1 — Coming Soon",
+        roadmap_v21_title: "More Items & Mini-Games",
+        r1_1: "25+ cat behaviors", r1_2: "Cat diary with blog entries", r1_3: "5 accessories (hat, bow tie, crown, glasses, flower)",
+        r1_4: "15+ new accessories (scarves, sunglasses, bandanas...)", r1_5: "New foods: sushi, cake, pizza, ice cream",
+        r1_6: "Mini-games: catch the fish, dodge the vacuum", r1_7: "Seasonal events (Halloween, Christmas, New Year)",
+        roadmap_v22: "v2.2 — Next Up",
+        roadmap_v22_title: "Social & Multiplayer",
+        r2_1: "Visit friends' cats on their desktops", r2_2: "Cat mood music & ambient sounds",
+        r2_3: "Desktop widgets (stats, diary preview)", r2_4: "iCloud sync between Macs",
+        r2_5: "Custom color skins & patterns", r2_6: "Photo mode with custom backgrounds",
+        roadmap_v3: "v3.0 — The Future",
+        roadmap_v3_title: "New Pets & Worlds",
+        r3_1: "New pet types: dog, hamster, parrot, bunny", r3_2: "Pet houses & furniture decorating",
+        r3_3: "Multi-pet households", r3_4: "iOS companion app",
+        r3_5: "AI personality — unique dialog for each cat", r3_6: "Community marketplace for accessories",
         footer_made: "Made with love for cats everywhere"
     },
     ru: {
@@ -1263,6 +1406,23 @@ const translations = {
         charity_note: "50% каждого доната идёт в приюты для животных",
         donations_title: "Стена донатов",
         donations_empty: "Стань первым, кто поддержит Мурчи и поможет животным!",
+        roadmap_title: "Планы",
+        roadmap_subtitle: "Что будет дальше в Мурчи",
+        roadmap_v21: "v2.1 — Скоро",
+        roadmap_v21_title: "Больше предметов и мини-игры",
+        r1_1: "25+ действий кота", r1_2: "Дневник с записями", r1_3: "5 аксессуаров (шляпа, бабочка, корона, очки, цветок)",
+        r1_4: "15+ новых аксессуаров (шарфы, очки, банданы...)", r1_5: "Новая еда: суши, торт, пицца, мороженое",
+        r1_6: "Мини-игры: поймай рыбку, уклонись от пылесоса", r1_7: "Сезонные ивенты (Хэллоуин, Рождество, Новый год)",
+        roadmap_v22: "v2.2 — Далее",
+        roadmap_v22_title: "Социальное и мультиплеер",
+        r2_1: "Ходить в гости к котам друзей", r2_2: "Музыка настроения и звуки",
+        r2_3: "Виджеты для рабочего стола", r2_4: "Синхронизация через iCloud",
+        r2_5: "Кастомные скины и расцветки", r2_6: "Фото-режим с фонами",
+        roadmap_v3: "v3.0 — Будущее",
+        roadmap_v3_title: "Новые питомцы и миры",
+        r3_1: "Новые питомцы: собака, хомяк, попугай, кролик", r3_2: "Домики и мебель",
+        r3_3: "Несколько питомцев одновременно", r3_4: "iOS приложение-компаньон",
+        r3_5: "AI-личность — уникальные диалоги для каждого кота", r3_6: "Маркетплейс аксессуаров от сообщества",
         footer_made: "Сделано с любовью к котикам по всему миру"
     },
     es: {
