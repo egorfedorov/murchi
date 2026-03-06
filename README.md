@@ -202,6 +202,12 @@ docs/                   murchi.pet website
 
 Requires Xcode command-line tools (`xcode-select --install`).
 
+> **Note:** If macOS says the app is "damaged and can't be opened", run:
+> ```bash
+> xattr -cr /Applications/Murchi.app
+> ```
+> This removes the quarantine flag added to apps downloaded from the internet.
+
 <br>
 
 ---
