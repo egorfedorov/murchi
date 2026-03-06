@@ -1692,6 +1692,12 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var screenW: CGFloat { NSScreen.main?.frame.width ?? 1440 }
     var screenH: CGFloat { NSScreen.main?.frame.height ?? 900 }
 
+    func safeRange(_ lo: CGFloat, _ hi: CGFloat) -> ClosedRange<CGFloat> {
+        let l = min(lo, hi)
+        let h = max(lo, hi)
+        return l == h ? l...l : l...h
+    }
+
     let petSize: CGFloat = 80
 
     // MARK: - App Launch
@@ -1743,7 +1749,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Restore poops
         for _ in 0..<stats.poopCount {
-            spawnPoopWindow(at: CGFloat.random(in: 50...(screenW - 80)))
+            spawnPoopWindow(at: CGFloat.random(in: safeRange(50, screenW - 80)))
         }
     }
 
@@ -2502,10 +2508,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         switch b {
         case .walking:
-            walkTargetX = CGFloat.random(in: 50...(screenW - 50))
+            walkTargetX = CGFloat.random(in: safeRange(50, screenW - 50))
             facingRight = (walkTargetX ?? petX) > petX
         case .running:
-            walkTargetX = CGFloat.random(in: 50...(screenW - 50))
+            walkTargetX = CGFloat.random(in: safeRange(50, screenW - 50))
             facingRight = (walkTargetX ?? petX) > petX
         case .chasingCursor:
             facingRight = NSEvent.mouseLocation.x > petX
@@ -2529,7 +2535,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         case .edgeWalking:
             // Walk along top of screen
             petY = screenH - petSize - 25  // menu bar area
-            walkTargetX = CGFloat.random(in: 100...(screenW - 100))
+            walkTargetX = CGFloat.random(in: safeRange(100, screenW - 100))
             facingRight = (walkTargetX ?? petX) > petX
         default:
             break
@@ -2552,6 +2558,19 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         // Behavior timeout
         let elapsed = Date().timeIntervalSince(behaviorStartTime)
         if elapsed > behaviorDuration && !isDragging && behavior != .idle {
+            // Clean up event windows on behavior timeout
+            if behavior == .openingGift, let gw = giftWindow, gw.isVisible {
+                gw.orderOut(nil)
+            }
+            if behavior == .chasingButterfly, let bw = butterflyWindow, bw.isVisible {
+                bw.orderOut(nil)
+            }
+            if behavior == .watchingBird, let bw = birdWindow, bw.isVisible {
+                bw.orderOut(nil)
+            }
+            if behavior == .knockingGlass, let gw = glassWindow, gw.isVisible {
+                gw.orderOut(nil)
+            }
             behavior = .idle
             animFrame = 0
         }
@@ -2669,7 +2688,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 }
                 // Laser dot moves randomly
                 if toy.type == .laserDot && frameCounter % 30 == 0 {
-                    currentToy?.x = CGFloat.random(in: 50...(screenW - 80))
+                    currentToy?.x = CGFloat.random(in: safeRange(50, screenW - 80))
                     toyWindow?.setFrameOrigin(NSPoint(x: currentToy!.x, y: currentToy!.y))
                 }
             }
@@ -2747,7 +2766,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         case .openingGift:
             // Gift falls down
             if let gw = giftWindow, gw.isVisible {
-                giftPos.y -= 3
+                giftPos.y -= 8
                 gw.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
                 // Cat runs to gift
                 let dx = giftPos.x - petX
@@ -2937,8 +2956,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnButterfly() {
         let size: CGFloat = 30
-        butterflyPos = NSPoint(x: CGFloat.random(in: 100...(screenW - 100)),
-                               y: CGFloat.random(in: 200...(screenH - 200)))
+        butterflyPos = NSPoint(x: CGFloat.random(in: safeRange(100, screenW - 100)),
+                               y: CGFloat.random(in: safeRange(200, screenH - 200)))
         let frame = NSRect(x: butterflyPos.x, y: butterflyPos.y, width: size, height: size)
 
         if butterflyWindow == nil {
@@ -3073,7 +3092,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnGift() {
         let size: CGFloat = 40
-        giftPos = NSPoint(x: petX + CGFloat.random(in: -100...100), y: screenH)
+        let gx = max(20, min(screenW - 60, petX + CGFloat.random(in: -100...100)))
+        giftPos = NSPoint(x: gx, y: screenH)
         let frame = NSRect(x: giftPos.x, y: giftPos.y, width: size, height: size)
 
         if giftWindow == nil {
@@ -3094,7 +3114,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         giftWindow!.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
         giftWindow!.orderFront(nil)
 
-        startBehavior(.openingGift, duration: 6.0)
+        startBehavior(.openingGift, duration: 12.0)
     }
 
     func startKnockingGlass() {
