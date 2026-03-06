@@ -120,23 +120,9 @@ The cat walks around, sleeps, plays, gets hungry, chases butterflies, knocks gla
 
 <br>
 
-## Quick Start
+## Download
 
-```bash
-# Clone
-git clone https://github.com/egorfedorov/murchi.git
-cd murchi
-
-# Run (compile + launch)
-bash run.sh
-
-# Or build .app + .dmg
-bash build-app.sh
-```
-
-> Requires **macOS 12+** and Xcode Command Line Tools: `xcode-select --install`
-
-Or just [**download the DMG**](https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg) from Releases.
+[**Download Murchi.dmg**](https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg) — open, drag to Applications, done. Requires **macOS 12+**.
 
 <br>
 
