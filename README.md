@@ -1,140 +1,178 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/placeholder-murchi-icon.png" width="128" alt="Murchi">
-</p>
-
-<h1 align="center">Murchi</h1>
-
-<p align="center">
-  <strong>A desktop Tamagotchi cat for macOS</strong><br>
-  Pixel-art virtual pet that lives on your screen, walks on your Dock, and keeps a personal diary.
+  <a href="https://murchi.pet">
+    <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/banner.svg" alt="Murchi — Desktop Tamagotchi Cat" width="700">
+  </a>
 </p>
 
 <p align="center">
-  <a href="https://murchi.pet">murchi.pet</a> &middot;
-  <a href="https://murchi.pet/Murchi.dmg">Download DMG</a> &middot;
-  macOS 12+
+  <a href="https://murchi.pet"><img src="https://img.shields.io/badge/website-murchi.pet-a78bfa?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHRleHQgeT0iMTQiIGZvbnQtc2l6ZT0iMTQiPvCfkLE8L3RleHQ+PC9zdmc+" alt="Website"></a>
+  <a href="https://github.com/egorfedorov/murchi/releases/latest"><img src="https://img.shields.io/github/v/release/egorfedorov/murchi?style=for-the-badge&color=34d399&label=download" alt="Download"></a>
+  <img src="https://img.shields.io/badge/platform-macOS_12+-0a0a1a?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 12+">
+  <img src="https://img.shields.io/badge/swift-single_file-f97316?style=for-the-badge&logo=swift&logoColor=white" alt="Swift">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-CC_BY--NC--ND_4.0-64748b?style=for-the-badge" alt="License"></a>
 </p>
 
----
+<br>
+
+<table>
+<tr>
+<td width="60%" valign="top">
 
 ## What is Murchi?
 
-Murchi is a single-file macOS app written entirely in Swift. No Xcode project, no storyboards, no dependencies — just one `.swift` file compiled with `swiftc`. A pixel-art cat appears on your desktop, walks around, reacts to your mouse, and lives its own little life.
+A **single-file Swift app** that puts a pixel-art Tamagotchi cat on your macOS desktop. No Xcode, no dependencies — one `.swift` file, compiled with `swiftc`.
 
-Think classic Tamagotchi, but on your Mac.
+The cat walks around, sleeps, plays, gets hungry, chases butterflies, knocks glasses off tables, writes a diary, and lives on top of your Dock.
 
-## Features
+**Think classic Tamagotchi, but on your Mac.**
 
-**Life simulation**
-- 6 stats: hunger, happiness, energy, social, hygiene, health
-- Gets sick if neglected, needs medicine to heal
-- Poops, needs bath, gets sleepy at night
-- Ages and evolves through 5 stages (Baby → Cosmic Murchi)
+</td>
+<td width="40%" align="center">
 
-**25+ behaviors**
-- Walking, sleeping, running, grooming, zoomies
-- Chasing butterflies, watching birds
-- Knocking glasses off tables (it's a cat)
-- Promenading on a leash, opening gifts
+```
+    ╱╲╱╲
+   ╱ ◉◉ ╲
+   │ ▼▼  │    ← Murchi
+   ╰┬──┬─╯
+    │▓▓│  ♥ ♥
+   ╱╰──╯╲
+  ╱ ╱  ╲ ╲
+```
 
-**Dock as a platform**
-- The cat walks ON TOP of your macOS Dock
-- Full physics: gravity, jumping, landing
+</td>
+</tr>
+</table>
 
-**Toys & accessories**
-- Mouse toy, yarn ball, laser pointer
-- Hats, bow ties, crowns, glasses, flowers
-- Unlock more as you level up
+---
 
-**Cat diary**
-- Murchi writes a personal blog about its day
-- Entries about meals, play, sickness, butterflies, birthdays
-- Full scrollable diary window with timestamps
+<br>
 
-**Particles & effects**
-- Hearts, stars, sparkles, poof clouds
-- Paw prints when walking
-- Sleep Z particles
-- Birthday confetti
+<h2 align="center">Features</h2>
 
-**Interactions**
-- Click to pet (multi-click for extra love)
-- Right-click for full action menu: feed, play, bathe, heal, walk, toys, accessories
-- Drag the cat around your screen
-- Cmd+Shift+M to summon to cursor
-- Hover to see animated stat bars
+<br>
 
-## Build
+<table>
+<tr>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/video-game_1f3ae.png"><br><br>
+<strong>25+ Behaviors</strong><br>
+<sub>Walk, sleep, zoomies, groom, chase butterflies, watch birds, knock glasses off tables</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/meat-on-bone_1f356.png"><br><br>
+<strong>Feed & Care</strong><br>
+<sub>Fish, milk, treats. 6 stats: hunger, happiness, energy, social, hygiene, health</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/yarn_1f9f6.png"><br><br>
+<strong>Toys & Accessories</strong><br>
+<sub>Mouse, yarn, laser. Hats, bow ties, crowns, glasses, flowers</sub><br><br>
+</td>
+</tr>
+<tr>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/open-book_1f4d6.png"><br><br>
+<strong>Cat Diary</strong><br>
+<sub>Personal blog about meals, play, sickness, butterflies, birthdays</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/sparkles_2728.png"><br><br>
+<strong>Particle Magic</strong><br>
+<sub>Hearts, stars, sparkles, paw prints, sleep Z particles, confetti</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/desktop-computer_1f5a5-fe0f.png"><br><br>
+<strong>Lives on Your Dock</strong><br>
+<sub>Walks on macOS Dock as a physical platform with gravity</sub><br><br>
+</td>
+</tr>
+<tr>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/chart-increasing_1f4c8.png"><br><br>
+<strong>Level Up</strong><br>
+<sub>XP system, 5 evolution stages: Baby to Cosmic Murchi</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/speech-balloon_1f4ac.png"><br><br>
+<strong>Speech Bubbles</strong><br>
+<sub>Murchi talks, reacts to petting, greets you when you return</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="40" src="https://em-content.zobj.net/source/apple/391/butterfly_1f98b.png"><br><br>
+<strong>Cute Events</strong><br>
+<sub>Butterflies, birds, gifts, glass knocking, birthday celebrations</sub><br><br>
+</td>
+</tr>
+</table>
 
-No Xcode needed. Just:
+<br>
+
+---
+
+<br>
+
+## Quick Start
 
 ```bash
-# Quick run (compile + launch)
+# Clone
+git clone https://github.com/egorfedorov/murchi.git
+cd murchi
+
+# Run (compile + launch)
 bash run.sh
 
-# Build .app bundle + DMG
+# Or build .app + .dmg
 bash build-app.sh
 ```
 
-Requires macOS 12+ and Xcode Command Line Tools (`xcode-select --install`).
+> Requires **macOS 12+** and Xcode Command Line Tools: `xcode-select --install`
+
+Or just [**download the DMG**](https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg) from Releases.
+
+<br>
 
 ## Architecture
 
-Everything is in **one file**: `Murchi.swift` (~4000 lines).
-
-- Pixel art sprites as `[[UInt32]]` arrays
-- `NSPanel` with borderless style for desktop overlay
-- Window level above the Dock
-- Physics engine with gravity and platform detection
-- Particle system for visual effects
-- `Codable` JSON persistence to `~/.murchi/stats.json`
-- Carbon `EventHotKeyID` for global hotkey
-- `NSAttributedString` styled diary window
-- Auto-milestone system for diary entries
-- 10-language website at `docs/index.html`
-
-## Project structure
+Everything lives in **one file**: `Murchi.swift` (~4000 lines)
 
 ```
-Murchi.swift          — the entire app (single file)
-generate-icon.swift   — generates AppIcon.icns from pixel art
-build-app.sh          — builds .app bundle and .dmg
-run.sh                — quick compile and run
-docs/                 — website (murchi.pet via GitHub Pages)
-  index.html          — landing page with interactive demo
-  CNAME               — custom domain config
+Murchi.swift            the entire app
+generate-icon.swift     pixel-art icon generator
+build-app.sh            .app bundle + .dmg builder
+run.sh                  compile & launch
+docs/                   murchi.pet website (GitHub Pages)
 ```
 
-## Website
+| Layer | Tech |
+|-------|------|
+| Rendering | Pixel art as `[[UInt32]]` → `NSImage` |
+| Window | `NSPanel` borderless, above Dock level |
+| Physics | Custom gravity + platform detection |
+| Particles | Hearts, stars, sparkles system |
+| Persistence | `Codable` JSON → `~/.murchi/stats.json` |
+| Hotkey | Carbon `EventHotKeyID` (Cmd+Shift+M) |
+| Diary | `NSAttributedString` styled window |
+| Website | Single HTML + vanilla JS, 10 languages |
 
-The landing page at [murchi.pet](https://murchi.pet) includes an interactive demo where a pixel cat walks around inside a fake macOS desktop. Click it to see hearts and stat bars. Built as a single HTML file with vanilla JS.
-
-Hosted via GitHub Pages from the `docs/` folder.
-
-## Domain setup
-
-To connect `murchi.pet` to GitHub Pages:
-
-1. In your domain registrar, add DNS records:
-   - **A records** pointing to GitHub Pages IPs:
-     ```
-     185.199.108.153
-     185.199.109.153
-     185.199.110.153
-     185.199.111.153
-     ```
-   - **CNAME** for `www` → `egorfedorov.github.io`
-2. In GitHub repo Settings → Pages → Custom domain: enter `murchi.pet`
-3. Enable "Enforce HTTPS"
-
-The `docs/CNAME` file is already configured.
+<br>
 
 ## License
 
-**CC BY-NC-ND 4.0** — You can view the source and build for personal use, but you cannot commercially distribute, modify, or create derivative works. See [LICENSE](LICENSE).
+**CC BY-NC-ND 4.0** — View source and build for personal use. Cannot commercially distribute, modify, or create derivative works. See [LICENSE](LICENSE).
 
 ---
 
 <p align="center">
-  <sub>Made with love for cats everywhere &middot; <a href="https://murchi.pet">murchi.pet</a> &middot; &copy; 2026 Egor Fedorov</sub>
+  <sub>Made with love for cats everywhere</sub><br>
+  <a href="https://murchi.pet"><strong>murchi.pet</strong></a><br>
+  <sub>&copy; 2026 Egor Fedorov</sub>
 </p>

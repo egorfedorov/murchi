@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 220">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f2e"/>
+      <stop offset="50%" style="stop-color:#1a1040"/>
+      <stop offset="100%" style="stop-color:#0a0a20"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a78bfa"/>
+      <stop offset="50%" style="stop-color:#f472b6"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="220" rx="16" fill="url(#bg)"/>
+  <rect width="700" height="220" rx="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Stars -->
+  <g opacity="0.5">
+    <circle cx="50" cy="30" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="150" cy="60" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/></circle>
+    <circle cx="280" cy="25" r="1.2" fill="white"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="4s" repeatCount="indefinite"/></circle>
+    <circle cx="420" cy="45" r="0.7" fill="white"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="550" cy="20" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="630" cy="55" r="0.9" fill="white"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="100" cy="85" r="0.6" fill="white"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/></circle>
+    <circle cx="600" cy="90" r="1.1" fill="white"><animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.2s" repeatCount="indefinite"/></circle>
+    <circle cx="350" cy="15" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle cx="480" cy="75" r="0.7" fill="white"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.2s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- Pixel Cat (16x14 grid, each pixel 5px, positioned left) -->
+  <g transform="translate(60, 55) scale(5)" filter="url(#glow)">
+    <!-- Ears -->
+    <rect x="2" y="0" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="0" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="11" y="0" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="12" y="0" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Ear row 2 -->
+    <rect x="1" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="1" width="1" height="1" fill="#9898B0"/>
+    <rect x="3" y="1" width="1" height="1" fill="#9898B0"/>
+    <rect x="4" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="10" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="11" y="1" width="1" height="1" fill="#9898B0"/>
+    <rect x="12" y="1" width="1" height="1" fill="#9898B0"/>
+    <rect x="13" y="1" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Head top -->
+    <rect x="1" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="3" y="2" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="4" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="5" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="6" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="7" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="8" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="9" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="10" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="11" y="2" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="12" y="2" width="1" height="1" fill="#9898B0"/>
+    <rect x="13" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Head -->
+    <rect x="1" y="3" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="3" width="12" height="1" fill="#9898B0"/>
+    <rect x="13" y="3" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Eyes -->
+    <rect x="1" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="2" y="4" width="2" height="1" fill="#9898B0"/>
+    <rect x="4" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="5" y="4" width="1" height="1" fill="#88DD88"/>
+    <rect x="6" y="4" width="4" height="1" fill="#9898B0"/>
+    <rect x="10" y="4" width="1" height="1" fill="#88DD88"/>
+    <rect x="11" y="4" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="12" y="4" width="2" height="1" fill="#9898B0"/>
+    <!-- Muzzle -->
+    <rect x="2" y="5" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="5" width="3" height="1" fill="#9898B0"/>
+    <rect x="6" y="5" width="2" height="1" fill="#F0F0F8"/>
+    <rect x="8" y="5" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="5" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Nose -->
+    <rect x="2" y="6" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="6" width="3" height="1" fill="#9898B0"/>
+    <rect x="6" y="6" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="7" y="6" width="1" height="1" fill="#FFBBCC"/>
+    <rect x="8" y="6" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="6" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Collar -->
+    <rect x="4" y="7" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="5" y="7" width="5" height="1" fill="#FFDD33"/>
+    <rect x="10" y="7" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Body -->
+    <rect x="3" y="8" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="4" y="8" width="3" height="1" fill="#9898B0"/>
+    <rect x="7" y="8" width="1" height="1" fill="#55AAFF"/>
+    <rect x="8" y="8" width="3" height="1" fill="#9898B0"/>
+    <rect x="11" y="8" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Body 2 -->
+    <rect x="2" y="9" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="9" width="10" height="1" fill="#9898B0"/>
+    <rect x="12" y="9" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Paws -->
+    <rect x="2" y="10" width="1" height="1" fill="#2D2D3F"/>
+    <rect x="3" y="10" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="4" y="10" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="5" y="10" width="5" height="1" fill="#9898B0"/>
+    <rect x="10" y="10" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="11" y="10" width="1" height="1" fill="#F0F0F8"/>
+    <rect x="12" y="10" width="1" height="1" fill="#2D2D3F"/>
+    <!-- Base -->
+    <rect x="3" y="11" width="10" height="1" fill="#2D2D3F"/>
+
+    <!-- Blink animation - cover eyes periodically -->
+    <rect x="5" y="4" width="1" height="1" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="10" y="4" width="1" height="1" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Cat breathing animation -->
+  <g transform="translate(60, 55)">
+    <animateTransform attributeName="transform" type="translate" values="60,55;60,53;60,55" dur="2.5s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Floating hearts -->
+  <g filter="url(#softglow)">
+    <text x="155" y="75" font-size="14" fill="#ff5a80" opacity="0.8">
+      <animate attributeName="y" values="75;55;75" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
+      &#9829;
+    </text>
+    <text x="140" y="60" font-size="10" fill="#ff5a80" opacity="0.5">
+      <animate attributeName="y" values="60;42;60" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
+      &#9829;
+    </text>
+    <text x="162" y="90" font-size="8" fill="#a78bfa" opacity="0.6">
+      <animate attributeName="y" values="90;70;90" dur="3.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.5s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+  </g>
+
+  <!-- Title -->
+  <text x="350" y="90" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="52" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
+
+  <!-- Subtitle -->
+  <text x="350" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#94a3b8" text-anchor="middle" font-weight="300">Desktop Tamagotchi Cat for macOS</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(350, 145)" text-anchor="middle">
+    <!-- Pill backgrounds -->
+    <rect x="-228" y="0" width="90" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
+    <rect x="-128" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
+    <rect x="-28" y="0" width="90" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+    <rect x="72" y="0" width="90" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
+    <rect x="172" y="0" width="60" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+    <!-- Pill text -->
+    <text x="-183" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">25+ behaviors</text>
+    <text x="-83" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">cat diary</text>
+    <text x="17" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">pixel art</text>
+    <text x="117" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single file</text>
+    <text x="202" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">free</text>
+  </g>
+
+  <!-- Bottom URL -->
+  <text x="350" y="198" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
+</svg>
