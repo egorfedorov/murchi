@@ -188,16 +188,43 @@
             font-size: 13px;
             color: var(--text-dim);
         }
-        .appstore-badge {
-            display: inline-block;
+        .cta-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
             margin-top: 20px;
-            padding: 10px 20px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-dim);
-            font-size: 13px;
+            flex-wrap: wrap;
         }
-        .appstore-badge strong { color: var(--text); }
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            background: rgba(255,255,255,0.04);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .github-btn:hover {
+            border-color: var(--yellow);
+            background: rgba(251,191,36,0.08);
+            transform: translateY(-2px);
+        }
+        .github-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .github-btn .star-icon { color: var(--yellow); font-size: 16px; }
+        .github-sub {
+            display: block;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
 
         /* ── Interactive Demo ── */
         .demo-section {
@@ -762,8 +789,16 @@
             <span class="download-sub">v2.0 &middot; DMG &middot; macOS 12+</span>
         </span>
     </a>
-    <br>
-    <div class="appstore-badge" data-i18n="appstore"><strong>App Store</strong> — coming soon</div>
+    <div class="cta-row">
+        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="github-btn">
+            <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <span>
+                <span data-i18n="github_star">Star on GitHub</span>
+                <span class="github-sub" data-i18n="github_sub">Help Murchi grow!</span>
+            </span>
+            <span class="star-icon">&#9733;</span>
+        </a>
+    </div>
 </section>
 
 <!-- Interactive Demo -->
@@ -1353,7 +1388,8 @@ const translations = {
     en: {
         tagline: "Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.",
         download: "Download for macOS",
-        appstore: "<strong>App Store</strong> — coming soon",
+        github_star: "Star on GitHub",
+        github_sub: "Help Murchi grow!",
         demo_label: "Live Preview — click the cat!",
         click_hint: "Click the cat to pet it",
         features_title: "Everything a Cat Needs",
@@ -1399,7 +1435,8 @@ const translations = {
     ru: {
         tagline: "Тамагочи на рабочем столе. Пиксельный кот для macOS. Корми, играй, люби.",
         download: "Скачать для macOS",
-        appstore: "<strong>App Store</strong> — скоро",
+        github_star: "Звезда на GitHub",
+        github_sub: "Помоги Murchi расти!",
         demo_label: "Живое превью — кликни на кота!",
         click_hint: "Нажми на кота, чтобы погладить",
         features_title: "Все, что нужно коту",
@@ -1445,7 +1482,8 @@ const translations = {
     es: {
         tagline: "Tu Tamagotchi de escritorio. Un gato pixel para macOS. Alimenta, juega, ama.",
         download: "Descargar para macOS",
-        appstore: "<strong>App Store</strong> — proximamente",
+        github_star: "Estrella en GitHub",
+        github_sub: "Ayuda a Murchi a crecer!",
         demo_label: "Vista previa en vivo — haz clic en el gato!",
         click_hint: "Haz clic en el gato para acariciarlo",
         features_title: "Todo lo que un gato necesita",
@@ -1474,7 +1512,8 @@ const translations = {
     zh: {
         tagline: "桌面上的电子宠物。macOS上的像素猫。喂食、玩耍、爱护。",
         download: "下载 macOS 版",
-        appstore: "<strong>App Store</strong> — 即将上线",
+        github_star: "GitHub 上加星",
+        github_sub: "帮助 Murchi 成长！",
         demo_label: "实时预览 — 点击猫咪！",
         click_hint: "点击猫咪来抚摸它",
         features_title: "猫咪所需的一切",
@@ -1503,7 +1542,8 @@ const translations = {
     ja: {
         tagline: "デスクトップのたまごっち。macOSのピクセル猫。餌をあげて、遊んで、愛して。",
         download: "macOS版をダウンロード",
-        appstore: "<strong>App Store</strong> — 近日公開",
+        github_star: "GitHub でスターを",
+        github_sub: "Murchi を応援しよう！",
         demo_label: "ライブプレビュー — 猫をクリック！",
         click_hint: "猫をクリックして撫でよう",
         features_title: "猫に必要な全て",
@@ -1532,7 +1572,8 @@ const translations = {
     ko: {
         tagline: "데스크탑 다마고치. macOS의 픽셀 고양이. 먹이주고, 놀아주고, 사랑하세요.",
         download: "macOS용 다운로드",
-        appstore: "<strong>App Store</strong> — 곧 출시",
+        github_star: "GitHub 스타",
+        github_sub: "Murchi 성장을 도와주세요!",
         demo_label: "라이브 미리보기 — 고양이를 클릭하세요!",
         click_hint: "고양이를 클릭해서 쓰다듬기",
         features_title: "고양이에게 필요한 모든 것",
@@ -1561,7 +1602,8 @@ const translations = {
     de: {
         tagline: "Dein Desktop-Tamagotchi. Eine Pixel-Katze fur macOS. Futtern, spielen, lieben.",
         download: "Fur macOS herunterladen",
-        appstore: "<strong>App Store</strong> — kommt bald",
+        github_star: "Stern auf GitHub",
+        github_sub: "Hilf Murchi zu wachsen!",
         demo_label: "Live-Vorschau — klick die Katze!",
         click_hint: "Klicke die Katze zum Streicheln",
         features_title: "Alles was eine Katze braucht",
@@ -1590,7 +1632,8 @@ const translations = {
     fr: {
         tagline: "Votre Tamagotchi de bureau. Un chat pixel pour macOS. Nourrir, jouer, aimer.",
         download: "Telecharger pour macOS",
-        appstore: "<strong>App Store</strong> — bientot",
+        github_star: "Etoile sur GitHub",
+        github_sub: "Aidez Murchi a grandir !",
         demo_label: "Apercu en direct — cliquez sur le chat !",
         click_hint: "Cliquez sur le chat pour le caresser",
         features_title: "Tout ce dont un chat a besoin",
@@ -1619,7 +1662,8 @@ const translations = {
     pt: {
         tagline: "Seu Tamagotchi de desktop. Um gato pixel para macOS. Alimente, brinque, ame.",
         download: "Baixar para macOS",
-        appstore: "<strong>App Store</strong> — em breve",
+        github_star: "Estrela no GitHub",
+        github_sub: "Ajude o Murchi a crescer!",
         demo_label: "Preview ao vivo — clique no gato!",
         click_hint: "Clique no gato para acariciar",
         features_title: "Tudo que um gato precisa",
@@ -1648,7 +1692,8 @@ const translations = {
     tr: {
         tagline: "Masaustu Tamagotchi'niz. macOS icin piksel kedi. Besle, oyna, sev.",
         download: "macOS icin indir",
-        appstore: "<strong>App Store</strong> — yakinda",
+        github_star: "GitHub'da Yildiz",
+        github_sub: "Murchi'nin buyumesine yardim edin!",
         demo_label: "Canli onizleme — kediye tikla!",
         click_hint: "Kediye tiklayarak oksa",
         features_title: "Bir kedinin ihtiyaci olan her sey",
