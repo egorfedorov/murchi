@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murchi — Desktop Tamagotchi Cat for macOS</title>
+    <meta name="description" content="Murchi is a pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
+    <meta name="keywords" content="tamagotchi, desktop pet, virtual pet, pixel cat, macOS pet, desktop tamagotchi, murchi, digital pet, virtual cat">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #08081a;
+            --bg-card: #111128;
+            --purple: #7c5cbf;
+            --purple-light: #a78bfa;
+            --blue: #3b82f6;
+            --pink: #f472b6;
+            --green: #34d399;
+            --yellow: #fbbf24;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: rgba(255,255,255,0.06);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Ambient background */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .ambient-orb:nth-child(1) {
+            width: 600px; height: 600px;
+            background: #7c5cbf;
+            top: -200px; left: -100px;
+        }
+        .ambient-orb:nth-child(2) {
+            width: 500px; height: 500px;
+            background: #3b82f6;
+            bottom: -150px; right: -100px;
+            animation-delay: -7s;
+        }
+        .ambient-orb:nth-child(3) {
+            width: 400px; height: 400px;
+            background: #f472b6;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.05); }
+            66% { transform: translate(-20px, 30px) scale(0.95); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Language switcher */
+        .lang-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(8, 8, 26, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 0;
+        }
+        .lang-bar .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-dim);
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .lang-btn:hover { color: var(--text); border-color: var(--border); }
+        .lang-btn.active {
+            color: white;
+            background: rgba(124, 92, 191, 0.3);
+            border-color: var(--purple);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 0 40px;
+        }
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple-light), var(--pink), var(--yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -3px;
+        }
+        .hero .tagline {
+            font-size: 22px;
+            color: var(--text-dim);
+            font-weight: 300;
+            max-width: 520px;
+            margin: 0 auto 36px;
+        }
+
+        /* Download button */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            color: white;
+            text-decoration: none;
+            font-size: 19px;
+            font-weight: 600;
+            padding: 16px 36px;
+            border-radius: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 30px rgba(124, 92, 191, 0.4);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(124, 92, 191, 0.6);
+        }
+        .download-btn svg { width: 22px; height: 22px; }
+        .download-sub {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        .appstore-badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+        .appstore-badge strong { color: var(--text); }
+
+        /* ── Interactive Demo ── */
+        .demo-section {
+            padding: 40px 0 60px;
+        }
+        .demo-label {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .desktop-frame {
+            position: relative;
+            max-width: 820px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.08),
+                0 20px 80px rgba(0, 0, 0, 0.6),
+                0 0 120px rgba(124, 92, 191, 0.08);
+        }
+        /* Titlebar */
+        .desktop-titlebar {
+            background: linear-gradient(180deg, #3a3a4a, #2a2a3a);
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 7px;
+        }
+        .tb-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .tb-dot.r { background: #ff5f57; }
+        .tb-dot.y { background: #febc2e; }
+        .tb-dot.g { background: #28c840; }
+        .desktop-titlebar-text {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+            margin-right: 50px;
+        }
+        /* Canvas area */
+        .desktop-screen {
+            position: relative;
+            background: linear-gradient(180deg, #1a1a3e 0%, #0e0e2a 60%, #16162e 100%);
+            height: 420px;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Wallpaper decorations */
+        .wallpaper-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(124, 92, 191, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+        }
+        .wallpaper-dots {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        /* Fake dock */
+        .fake-dock {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .dock-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: transform 0.15s;
+        }
+        .dock-icon:hover { transform: scale(1.3) translateY(-6px); }
+        .dock-icon.finder { background: linear-gradient(135deg, #35a8f0, #1d7dd9); }
+        .dock-icon.safari { background: linear-gradient(135deg, #54b5f0, #2d8fd9); }
+        .dock-icon.music { background: linear-gradient(135deg, #fa5c5c, #d93b3b); }
+        .dock-icon.terminal { background: linear-gradient(135deg, #2d2d3f, #1a1a2e); }
+        .dock-icon.notes { background: linear-gradient(135deg, #fdd835, #e6b800); }
+
+        /* Cat canvas */
+        #demo-canvas {
+            position: absolute;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            pointer-events: none;
+        }
+        /* Particles */
+        .demo-particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 14px;
+            animation: particleUp 1s ease-out forwards;
+            z-index: 10;
+        }
+        @keyframes particleUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
+        }
+        /* Speech bubble */
+        .demo-bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.95);
+            color: #1a1a2e;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: bubblePop 2.5s ease-out forwards;
+            z-index: 10;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .demo-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(255,255,255,0.95);
+        }
+        @keyframes bubblePop {
+            0% { opacity: 0; transform: translateY(4px) scale(0.8); }
+            10% { opacity: 1; transform: translateY(0) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-6px); }
+        }
+        /* Stat bars overlay */
+        .demo-stats {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .demo-stats.visible { opacity: 1; }
+        .demo-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+        .demo-stat-icon { width: 14px; text-align: center; }
+        .demo-stat-bar {
+            width: 60px; height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .demo-stat-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        .demo-stat-pct {
+            font-size: 9px;
+            color: rgba(255,255,255,0.6);
+            font-family: 'SF Mono', monospace;
+            min-width: 24px;
+        }
+        /* Click hint */
+        .click-hint {
+            position: absolute;
+            bottom: 76px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            animation: hintPulse 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Sections */
+        .section {
+            padding: 70px 0;
+        }
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 16px;
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Feature cards — bento grid */
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px 24px;
+            transition: border-color 0.3s, transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(124, 92, 191, 0.06), transparent 70%);
+            pointer-events: none;
+        }
+        .bento-card:hover {
+            border-color: rgba(124, 92, 191, 0.25);
+            transform: translateY(-2px);
+        }
+        .bento-card.wide { grid-column: span 2; }
+        .bento-icon {
+            font-size: 32px;
+            margin-bottom: 14px;
+        }
+        .bento-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .bento-card p {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* Install steps */
+        .steps {
+            display: grid;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 22px;
+            transition: border-color 0.3s;
+        }
+        .step:hover { border-color: rgba(124, 92, 191, 0.2); }
+        .step-num {
+            width: 36px; height: 36px; min-width: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .step-text {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+        .step-text strong { color: var(--text); }
+
+        /* Pay what you want */
+        .pay-section { text-align: center; padding: 60px 0; }
+        .pay-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 44px 32px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .charity-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(251, 191, 36, 0.12));
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 24px;
+            padding: 7px 18px;
+            font-size: 13px;
+            color: var(--green);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .pay-card h2 { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+        .pay-card .subtitle {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+        .crypto-grid { display: grid; gap: 10px; margin-top: 20px; }
+        .crypto-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .crypto-row:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+        }
+        .crypto-icon {
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 12px; min-width: 34px;
+        }
+        .crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #e68a00); }
+        .crypto-icon.eth { background: linear-gradient(135deg, #627eea, #4c64c8); }
+        .crypto-icon.sol { background: linear-gradient(135deg, #9945ff, #14f195); }
+        .crypto-info { flex: 1; text-align: left; }
+        .crypto-label { font-size: 13px; font-weight: 600; }
+        .crypto-addr {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.07);
+            border: none;
+            color: var(--text-dim);
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+        .copy-btn.copied { background: rgba(52, 211, 153, 0.2); color: var(--green); }
+        .charity-note {
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(52, 211, 153, 0.04);
+            border: 1px solid rgba(52, 211, 153, 0.12);
+            border-radius: 12px;
+            font-size: 13px;
+            color: var(--green);
+        }
+
+        /* Donation wall */
+        .donations-section { padding: 40px 0; text-align: center; }
+        .donations-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .empty-donations {
+            color: var(--text-dim);
+            font-size: 14px;
+            padding: 20px 0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 12px;
+        }
+        footer a { color: var(--purple-light); text-decoration: none; }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 48px; letter-spacing: -2px; }
+            .hero .tagline { font-size: 17px; }
+            .desktop-screen { height: 320px; }
+            .bento { grid-template-columns: 1fr; }
+            .bento-card.wide { grid-column: span 1; }
+            .download-btn { font-size: 16px; padding: 14px 28px; }
+            .fake-dock { gap: 6px; padding: 5px 10px; }
+            .dock-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 38px; }
+            .desktop-screen { height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Ambient bg -->
+<div class="ambient">
+    <div class="ambient-orb"></div>
+    <div class="ambient-orb"></div>
+    <div class="ambient-orb"></div>
+</div>
+
+<!-- Language bar -->
+<div class="lang-bar">
+    <div class="container">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="ru">Русский</button>
+        <button class="lang-btn" data-lang="es">Espanol</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="ja">日本語</button>
+        <button class="lang-btn" data-lang="ko">한국어</button>
+        <button class="lang-btn" data-lang="de">Deutsch</button>
+        <button class="lang-btn" data-lang="fr">Francais</button>
+        <button class="lang-btn" data-lang="pt">Portugues</button>
+        <button class="lang-btn" data-lang="tr">Turkce</button>
+    </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+    <h1>Murchi</h1>
+    <p class="tagline" data-i18n="tagline">Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.</p>
+    <a href="Murchi.dmg" class="download-btn" id="download-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>
+            <span data-i18n="download">Download for macOS</span>
+            <span class="download-sub">v2.0 &middot; DMG &middot; macOS 12+</span>
+        </span>
+    </a>
+    <br>
+    <div class="appstore-badge" data-i18n="appstore"><strong>App Store</strong> — coming soon</div>
+</section>
+
+<!-- Interactive Demo -->
+<section class="demo-section">
+    <div class="container">
+        <p class="demo-label" data-i18n="demo_label">Live Preview — click the cat!</p>
+        <div class="desktop-frame">
+            <div class="desktop-titlebar">
+                <div class="tb-dot r"></div>
+                <div class="tb-dot y"></div>
+                <div class="tb-dot g"></div>
+                <div class="desktop-titlebar-text">macOS Desktop</div>
+            </div>
+            <div class="desktop-screen" id="desktop-screen">
+                <div class="wallpaper-grid"></div>
+                <div class="wallpaper-dots"></div>
+                <canvas id="demo-canvas" width="64" height="64"></canvas>
+                <div class="demo-stats" id="demo-stats"></div>
+                <div class="click-hint" id="click-hint" data-i18n="click_hint">Click the cat to pet it</div>
+                <div class="fake-dock">
+                    <div class="dock-icon finder">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="10" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="white" stroke="none"/><path d="M9 15c1.5 1.5 4.5 1.5 6 0"/></svg>
+                    </div>
+                    <div class="dock-icon safari">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M16 8l-6 2.5L8 16l6-2.5z" fill="rgba(255,255,255,0.3)"/></svg>
+                    </div>
+                    <div class="dock-icon music">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <div class="dock-icon terminal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    </div>
+                    <div class="dock-icon notes">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="section reveal">
+    <div class="container">
+        <h2 class="section-title" data-i18n="features_title">Everything a Cat Needs</h2>
+        <p class="section-subtitle" data-i18n="features_subtitle">A full Tamagotchi experience right on your desktop</p>
+        <div class="bento">
+            <div class="bento-card wide">
+                <div class="bento-icon">🎮</div>
+                <h3 data-i18n="f1_title">25+ Behaviors</h3>
+                <p data-i18n="f1_desc">Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">🐟</div>
+                <h3 data-i18n="f2_title">Feed & Care</h3>
+                <p data-i18n="f2_desc">Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">🧶</div>
+                <h3 data-i18n="f3_title">Toys & Accessories</h3>
+                <p data-i18n="f3_desc">Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.</p>
+            </div>
+            <div class="bento-card wide">
+                <div class="bento-icon">📖</div>
+                <h3 data-i18n="f7_title">Cat Diary</h3>
+                <p data-i18n="f7_desc">Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">⬆️</div>
+                <h3 data-i18n="f4_title">Level Up & Evolve</h3>
+                <p data-i18n="f4_desc">Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">✨</div>
+                <h3 data-i18n="f5_title">Particle Magic</h3>
+                <p data-i18n="f5_desc">Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">🖥️</div>
+                <h3 data-i18n="f8_title">Lives on Your Dock</h3>
+                <p data-i18n="f8_desc">Walks on the macOS Dock as a physical platform. Falls off the edges!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Install -->
+<section class="section reveal">
+    <div class="container">
+        <h2 class="section-title" data-i18n="install_title">Get Started in Seconds</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text" data-i18n="step1">Download <strong>Murchi.dmg</strong> above</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text" data-i18n="step2">Open the DMG and drag <strong>Murchi</strong> to Applications</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text" data-i18n="step3">Launch it. If macOS blocks: <strong>Settings > Privacy > Open Anyway</strong></div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text" data-i18n="step4">Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pay what you want -->
+<section class="pay-section reveal">
+    <div class="pay-card">
+        <div class="charity-badge" data-i18n="charity_badge">50% goes to animal charity</div>
+        <h2 data-i18n="pay_title">Pay What You Want</h2>
+        <p class="subtitle" data-i18n="pay_subtitle">Murchi is free forever. Support development if you'd like — half goes to animal rescue.</p>
+        <div class="crypto-grid">
+            <div class="crypto-row" onclick="copyAddr(this, 'bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d')">
+                <div class="crypto-icon btc">BTC</div>
+                <div class="crypto-info">
+                    <div class="crypto-label">Bitcoin</div>
+                    <div class="crypto-addr">bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d</div>
+                </div>
+                <button class="copy-btn" data-i18n="copy">Copy</button>
+            </div>
+            <div class="crypto-row" onclick="copyAddr(this, '0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91')">
+                <div class="crypto-icon eth">ETH</div>
+                <div class="crypto-info">
+                    <div class="crypto-label">ETH / USDT / USDC</div>
+                    <div class="crypto-addr">0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91</div>
+                </div>
+                <button class="copy-btn" data-i18n="copy">Copy</button>
+            </div>
+            <div class="crypto-row" onclick="copyAddr(this, 'CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9')">
+                <div class="crypto-icon sol">SOL</div>
+                <div class="crypto-info">
+                    <div class="crypto-label">Solana</div>
+                    <div class="crypto-addr">CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9</div>
+                </div>
+                <button class="copy-btn" data-i18n="copy">Copy</button>
+            </div>
+        </div>
+        <div class="charity-note" data-i18n="charity_note">50% of every donation goes to animal shelters and rescue organizations</div>
+    </div>
+</section>
+
+<!-- Donations -->
+<section class="donations-section reveal">
+    <div class="donations-card">
+        <h2 class="section-title" data-i18n="donations_title">Donation Wall</h2>
+        <p class="empty-donations" data-i18n="donations_empty">Be the first to support Murchi and help animals!</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p>&copy; 2026 <a href="https://murchi.pet">murchi.pet</a> &middot; <span data-i18n="footer_made">Made with love for cats everywhere</span></p>
+    </div>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  INTERACTIVE CAT DEMO
+// ══════════════════════════════════════════════
+
+(function() {
+    const screen = document.getElementById('desktop-screen');
+    const canvas = document.getElementById('demo-canvas');
+    const ctx = canvas.getContext('2d');
+    const statsEl = document.getElementById('demo-stats');
+    const hintEl = document.getElementById('click-hint');
+
+    const SCALE = 4;
+    canvas.width = 16 * SCALE;
+    canvas.height = 16 * SCALE;
+    canvas.style.width = (16 * SCALE) + 'px';
+    canvas.style.height = (16 * SCALE) + 'px';
+
+    // Sprites
+    const T = 0, B = 0x2D2D3F, G = 0x9898B0, GD = 0x7E7E98, P = 0xFFBBCC, W = 0xF0F0F8;
+    const GR = 0x88DD88, Y = 0xFFDD33, BL = 0x55AAFF;
+
+    const sprites = {
+        idle: [
+            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
+            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
+            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
+            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
+            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
+            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
+            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+        ],
+        walk1: [
+            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
+            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
+            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
+            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
+            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
+            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,B,W,W,B,G,G,G,G,G,G,B,W,W,B,T],
+            [T,T,B,B,T,B,B,B,B,B,B,T,B,B,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+        ],
+        walk2: [
+            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
+            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
+            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
+            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
+            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
+            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
+            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,W,B,G,G,G,G,G,G,B,W,B,T,T],
+            [T,T,T,B,T,T,B,B,B,B,T,T,B,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+        ],
+        happy: [
+            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
+            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
+            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,B,G,G,B,B,G,G,G,G,B,B,G,G,B,T],
+            [T,B,G,G,G,B,G,G,G,G,B,G,G,G,B,T],
+            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
+            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
+            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
+            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
+            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
+            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+        ],
+        sleep: [
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
+            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
+            [T,B,G,G,B,B,B,B,B,B,B,B,G,G,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,B,G,B,B,B,G,G,G,G,B,B,B,G,B,T],
+            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
+            [T,T,B,G,G,G,G,P,P,G,G,G,G,B,T,T],
+            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
+            [T,B,B,G,G,G,G,G,G,G,G,G,G,B,B,T],
+            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
+            [T,T,B,B,B,B,B,B,B,B,B,B,B,B,T,T],
+        ],
+    };
+
+    function drawSprite(data, flipX) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < 16; y++) {
+            for (let x = 0; x < 16; x++) {
+                const hex = data[y][x];
+                if (!hex) continue;
+                const r = (hex >> 16) & 0xFF;
+                const g = (hex >> 8) & 0xFF;
+                const b = hex & 0xFF;
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                const px = flipX ? (15 - x) : x;
+                ctx.fillRect(px * SCALE, y * SCALE, SCALE, SCALE);
+            }
+        }
+    }
+
+    // Cat state
+    const rect = screen.getBoundingClientRect;
+    let catX = 300, catY = 0;
+    let targetX = null;
+    let facingRight = true;
+    let behavior = 'idle'; // idle, walking, sleeping, happy
+    let frame = 0;
+    let behaviorTimer = 0;
+    let showStats = false;
+    let statsTimer = 0;
+    let hintHidden = false;
+
+    // Stats
+    const demoStats = {
+        food: 72, happy: 85, energy: 60, social: 55, clean: 90, health: 95
+    };
+    const statColors = {
+        food: '#ff8c40', happy: '#ff5a80', energy: '#4dc0ff',
+        social: '#a66dff', clean: '#40e899', health: '#ff4d5a'
+    };
+    const statIcons = {
+        food: '🍖', happy: '❤️', energy: '⚡',
+        social: '👥', clean: '🚿', health: '💚'
+    };
+
+    function buildStatsHTML() {
+        let html = '';
+        for (const [key, val] of Object.entries(demoStats)) {
+            html += `<div class="demo-stat-row" style="transform:translateX(-10px);opacity:0;animation:statSlide 0.3s ${Object.keys(demoStats).indexOf(key) * 0.06}s forwards">
+                <div class="demo-stat-icon">${statIcons[key]}</div>
+                <div class="demo-stat-bar"><div class="demo-stat-fill" style="width:${val}%;background:${statColors[key]}"></div></div>
+                <div class="demo-stat-pct">${val}%</div>
+            </div>`;
+        }
+        return html;
+    }
+
+    // Ground Y (just above dock)
+    function getGroundY() {
+        return screen.clientHeight - 72;
+    }
+    function getDockLeft() {
+        const sw = screen.clientWidth;
+        const dw = document.querySelector('.fake-dock').offsetWidth;
+        return (sw - dw) / 2;
+    }
+    function getDockRight() {
+        return getDockLeft() + document.querySelector('.fake-dock').offsetWidth;
+    }
+
+    // Position cat
+    function updateCatPosition() {
+        const groundY = getGroundY();
+        canvas.style.left = catX + 'px';
+        canvas.style.top = (groundY - canvas.height) + 'px';
+        // Stats follow cat
+        statsEl.style.left = (catX - 10) + 'px';
+        statsEl.style.top = (groundY - canvas.height - 65) + 'px';
+    }
+
+    // Particles
+    function spawnParticle(emoji, x, y) {
+        const p = document.createElement('div');
+        p.className = 'demo-particle';
+        p.textContent = emoji;
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
+        screen.appendChild(p);
+        setTimeout(() => p.remove(), 1500);
+    }
+
+    // Speech bubble
+    function showBubble(text) {
+        const b = document.createElement('div');
+        b.className = 'demo-bubble';
+        b.textContent = text;
+        b.style.left = (catX + canvas.width / 2) + 'px';
+        b.style.top = (getGroundY() - canvas.height - 24) + 'px';
+        b.style.transform = 'translateX(-50%)';
+        screen.appendChild(b);
+        setTimeout(() => b.remove(), 2500);
+    }
+
+    const bubbles = [
+        "Purrrr~", "Meow!", "Love you!", "*happy*", "More pets!",
+        "Nya~", "*purrs*", "Hehe~", "Yay!", "*nuzzle*"
+    ];
+
+    // Click handler
+    screen.addEventListener('click', function(e) {
+        const rect = screen.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        const catRight = catX + canvas.width;
+        const catTop = getGroundY() - canvas.height;
+
+        // Check if clicked on cat
+        if (clickX >= catX && clickX <= catRight && clickY >= catTop && clickY <= getGroundY()) {
+            // Pet the cat!
+            behavior = 'happy';
+            behaviorTimer = 90;
+            if (!hintHidden) {
+                hintEl.style.display = 'none';
+                hintHidden = true;
+            }
+
+            // Show stats
+            statsEl.innerHTML = buildStatsHTML();
+            statsEl.classList.add('visible');
+            showStats = true;
+            statsTimer = 120;
+
+            // Particles
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    const px = catX + 10 + Math.random() * (canvas.width - 20);
+                    const py = catTop - 5 + Math.random() * 20;
+                    spawnParticle(['❤️', '💖', '💕', '✨'][i % 4], px, py);
+                }, i * 120);
+            }
+
+            // Bubble
+            showBubble(bubbles[Math.floor(Math.random() * bubbles.length)]);
+
+            // Animate stats change
+            demoStats.happy = Math.min(100, demoStats.happy + 3);
+            demoStats.social = Math.min(100, demoStats.social + 2);
+        }
+    });
+
+    // Main loop
+    function tick() {
+        frame++;
+
+        // Behavior AI
+        if (behaviorTimer > 0) {
+            behaviorTimer--;
+            if (behaviorTimer === 0) {
+                behavior = 'idle';
+                targetX = null;
+            }
+        }
+
+        if (behavior === 'idle' && frame % 120 === 0 && Math.random() < 0.6) {
+            // Start walking
+            const sw = screen.clientWidth;
+            targetX = 40 + Math.random() * (sw - 120);
+            behavior = 'walking';
+            behaviorTimer = 300;
+        }
+
+        if (behavior === 'idle' && frame % 600 === 0 && Math.random() < 0.3) {
+            behavior = 'sleeping';
+            behaviorTimer = 200;
+        }
+
+        // Walking
+        if (behavior === 'walking' && targetX !== null) {
+            const speed = 1.2;
+            const dx = targetX - catX;
+            if (Math.abs(dx) < speed * 2) {
+                catX = targetX;
+                targetX = null;
+                behavior = 'idle';
+                behaviorTimer = 0;
+            } else {
+                catX += dx > 0 ? speed : -speed;
+                facingRight = dx > 0;
+            }
+        }
+
+        // Clamp
+        const maxX = screen.clientWidth - canvas.width - 10;
+        catX = Math.max(10, Math.min(maxX, catX));
+
+        // Draw sprite
+        let sprite;
+        if (behavior === 'sleeping') {
+            sprite = sprites.sleep;
+        } else if (behavior === 'happy') {
+            sprite = sprites.happy;
+        } else if (behavior === 'walking') {
+            sprite = (Math.floor(frame / 8) % 2 === 0) ? sprites.walk1 : sprites.walk2;
+        } else {
+            sprite = sprites.idle;
+        }
+        drawSprite(sprite, !facingRight);
+
+        // Stats timer
+        if (showStats) {
+            statsTimer--;
+            if (statsTimer <= 0) {
+                statsEl.classList.remove('visible');
+                showStats = false;
+            }
+        }
+
+        updateCatPosition();
+        requestAnimationFrame(tick);
+    }
+
+    // Init
+    catX = screen.clientWidth / 2 - canvas.width / 2;
+    updateCatPosition();
+    drawSprite(sprites.idle, false);
+
+    // Inject stat animation keyframes
+    const styleTag = document.createElement('style');
+    styleTag.textContent = `@keyframes statSlide { to { transform: translateX(0); opacity: 1; } }`;
+    document.head.appendChild(styleTag);
+
+    requestAnimationFrame(tick);
+})();
+
+
+// ══════════════════════════════════════════════
+//  SCROLL REVEAL
+// ══════════════════════════════════════════════
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+    });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+
+// ══════════════════════════════════════════════
+//  COPY ADDRESS
+// ══════════════════════════════════════════════
+function copyAddr(row, addr) {
+    navigator.clipboard.writeText(addr);
+    const btn = row.querySelector('.copy-btn');
+    btn.textContent = translations[currentLang].copied || 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+        btn.textContent = translations[currentLang].copy || 'Copy';
+        btn.classList.remove('copied');
+    }, 2000);
+}
+
+
+// ══════════════════════════════════════════════
+//  TRANSLATIONS
+// ══════════════════════════════════════════════
+const translations = {
+    en: {
+        tagline: "Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.",
+        download: "Download for macOS",
+        appstore: "<strong>App Store</strong> — coming soon",
+        demo_label: "Live Preview — click the cat!",
+        click_hint: "Click the cat to pet it",
+        features_title: "Everything a Cat Needs",
+        features_subtitle: "A full Tamagotchi experience right on your desktop",
+        f1_title: "25+ Behaviors", f1_desc: "Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.",
+        f2_title: "Feed & Care", f2_desc: "Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.",
+        f3_title: "Toys & Accessories", f3_desc: "Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.",
+        f4_title: "Level Up & Evolve", f4_desc: "Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.",
+        f5_title: "Particle Magic", f5_desc: "Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.",
+        f7_title: "Cat Diary", f7_desc: "Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.",
+        f8_title: "Lives on Your Dock", f8_desc: "Walks on the macOS Dock as a physical platform. Falls off the edges!",
+        install_title: "Get Started in Seconds",
+        step1: "Download <strong>Murchi.dmg</strong> above",
+        step2: "Open the DMG and drag <strong>Murchi</strong> to Applications",
+        step3: "Launch it. If macOS blocks: <strong>Settings > Privacy > Open Anyway</strong>",
+        step4: "Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon",
+        charity_badge: "50% goes to animal charity",
+        pay_title: "Pay What You Want",
+        pay_subtitle: "Murchi is free forever. Support development if you'd like — half goes to animal rescue.",
+        copy: "Copy", copied: "Copied!",
+        charity_note: "50% of every donation goes to animal shelters and rescue organizations",
+        donations_title: "Donation Wall",
+        donations_empty: "Be the first to support Murchi and help animals!",
+        footer_made: "Made with love for cats everywhere"
+    },
+    ru: {
+        tagline: "Тамагочи на рабочем столе. Пиксельный кот для macOS. Корми, играй, люби.",
+        download: "Скачать для macOS",
+        appstore: "<strong>App Store</strong> — скоро",
+        demo_label: "Живое превью — кликни на кота!",
+        click_hint: "Нажми на кота, чтобы погладить",
+        features_title: "Все, что нужно коту",
+        features_subtitle: "Полный тамагочи прямо на рабочем столе",
+        f1_title: "25+ действий", f1_desc: "Ходит, спит, бегает, умывается, купается, гуляет, ловит бабочек, наблюдает за птицами, скидывает стаканы со стола и многое другое.",
+        f2_title: "Корми и ухаживай", f2_desc: "Рыбка, молоко, лакомства. Следи за голодом, счастьем, энергией, гигиеной и здоровьем.",
+        f3_title: "Игрушки и аксессуары", f3_desc: "Мышка, клубок, лазер. Шляпы, бабочки, короны, очки, цветы.",
+        f4_title: "Уровни и эволюция", f4_desc: "Получай опыт за заботу. Эволюция от малыша до Космического Мурчи.",
+        f5_title: "Магия частиц", f5_desc: "Сердечки, звёзды, блёстки, облачка, следы лап, Zzz во сне.",
+        f7_title: "Дневник кота", f7_desc: "Мурчи ведёт личный блог — когда его кормили, играли, видел бабочку, заболел, праздновал день рождения. Читай как настоящий журнал питомца.",
+        f8_title: "Живёт на Доке", f8_desc: "Ходит по Доку macOS как по платформе. Падает с краёв!",
+        install_title: "Начни за секунды",
+        step1: "Скачай <strong>Murchi.dmg</strong> выше",
+        step2: "Открой DMG и перетащи <strong>Murchi</strong> в Applications",
+        step3: "Запусти. Если macOS блокирует: <strong>Настройки > Конфиденциальность > Всё равно открыть</strong>",
+        step4: "Мурчи на рабочем столе! <strong>Cmd+Shift+M</strong> чтобы позвать",
+        charity_badge: "50% на благотворительность для животных",
+        pay_title: "Заплати сколько хочешь",
+        pay_subtitle: "Мурчи бесплатен навсегда. Хотите поддержать — половина идёт на помощь животным.",
+        copy: "Копировать", copied: "Скопировано!",
+        charity_note: "50% каждого доната идёт в приюты для животных",
+        donations_title: "Стена донатов",
+        donations_empty: "Стань первым, кто поддержит Мурчи и поможет животным!",
+        footer_made: "Сделано с любовью к котикам по всему миру"
+    },
+    es: {
+        tagline: "Tu Tamagotchi de escritorio. Un gato pixel para macOS. Alimenta, juega, ama.",
+        download: "Descargar para macOS",
+        appstore: "<strong>App Store</strong> — proximamente",
+        demo_label: "Vista previa en vivo — haz clic en el gato!",
+        click_hint: "Haz clic en el gato para acariciarlo",
+        features_title: "Todo lo que un gato necesita",
+        features_subtitle: "Una experiencia Tamagotchi completa en tu escritorio",
+        f1_title: "25+ comportamientos", f1_desc: "Caminar, dormir, correr, acicalarse, banarse, pasear, perseguir mariposas, observar pajaros, tirar vasos de la mesa y mucho mas.",
+        f2_title: "Alimenta y cuida", f2_desc: "Pescado, leche, golosinas. Controla hambre, felicidad, energia, higiene y salud.",
+        f3_title: "Juguetes y accesorios", f3_desc: "Raton, ovillo, laser. Sombreros, pajaritas, coronas, gafas, flores.",
+        f4_title: "Sube de nivel", f4_desc: "Gana XP cuidando. Evoluciona de bebe a Murchi Cosmico en 5 etapas.",
+        f5_title: "Magia de particulas", f5_desc: "Corazones, estrellas, destellos, nubes, huellas, particulas Z al dormir.",
+        f7_title: "Diario del gato", f7_desc: "Murchi escribe un blog personal sobre su dia — comidas, juegos, mariposas, enfermedades, cumpleanos. Leelo como un diario real.",
+        f8_title: "Vive en tu Dock", f8_desc: "Camina sobre el Dock de macOS como plataforma. Se cae por los bordes!",
+        install_title: "Empieza en segundos",
+        step1: "Descarga <strong>Murchi.dmg</strong> arriba",
+        step2: "Abre el DMG y arrastra <strong>Murchi</strong> a Aplicaciones",
+        step3: "Abrelo. Si macOS bloquea: <strong>Ajustes > Privacidad > Abrir de todos modos</strong>",
+        step4: "Murchi aparece en tu escritorio! <strong>Cmd+Shift+M</strong> para invocarlo",
+        charity_badge: "50% va a caridad animal",
+        pay_title: "Paga lo que quieras",
+        pay_subtitle: "Murchi es gratis para siempre. Apoya el desarrollo si quieres — la mitad va al rescate animal.",
+        copy: "Copiar", copied: "Copiado!",
+        charity_note: "El 50% de cada donacion va a refugios y organizaciones de rescate animal",
+        donations_title: "Muro de donaciones",
+        donations_empty: "Se el primero en apoyar a Murchi y ayudar a los animales!",
+        footer_made: "Hecho con amor para los gatos de todo el mundo"
+    },
+    zh: {
+        tagline: "桌面上的电子宠物。macOS上的像素猫。喂食、玩耍、爱护。",
+        download: "下载 macOS 版",
+        appstore: "<strong>App Store</strong> — 即将上线",
+        demo_label: "实时预览 — 点击猫咪！",
+        click_hint: "点击猫咪来抚摸它",
+        features_title: "猫咪所需的一切",
+        features_subtitle: "桌面上的完整电子宠物体验",
+        f1_title: "25+ 种行为", f1_desc: "走路、睡觉、狂奔、梳理、洗澡、散步、追蝴蝶、看鸟、把杯子推下桌子等等。你的猫有自己的生活。",
+        f2_title: "喂食和照顾", f2_desc: "鱼、牛奶、零食。管理饥饿、快乐、能量、卫生和健康。",
+        f3_title: "玩具和配饰", f3_desc: "玩具鼠、毛线球、激光笔。帽子、领结、皇冠、眼镜、花朵。",
+        f4_title: "升级进化", f4_desc: "通过照顾获取经验。从宝宝进化到宇宙Murchi，共5个阶段。",
+        f5_title: "粒子魔法", f5_desc: "爱心、星星、闪光、烟雾、爪印、睡眠Z粒子。",
+        f7_title: "猫咪日记", f7_desc: "Murchi写个人博客记录每天——什么时候吃饭、玩耍、看到蝴蝶、生病、过生日。像真正的宠物日记一样阅读。",
+        f8_title: "住在Dock上", f8_desc: "在macOS Dock上走来走去。会从边缘掉下去！",
+        install_title: "几秒钟开始",
+        step1: "下载上方的 <strong>Murchi.dmg</strong>",
+        step2: "打开 DMG，将 <strong>Murchi</strong> 拖入应用程序",
+        step3: "启动它。如果macOS阻止：<strong>设置 > 隐私 > 仍然打开</strong>",
+        step4: "Murchi出现在桌面！<strong>Cmd+Shift+M</strong> 召唤",
+        charity_badge: "50% 捐给动物慈善",
+        pay_title: "随意付费",
+        pay_subtitle: "Murchi永久免费。想支持就支持——一半捐给动物救助。",
+        copy: "复制", copied: "已复制！",
+        charity_note: "每笔捐款的50%捐给动物收容所和救助组织",
+        donations_title: "捐赠墙",
+        donations_empty: "成为第一个支持Murchi和帮助动物的人！",
+        footer_made: "用爱为全世界的猫咪制作"
+    },
+    ja: {
+        tagline: "デスクトップのたまごっち。macOSのピクセル猫。餌をあげて、遊んで、愛して。",
+        download: "macOS版をダウンロード",
+        appstore: "<strong>App Store</strong> — 近日公開",
+        demo_label: "ライブプレビュー — 猫をクリック！",
+        click_hint: "猫をクリックして撫でよう",
+        features_title: "猫に必要な全て",
+        features_subtitle: "デスクトップで完全なたまごっち体験",
+        f1_title: "25以上の行動", f1_desc: "歩く、寝る、走り回る、毛づくろい、お風呂、散歩、蝶を追いかける、鳥を見る、コップを落とすなど。猫は自分の生活を持っています。",
+        f2_title: "餌やり＆お世話", f2_desc: "魚、ミルク、おやつ。空腹、幸福度、体力、衛生、健康を管理。",
+        f3_title: "おもちゃ＆アクセサリー", f3_desc: "ネズミ、毛糸玉、レーザー。帽子、蝶ネクタイ、王冠、眼鏡、花。",
+        f4_title: "レベルアップ＆進化", f4_desc: "お世話でXPを獲得。ベビーからコスミックMurchiまで5段階の進化。",
+        f5_title: "パーティクルマジック", f5_desc: "ハート、星、キラキラ、煙、足跡、睡眠Zパーティクル。",
+        f7_title: "猫の日記", f7_desc: "Murchiが日々のブログを書きます — いつ食べた、遊んだ、蝶を見た、病気になった、誕生日を祝った。本物のペット日記として読めます。",
+        f8_title: "Dockに住む", f8_desc: "macOSのDockの上を歩きます。端から落ちることも！",
+        install_title: "数秒で始められます",
+        step1: "上の <strong>Murchi.dmg</strong> をダウンロード",
+        step2: "DMGを開いて <strong>Murchi</strong> をアプリケーションにドラッグ",
+        step3: "起動。macOSがブロックしたら：<strong>設定 > プライバシー > このまま開く</strong>",
+        step4: "Murchiがデスクトップに！<strong>Cmd+Shift+M</strong> で呼び出し",
+        charity_badge: "50%が動物チャリティーに",
+        pay_title: "お好きな金額で",
+        pay_subtitle: "Murchiは永久無料。サポートしたい方はどうぞ — 半分が動物救助に。",
+        copy: "コピー", copied: "コピーしました！",
+        charity_note: "全寄付の50%が動物シェルターや保護団体に届きます",
+        donations_title: "寄付の壁",
+        donations_empty: "Murchiを最初に応援して動物を助けよう！",
+        footer_made: "世界中の猫への愛を込めて"
+    },
+    ko: {
+        tagline: "데스크탑 다마고치. macOS의 픽셀 고양이. 먹이주고, 놀아주고, 사랑하세요.",
+        download: "macOS용 다운로드",
+        appstore: "<strong>App Store</strong> — 곧 출시",
+        demo_label: "라이브 미리보기 — 고양이를 클릭하세요!",
+        click_hint: "고양이를 클릭해서 쓰다듬기",
+        features_title: "고양이에게 필요한 모든 것",
+        features_subtitle: "데스크탑에서 완전한 다마고치 체험",
+        f1_title: "25가지 이상의 행동", f1_desc: "걷기, 자기, 달리기, 그루밍, 목욕, 산책, 나비 쫓기, 새 구경, 컵 떨어뜨리기 등. 고양이는 자기만의 삶을 살아요.",
+        f2_title: "먹이 & 돌보기", f2_desc: "생선, 우유, 간식. 배고픔, 행복, 에너지, 위생, 건강 관리.",
+        f3_title: "장난감 & 액세서리", f3_desc: "쥐, 실타래, 레이저. 모자, 나비넥타이, 왕관, 안경, 꽃.",
+        f4_title: "레벨 업 & 진화", f4_desc: "돌보며 XP 획득. 아기에서 코스믹 Murchi까지 5단계 진화.",
+        f5_title: "파티클 마법", f5_desc: "하트, 별, 반짝임, 연기, 발자국, 수면 Z 파티클.",
+        f7_title: "고양이 일기", f7_desc: "Murchi가 매일 블로그를 써요 — 밥 먹은 시간, 놀이, 나비, 아픈 날, 생일. 진짜 반려동물 일기처럼 읽어보세요.",
+        f8_title: "Dock 위에서 살아요", f8_desc: "macOS Dock 위를 걸어다녀요. 가장자리에서 떨어지기도!",
+        install_title: "몇 초면 시작",
+        step1: "위에서 <strong>Murchi.dmg</strong> 다운로드",
+        step2: "DMG를 열고 <strong>Murchi</strong>를 응용 프로그램으로 드래그",
+        step3: "실행. macOS가 차단하면: <strong>설정 > 개인정보 > 그래도 열기</strong>",
+        step4: "Murchi가 데스크탑에! <strong>Cmd+Shift+M</strong>으로 소환",
+        charity_badge: "50%가 동물 자선단체에",
+        pay_title: "원하는 만큼 지불",
+        pay_subtitle: "Murchi는 영원히 무료. 지원하고 싶다면 — 절반이 동물 구조에.",
+        copy: "복사", copied: "복사됨!",
+        charity_note: "모든 기부금의 50%가 동물 보호소와 구조 단체에",
+        donations_title: "기부 벽",
+        donations_empty: "Murchi를 처음으로 응원하고 동물을 도와주세요!",
+        footer_made: "전 세계 고양이를 위한 사랑으로"
+    },
+    de: {
+        tagline: "Dein Desktop-Tamagotchi. Eine Pixel-Katze fur macOS. Futtern, spielen, lieben.",
+        download: "Fur macOS herunterladen",
+        appstore: "<strong>App Store</strong> — kommt bald",
+        demo_label: "Live-Vorschau — klick die Katze!",
+        click_hint: "Klicke die Katze zum Streicheln",
+        features_title: "Alles was eine Katze braucht",
+        features_subtitle: "Ein vollstandiges Tamagotchi-Erlebnis auf deinem Desktop",
+        f1_title: "25+ Verhaltensweisen", f1_desc: "Laufen, schlafen, rennen, putzen, baden, spazieren, Schmetterlinge jagen, Vogel beobachten, Glaser vom Tisch werfen und vieles mehr.",
+        f2_title: "Futtern & Pflegen", f2_desc: "Fisch, Milch, Leckerlis. Verwalte Hunger, Gluck, Energie, Hygiene und Gesundheit.",
+        f3_title: "Spielzeug & Zubehor", f3_desc: "Maus, Wollknauel, Laserpointer. Hute, Fliegen, Kronen, Brillen, Blumen.",
+        f4_title: "Level-Aufstieg & Evolution", f4_desc: "Sammle XP durch Pflege. Entwickle dich vom Baby zum Kosmischen Murchi in 5 Stufen.",
+        f5_title: "Partikel-Magie", f5_desc: "Herzen, Sterne, Glitzer, Rauchwolken, Pfotenabdrucke, Schlaf-Z-Partikel.",
+        f7_title: "Katzen-Tagebuch", f7_desc: "Murchi schreibt ein personliches Blog uber seinen Tag — Futterung, Spiel, Schmetterlinge, Krankheit, Geburtstag. Lies es wie ein echtes Haustier-Journal.",
+        f8_title: "Lebt auf dem Dock", f8_desc: "Lauft auf dem macOS Dock als Plattform. Fallt uber den Rand!",
+        install_title: "In Sekunden starten",
+        step1: "Lade oben <strong>Murchi.dmg</strong> herunter",
+        step2: "Offne die DMG und ziehe <strong>Murchi</strong> in Programme",
+        step3: "Starte es. Falls macOS blockiert: <strong>Einstellungen > Datenschutz > Trotzdem offnen</strong>",
+        step4: "Murchi auf dem Desktop! <strong>Cmd+Shift+M</strong> zum Herbeirufen",
+        charity_badge: "50% gehen an Tierschutz",
+        pay_title: "Zahl was du willst",
+        pay_subtitle: "Murchi ist fur immer kostenlos. Unterstutze die Entwicklung — die Halfte geht an Tierrettung.",
+        copy: "Kopieren", copied: "Kopiert!",
+        charity_note: "50% jeder Spende gehen an Tierheime und Rettungsorganisationen",
+        donations_title: "Spendenwand",
+        donations_empty: "Sei der Erste, der Murchi unterstutzt und Tieren hilft!",
+        footer_made: "Mit Liebe fur Katzen uberall auf der Welt gemacht"
+    },
+    fr: {
+        tagline: "Votre Tamagotchi de bureau. Un chat pixel pour macOS. Nourrir, jouer, aimer.",
+        download: "Telecharger pour macOS",
+        appstore: "<strong>App Store</strong> — bientot",
+        demo_label: "Apercu en direct — cliquez sur le chat !",
+        click_hint: "Cliquez sur le chat pour le caresser",
+        features_title: "Tout ce dont un chat a besoin",
+        features_subtitle: "Une experience Tamagotchi complete sur votre bureau",
+        f1_title: "25+ comportements", f1_desc: "Marcher, dormir, courir, se toiletter, se baigner, se promener, chasser des papillons, observer des oiseaux, faire tomber des verres et bien plus.",
+        f2_title: "Nourrir et soigner", f2_desc: "Poisson, lait, friandises. Gerez la faim, le bonheur, l'energie, l'hygiene et la sante.",
+        f3_title: "Jouets et accessoires", f3_desc: "Souris, pelote, laser. Chapeaux, noeuds papillon, couronnes, lunettes, fleurs.",
+        f4_title: "Monter de niveau", f4_desc: "Gagnez de l'XP en prenant soin. Evoluez de bebe a Murchi Cosmique en 5 etapes.",
+        f5_title: "Magie des particules", f5_desc: "Coeurs, etoiles, etincelles, nuages, empreintes, particules Z au sommeil.",
+        f7_title: "Journal du chat", f7_desc: "Murchi tient un blog personnel — repas, jeux, papillons, maladie, anniversaire. Lisez-le comme un vrai journal d'animal.",
+        f8_title: "Vit sur le Dock", f8_desc: "Marche sur le Dock macOS comme une plateforme. Tombe des bords !",
+        install_title: "Commencez en quelques secondes",
+        step1: "Telechargez <strong>Murchi.dmg</strong> ci-dessus",
+        step2: "Ouvrez le DMG et glissez <strong>Murchi</strong> dans Applications",
+        step3: "Lancez-le. Si macOS bloque : <strong>Reglages > Confidentialite > Ouvrir quand meme</strong>",
+        step4: "Murchi sur votre bureau ! <strong>Cmd+Shift+M</strong> pour l'invoquer",
+        charity_badge: "50% pour la charite animale",
+        pay_title: "Payez ce que vous voulez",
+        pay_subtitle: "Murchi est gratuit pour toujours. Soutenez si vous le souhaitez — la moitie va au sauvetage animal.",
+        copy: "Copier", copied: "Copie !",
+        charity_note: "50% de chaque don va aux refuges et organisations de sauvetage d'animaux",
+        donations_title: "Mur des dons",
+        donations_empty: "Soyez le premier a soutenir Murchi et aider les animaux !",
+        footer_made: "Fait avec amour pour les chats du monde entier"
+    },
+    pt: {
+        tagline: "Seu Tamagotchi de desktop. Um gato pixel para macOS. Alimente, brinque, ame.",
+        download: "Baixar para macOS",
+        appstore: "<strong>App Store</strong> — em breve",
+        demo_label: "Preview ao vivo — clique no gato!",
+        click_hint: "Clique no gato para acariciar",
+        features_title: "Tudo que um gato precisa",
+        features_subtitle: "Uma experiencia Tamagotchi completa no seu desktop",
+        f1_title: "25+ comportamentos", f1_desc: "Andar, dormir, correr, se limpar, tomar banho, passear, perseguir borboletas, observar passaros, derrubar copos e muito mais.",
+        f2_title: "Alimentar e cuidar", f2_desc: "Peixe, leite, petiscos. Gerencie fome, felicidade, energia, higiene e saude.",
+        f3_title: "Brinquedos e acessorios", f3_desc: "Rato, novelo, laser. Chapeus, gravatas-borboleta, coroas, oculos, flores.",
+        f4_title: "Subir de nivel", f4_desc: "Ganhe XP cuidando. Evolua de bebe a Murchi Cosmico em 5 estagios.",
+        f5_title: "Magia de particulas", f5_desc: "Coracoes, estrelas, brilhos, nuvens, pegadas, particulas Z ao dormir.",
+        f7_title: "Diario do gato", f7_desc: "Murchi escreve um blog pessoal sobre seu dia — refeicoes, brincadeiras, borboletas, doencas, aniversario. Leia como um diario de pet real.",
+        f8_title: "Vive no Dock", f8_desc: "Anda no Dock do macOS como plataforma. Cai das bordas!",
+        install_title: "Comece em segundos",
+        step1: "Baixe o <strong>Murchi.dmg</strong> acima",
+        step2: "Abra o DMG e arraste <strong>Murchi</strong> para Aplicativos",
+        step3: "Abra. Se o macOS bloquear: <strong>Configuracoes > Privacidade > Abrir mesmo assim</strong>",
+        step4: "Murchi no seu desktop! <strong>Cmd+Shift+M</strong> para invocar",
+        charity_badge: "50% vai para caridade animal",
+        pay_title: "Pague o que quiser",
+        pay_subtitle: "Murchi e gratis para sempre. Apoie se quiser — metade vai para resgate animal.",
+        copy: "Copiar", copied: "Copiado!",
+        charity_note: "50% de cada doacao vai para abrigos e organizacoes de resgate animal",
+        donations_title: "Mural de doacoes",
+        donations_empty: "Seja o primeiro a apoiar o Murchi e ajudar os animais!",
+        footer_made: "Feito com amor para gatos de todo o mundo"
+    },
+    tr: {
+        tagline: "Masaustu Tamagotchi'niz. macOS icin piksel kedi. Besle, oyna, sev.",
+        download: "macOS icin indir",
+        appstore: "<strong>App Store</strong> — yakinda",
+        demo_label: "Canli onizleme — kediye tikla!",
+        click_hint: "Kediye tiklayarak oksa",
+        features_title: "Bir kedinin ihtiyaci olan her sey",
+        features_subtitle: "Masaustunuzde tam bir Tamagotchi deneyimi",
+        f1_title: "25+ davranis", f1_desc: "Yurume, uyuma, kosma, timar, banyo, gezinti, kelebek kovalama, kus izleme, bardak dusurme ve daha fazlasi.",
+        f2_title: "Besle ve bak", f2_desc: "Balik, sut, odul. Aclik, mutluluk, enerji, hijyen ve saglik yonet.",
+        f3_title: "Oyuncaklar ve aksesuarlar", f3_desc: "Fare, yun yumagi, lazer. Sapkalar, papyonlar, taclar, gozlukler, cicekler.",
+        f4_title: "Seviye atla", f4_desc: "Bakarak XP kazan. Bebekten Kozmik Murchi'ye 5 asamada evrimles.",
+        f5_title: "Parcacik sihiri", f5_desc: "Kalpler, yildizlar, pariltiar, bulutlar, pati izleri, uyku Z parcaciklari.",
+        f7_title: "Kedi gunlugu", f7_desc: "Murchi gunluk blog yazar — yemek, oyun, kelebek, hastalik, dogum gunu. Gercek bir evcil hayvan gunlugu gibi oku.",
+        f8_title: "Dock'ta yasar", f8_desc: "macOS Dock uzerinde platform olarak yurur. Kenarlardan duser!",
+        install_title: "Saniyeler icinde basla",
+        step1: "Yukaridan <strong>Murchi.dmg</strong> indirin",
+        step2: "DMG'yi acin ve <strong>Murchi</strong>'yi Uygulamalar'a surukleyin",
+        step3: "Baslatin. macOS engellerse: <strong>Ayarlar > Gizlilik > Yine de Ac</strong>",
+        step4: "Murchi masaustunuzde! <strong>Cmd+Shift+M</strong> ile cagirin",
+        charity_badge: "%50 hayvan yardimina gidiyor",
+        pay_title: "Istedigin kadar ode",
+        pay_subtitle: "Murchi sonsuza kadar ucretsiz. Desteklemek istersen — yarisi hayvan kurtarmaya.",
+        copy: "Kopyala", copied: "Kopyalandi!",
+        charity_note: "Her bagisin %50'si hayvan barinaklarina ve kurtarma kuruluslarina gider",
+        donations_title: "Bagis duvari",
+        donations_empty: "Murchi'yi destekleyen ve hayvanlara yardim eden ilk kisi olun!",
+        footer_made: "Dunyanin her yerindeki kediler icin sevgiyle yapildi"
+    }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+    currentLang = lang;
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('.copy-btn:not(.copied)').forEach(b => {
+        b.textContent = t.copy || 'Copy';
+    });
+    localStorage.setItem('murchi-lang', lang);
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+
+const saved = localStorage.getItem('murchi-lang');
+if (saved && translations[saved]) setLang(saved);
+else {
+    const bl = navigator.language.slice(0, 2);
+    if (translations[bl]) setLang(bl);
+}
+</script>
+
+</body>
+</html>

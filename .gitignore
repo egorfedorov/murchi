@@ -1,0 +1,18 @@
+# Build artifacts
+Murchi.app/
+Murchi.dmg
+murchi
+gen-icon
+.dmg-staging/
+AppIcon.iconset/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Xcode (if ever used)
+*.xcodeproj/
+*.xcworkspace/
+build/
+DerivedData/
