@@ -1456,6 +1456,162 @@ struct Toy {
     }
 }
 
+// MARK: - Sound Engine
+
+class SoundEngine {
+    static let shared = SoundEngine()
+
+    private let engine = AVAudioEngine()
+    private let playerNode = AVAudioPlayerNode()
+    private var isSetup = false
+    private var volume: Float = 0.3
+
+    private func setup() {
+        guard !isSetup else { return }
+        engine.attach(playerNode)
+        let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+        engine.connect(playerNode, to: engine.mainMixerNode, format: format)
+        engine.mainMixerNode.outputVolume = volume
+        do {
+            try engine.start()
+            isSetup = true
+        } catch {
+            print("Sound engine failed: \(error)")
+        }
+    }
+
+    func setVolume(_ v: Float) {
+        volume = v
+        if isSetup { engine.mainMixerNode.outputVolume = v }
+    }
+
+    // Generate a tone buffer
+    private func makeBuffer(duration: Double, generator: (Int, Double) -> Float) -> AVAudioPCMBuffer? {
+        let sampleRate: Double = 44100
+        let frameCount = AVAudioFrameCount(sampleRate * duration)
+        guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
+              let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else { return nil }
+        buffer.frameLength = frameCount
+        let data = buffer.floatChannelData![0]
+        for i in 0..<Int(frameCount) {
+            let t = Double(i) / sampleRate
+            data[i] = generator(i, t)
+        }
+        return buffer
+    }
+
+    // Purring — low rumble with amplitude modulation
+    func purr() {
+        setup()
+        guard let buffer = makeBuffer(duration: 1.2, generator: { _, t in
+            let freq = 25.0 + sin(t * 3) * 5  // ~25Hz rumble
+            let base = sin(2 * .pi * freq * t)
+            let harmonic = sin(2 * .pi * freq * 2 * t) * 0.3
+            let envelope = sin(.pi * t / 1.2) // fade in/out
+            let am = (1.0 + sin(2 * .pi * 4 * t)) * 0.5 // amplitude modulation ~4Hz
+            return Float((base + harmonic) * envelope * am * 0.4)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Meow — rising then falling tone
+    func meow() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.4, generator: { _, t in
+            let progress = t / 0.4
+            // Frequency rises then falls: 400 -> 800 -> 500
+            let freq: Double
+            if progress < 0.3 {
+                freq = 400 + (progress / 0.3) * 400
+            } else {
+                freq = 800 - ((progress - 0.3) / 0.7) * 300
+            }
+            let base = sin(2 * .pi * freq * t)
+            let h2 = sin(2 * .pi * freq * 2 * t) * 0.2
+            let envelope = sin(.pi * progress)
+            return Float((base + h2) * envelope * 0.3)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Short chirp — quick rising tone
+    func chirp() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.15, generator: { _, t in
+            let freq = 600 + t * 3000  // quick sweep up
+            let envelope = sin(.pi * t / 0.15)
+            return Float(sin(2 * .pi * freq * t) * envelope * 0.25)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Eating — crunchy repeating sound
+    func eat() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.5, generator: { i, t in
+            let crunch = (i % Int(44100 * 0.08) < Int(44100 * 0.03)) ? 1.0 : 0.0
+            let noise = Double.random(in: -1...1)
+            let tone = sin(2 * .pi * 200 * t)
+            let envelope = sin(.pi * t / 0.5)
+            return Float((noise * 0.6 + tone * 0.4) * crunch * envelope * 0.2)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Happy sound — ascending notes
+    func happy() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.3, generator: { _, t in
+            let progress = t / 0.3
+            let freq = 500 + progress * 500  // 500 -> 1000
+            let envelope = sin(.pi * progress)
+            return Float(sin(2 * .pi * freq * t) * envelope * 0.2)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Sad sound — descending tone
+    func sad() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.4, generator: { _, t in
+            let progress = t / 0.4
+            let freq = 500 - progress * 200  // 500 -> 300
+            let envelope = sin(.pi * progress) * (1 - progress * 0.5)
+            return Float(sin(2 * .pi * freq * t) * envelope * 0.2)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Pop — gift opening, level up
+    func pop() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.2, generator: { _, t in
+            let freq = 800 + (1 - t / 0.2) * 600  // 1400 -> 800
+            let envelope = exp(-t * 15)
+            return Float(sin(2 * .pi * freq * t) * envelope * 0.35)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    // Sleepy — soft low tone
+    func sleepy() {
+        setup()
+        guard let buffer = makeBuffer(duration: 0.6, generator: { _, t in
+            let freq = 180 + sin(t * 2) * 20
+            let envelope = sin(.pi * t / 0.6) * 0.5
+            return Float(sin(2 * .pi * freq * t) * envelope * 0.15)
+        }) else { return }
+        playBuffer(buffer)
+    }
+
+    private func playBuffer(_ buffer: AVAudioPCMBuffer) {
+        guard isSetup else { return }
+        if playerNode.isPlaying { playerNode.stop() }
+        playerNode.scheduleBuffer(buffer, at: nil, options: .interrupts)
+        playerNode.play()
+    }
+}
+
 // MARK: - Particle Canvas View (overlay for effects)
 
 class ParticleCanvasView: NSView {
@@ -1596,6 +1752,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var jumpBaseY: CGFloat = 100
     var isHoveringPet = false
     var lastLevel = 1
+    var soundEnabled = true
     var clickCount = 0
     var lastClickTime = Date()
     var breathOffset: CGFloat = 0  // idle breathing animation
@@ -1765,6 +1922,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             behavior = .greeting
             behaviorStartTime = Date()
             behaviorDuration = 3.0
+            SoundEngine.shared.meow()
             showBubble(SpeechBubbles.greeting.randomElement()!)
             particleCanvas.particleSystem.emit(
                 at: NSPoint(x: petSize / 2, y: petSize),
@@ -1902,6 +2060,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             attributes: [.font: NSFont.systemFont(ofSize: 11), .foregroundColor: NSColor.secondaryLabelColor]
         )
         menu.addItem(aboutItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let soundItem = NSMenuItem(title: soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds", action: #selector(toggleSound), keyEquivalent: "")
+        menu.addItem(soundItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -2379,6 +2542,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             if self.stats.level > self.lastLevel {
                 self.lastLevel = self.stats.level
                 self.showBubble(SpeechBubbles.levelUp.randomElement()!)
+                SoundEngine.shared.pop()
                 self.particleCanvas.particleSystem.emit(
                     at: NSPoint(x: self.petSize / 2 + 40, y: self.petSize + 20),
                     type: .star, count: 15
@@ -2822,6 +2986,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 if giftPos.y <= groundYForPet() + 10 {
                     gw.orderOut(nil)
                     showBubble("A PRESENT!! Yay!!")
+                    SoundEngine.shared.pop()
                     particleCanvas.particleSystem.emit(
                         at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
                         type: .star, count: 15
@@ -3308,6 +3473,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if stats.totalFeedings % 50 == 0 { stats.addMilestone("Eaten \(stats.totalFeedings) meals! I'm a foodie \u{1F41F}") }
         startBehavior(.eating, duration: 3.0)
         showBubble(SpeechBubbles.eating.randomElement()!)
+        SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 5
@@ -3324,6 +3490,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if stats.totalPlays % 25 == 0 { stats.addMilestone("Play session #\(stats.totalPlays)! I love games!") }
         startBehavior(.playing, duration: 5.0)
         showBubble(SpeechBubbles.playing.randomElement()!)
+        SoundEngine.shared.happy()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .star, count: 8
@@ -3335,6 +3502,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.rest()
         startBehavior(.sleeping, duration: 12.0)
         showBubble("*purrs and curls up*")
+        SoundEngine.shared.sleepy()
         stats.save()
     }
 
@@ -3344,6 +3512,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if stats.totalBaths % 10 == 0 { stats.addMilestone("Bath #\(stats.totalBaths)... I'm starting to accept it") }
         startBehavior(.bathing, duration: 4.0)
         showBubble(SpeechBubbles.bathBubbles.randomElement()!)
+        SoundEngine.shared.meow()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 10
@@ -3355,6 +3524,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.feedMilk()
         startBehavior(.eating, duration: 3.0)
         showBubble(SpeechBubbles.milkBubbles.randomElement()!)
+        SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 5
@@ -3367,12 +3537,26 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.feedTreat()
         startBehavior(.eating, duration: 2.0)
         showBubble(SpeechBubbles.treatBubbles.randomElement()!)
+        SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .star, count: 6
         )
         showFoodAnimation(sprite: Sprites.treat)
         stats.save()
+    }
+
+    @objc func toggleSound() {
+        soundEnabled.toggle()
+        SoundEngine.shared.setVolume(soundEnabled ? 0.3 : 0)
+        // Update menu item title
+        if let menu = statusBarItem.menu {
+            for item in menu.items {
+                if item.title.contains("Mute") || item.title.contains("Enable") {
+                    item.title = soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds"
+                }
+            }
+        }
     }
 
     @objc func healPet() {
@@ -3603,6 +3787,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if clickCount >= 3 {
             // Triple click — extra love!
             showBubble("SO MUCH LOVE!!!")
+            SoundEngine.shared.purr()
             particleCanvas.particleSystem.emit(
                 at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
                 type: .heart, count: 15
@@ -3612,6 +3797,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         } else {
             startBehavior(.beingPet, duration: 2.5)
             showBubble(SpeechBubbles.petted.randomElement()!)
+            SoundEngine.shared.chirp()
             particleCanvas.particleSystem.emit(
                 at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
                 type: .heart, count: 5
