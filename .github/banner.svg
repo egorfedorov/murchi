@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 220">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0f0f2e"/>
@@ -11,169 +11,192 @@
       <stop offset="100%" style="stop-color:#fbbf24"/>
     </linearGradient>
     <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="2" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="softglow">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feGaussianBlur stdDeviation="6" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
   <!-- Background -->
-  <rect width="700" height="220" rx="16" fill="url(#bg)"/>
-  <rect width="700" height="220" rx="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <rect width="800" height="260" rx="16" fill="url(#bg)"/>
+  <rect width="800" height="260" rx="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
 
   <!-- Stars -->
   <g opacity="0.5">
     <circle cx="50" cy="30" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/></circle>
     <circle cx="150" cy="60" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/></circle>
     <circle cx="280" cy="25" r="1.2" fill="white"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="4s" repeatCount="indefinite"/></circle>
-    <circle cx="420" cy="45" r="0.7" fill="white"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/></circle>
-    <circle cx="550" cy="20" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="3.5s" repeatCount="indefinite"/></circle>
-    <circle cx="630" cy="55" r="0.9" fill="white"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="520" cy="45" r="0.7" fill="white"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="650" cy="20" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="730" cy="55" r="0.9" fill="white"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/></circle>
     <circle cx="100" cy="85" r="0.6" fill="white"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/></circle>
-    <circle cx="600" cy="90" r="1.1" fill="white"><animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.2s" repeatCount="indefinite"/></circle>
-    <circle cx="350" cy="15" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle cx="480" cy="75" r="0.7" fill="white"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.2s" repeatCount="indefinite"/></circle>
+    <circle cx="700" cy="90" r="1.1" fill="white"><animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.2s" repeatCount="indefinite"/></circle>
+    <circle cx="400" cy="15" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle cx="580" cy="75" r="0.7" fill="white"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.2s" repeatCount="indefinite"/></circle>
   </g>
 
-  <!-- Pixel Cat (16x14 grid, each pixel 5px, positioned left) -->
-  <g transform="translate(60, 55) scale(5)" filter="url(#glow)">
+  <!-- ===== KAWAII CAT (left) ===== -->
+  <g transform="translate(85, 65) scale(0.9)" filter="url(#glow)">
+    <!-- Tail -->
+    <path d="M5,72 Q-8,60 -5,48 Q-2,38 5,42" stroke="#8a8aaa" stroke-width="4" fill="none" stroke-linecap="round">
+      <animate attributeName="d" values="M5,72 Q-8,60 -5,48 Q-2,38 5,42;M5,72 Q-12,58 -8,46 Q-4,36 2,40;M5,72 Q-8,60 -5,48 Q-2,38 5,42" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <circle cx="-4" cy="42" r="3" fill="#6a6a8a"/>
     <!-- Ears -->
-    <rect x="2" y="0" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="3" y="0" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="11" y="0" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="12" y="0" width="1" height="1" fill="#2D2D3F"/>
-    <!-- Ear row 2 -->
-    <rect x="1" y="1" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="2" y="1" width="1" height="1" fill="#9898B0"/>
-    <rect x="3" y="1" width="1" height="1" fill="#9898B0"/>
-    <rect x="4" y="1" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="10" y="1" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="11" y="1" width="1" height="1" fill="#9898B0"/>
-    <rect x="12" y="1" width="1" height="1" fill="#9898B0"/>
-    <rect x="13" y="1" width="1" height="1" fill="#2D2D3F"/>
-    <!-- Head top -->
-    <rect x="1" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="2" y="2" width="1" height="1" fill="#9898B0"/>
-    <rect x="3" y="2" width="1" height="1" fill="#FFBBCC"/>
-    <rect x="4" y="2" width="1" height="1" fill="#9898B0"/>
-    <rect x="5" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="6" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="7" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="8" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="9" y="2" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="10" y="2" width="1" height="1" fill="#9898B0"/>
-    <rect x="11" y="2" width="1" height="1" fill="#FFBBCC"/>
-    <rect x="12" y="2" width="1" height="1" fill="#9898B0"/>
-    <rect x="13" y="2" width="1" height="1" fill="#2D2D3F"/>
+    <path d="M18,22 L25,2 L36,20 Z" fill="#9898B0" stroke="#7a7a96" stroke-width="1"/>
+    <path d="M22,18 L25,6 L32,18 Z" fill="#ffbbcc"/>
+    <path d="M54,20 L65,2 L72,22 Z" fill="#9898B0" stroke="#7a7a96" stroke-width="1"/>
+    <path d="M58,18 L65,6 L68,18 Z" fill="#ffbbcc"/>
     <!-- Head -->
-    <rect x="1" y="3" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="2" y="3" width="12" height="1" fill="#9898B0"/>
-    <rect x="13" y="3" width="1" height="1" fill="#2D2D3F"/>
+    <ellipse cx="45" cy="36" rx="28" ry="22" fill="#9898B0"/>
+    <!-- Forehead stripes -->
+    <path d="M38,20 L40,28" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M45,18 L45,27" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M52,20 L50,28" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
     <!-- Eyes -->
-    <rect x="1" y="4" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="2" y="4" width="2" height="1" fill="#9898B0"/>
-    <rect x="4" y="4" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="5" y="4" width="1" height="1" fill="#88DD88"/>
-    <rect x="6" y="4" width="4" height="1" fill="#9898B0"/>
-    <rect x="10" y="4" width="1" height="1" fill="#88DD88"/>
-    <rect x="11" y="4" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="12" y="4" width="2" height="1" fill="#9898B0"/>
-    <!-- Muzzle -->
-    <rect x="2" y="5" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="3" y="5" width="3" height="1" fill="#9898B0"/>
-    <rect x="6" y="5" width="2" height="1" fill="#F0F0F8"/>
-    <rect x="8" y="5" width="3" height="1" fill="#9898B0"/>
-    <rect x="11" y="5" width="1" height="1" fill="#2D2D3F"/>
+    <ellipse cx="35" cy="36" rx="5" ry="6" fill="white"/>
+    <ellipse cx="35" cy="36" rx="3.5" ry="5" fill="#88DD88"/>
+    <ellipse cx="35" cy="36" rx="1.5" ry="4" fill="#2D2D3F"/>
+    <circle cx="33" cy="34" r="1.2" fill="white"/>
+    <ellipse cx="55" cy="36" rx="5" ry="6" fill="white"/>
+    <ellipse cx="55" cy="36" rx="3.5" ry="5" fill="#88DD88"/>
+    <ellipse cx="55" cy="36" rx="1.5" ry="4" fill="#2D2D3F"/>
+    <circle cx="53" cy="34" r="1.2" fill="white"/>
+    <!-- Blink -->
+    <ellipse cx="35" cy="36" rx="5" ry="6" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="55" cy="36" rx="5" ry="6" fill="#9898B0" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
+    </ellipse>
     <!-- Nose -->
-    <rect x="2" y="6" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="3" y="6" width="3" height="1" fill="#9898B0"/>
-    <rect x="6" y="6" width="1" height="1" fill="#F0F0F8"/>
-    <rect x="7" y="6" width="1" height="1" fill="#FFBBCC"/>
-    <rect x="8" y="6" width="3" height="1" fill="#9898B0"/>
-    <rect x="11" y="6" width="1" height="1" fill="#2D2D3F"/>
-    <!-- Collar -->
-    <rect x="4" y="7" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="5" y="7" width="5" height="1" fill="#FFDD33"/>
-    <rect x="10" y="7" width="1" height="1" fill="#2D2D3F"/>
+    <path d="M43,42 L45,44 L47,42 Z" fill="#ffbbcc"/>
+    <!-- Mouth -->
+    <path d="M41,46 Q45,49 49,46" stroke="#7a7a96" stroke-width="1" fill="none"/>
+    <!-- Cheeks -->
+    <ellipse cx="26" cy="43" rx="5" ry="3" fill="#ffccdd" opacity="0.4"/>
+    <ellipse cx="64" cy="43" rx="5" ry="3" fill="#ffccdd" opacity="0.4"/>
+    <!-- Whiskers -->
+    <line x1="14" y1="40" x2="28" y2="42" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
+    <line x1="14" y1="45" x2="28" y2="44" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
+    <line x1="62" y1="42" x2="76" y2="40" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
+    <line x1="62" y1="44" x2="76" y2="45" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
     <!-- Body -->
-    <rect x="3" y="8" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="4" y="8" width="3" height="1" fill="#9898B0"/>
-    <rect x="7" y="8" width="1" height="1" fill="#55AAFF"/>
-    <rect x="8" y="8" width="3" height="1" fill="#9898B0"/>
-    <rect x="11" y="8" width="1" height="1" fill="#2D2D3F"/>
-    <!-- Body 2 -->
-    <rect x="2" y="9" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="3" y="9" width="10" height="1" fill="#9898B0"/>
-    <rect x="12" y="9" width="1" height="1" fill="#2D2D3F"/>
+    <ellipse cx="45" cy="72" rx="22" ry="18" fill="#9898B0"/>
+    <ellipse cx="45" cy="74" rx="14" ry="12" fill="#d4d4e8"/>
+    <!-- Collar -->
+    <path d="M25,58 Q45,64 65,58" stroke="#FFDD33" stroke-width="3" fill="none"/>
+    <circle cx="45" cy="62" r="3" fill="#55AAFF"/>
     <!-- Paws -->
-    <rect x="2" y="10" width="1" height="1" fill="#2D2D3F"/>
-    <rect x="3" y="10" width="1" height="1" fill="#F0F0F8"/>
-    <rect x="4" y="10" width="1" height="1" fill="#F0F0F8"/>
-    <rect x="5" y="10" width="5" height="1" fill="#9898B0"/>
-    <rect x="10" y="10" width="1" height="1" fill="#F0F0F8"/>
-    <rect x="11" y="10" width="1" height="1" fill="#F0F0F8"/>
-    <rect x="12" y="10" width="1" height="1" fill="#2D2D3F"/>
-    <!-- Base -->
-    <rect x="3" y="11" width="10" height="1" fill="#2D2D3F"/>
-
-    <!-- Blink animation - cover eyes periodically -->
-    <rect x="5" y="4" width="1" height="1" fill="#9898B0" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
-    </rect>
-    <rect x="10" y="4" width="1" height="1" fill="#9898B0" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
-    </rect>
+    <ellipse cx="30" cy="88" rx="8" ry="5" fill="#9898B0"/>
+    <ellipse cx="30" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
+    <ellipse cx="60" cy="88" rx="8" ry="5" fill="#9898B0"/>
+    <ellipse cx="60" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
+    <!-- Breathing -->
+    <animateTransform attributeName="transform" type="translate" values="85,65;85,63;85,65" dur="2.5s" repeatCount="indefinite" additive="replace"/>
   </g>
 
-  <!-- Cat breathing animation -->
-  <g transform="translate(60, 55)">
-    <animateTransform attributeName="transform" type="translate" values="60,55;60,53;60,55" dur="2.5s" repeatCount="indefinite"/>
-  </g>
-
-  <!-- Floating hearts -->
+  <!-- Cat hearts -->
   <g filter="url(#softglow)">
-    <text x="155" y="75" font-size="14" fill="#ff5a80" opacity="0.8">
-      <animate attributeName="y" values="75;55;75" dur="3s" repeatCount="indefinite"/>
+    <text x="175" y="85" font-size="14" fill="#ff5a80" opacity="0.8">
+      <animate attributeName="y" values="85;65;85" dur="3s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
       &#9829;
     </text>
-    <text x="140" y="60" font-size="10" fill="#ff5a80" opacity="0.5">
-      <animate attributeName="y" values="60;42;60" dur="2.5s" repeatCount="indefinite"/>
+    <text x="160" y="70" font-size="10" fill="#ff5a80" opacity="0.5">
+      <animate attributeName="y" values="70;52;70" dur="2.5s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
       &#9829;
     </text>
-    <text x="162" y="90" font-size="8" fill="#a78bfa" opacity="0.6">
-      <animate attributeName="y" values="90;70;90" dur="3.5s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.5s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- ===== KAWAII BEAR (right) ===== -->
+  <g transform="translate(600, 65) scale(0.9)" filter="url(#glow)">
+    <!-- Ears -->
+    <circle cx="20" cy="12" r="12" fill="#c4956a"/>
+    <circle cx="20" cy="12" r="7" fill="#e8c9a0"/>
+    <circle cx="70" cy="12" r="12" fill="#c4956a"/>
+    <circle cx="70" cy="12" r="7" fill="#e8c9a0"/>
+    <!-- Head -->
+    <ellipse cx="45" cy="36" rx="30" ry="25" fill="#c4956a"/>
+    <!-- Face -->
+    <ellipse cx="45" cy="42" rx="14" ry="10" fill="#e8c9a0"/>
+    <!-- Eyes -->
+    <circle cx="33" cy="34" r="4" fill="#2D2D3F"/>
+    <circle cx="31.5" cy="32.5" r="1.5" fill="white"/>
+    <circle cx="57" cy="34" r="4" fill="#2D2D3F"/>
+    <circle cx="55.5" cy="32.5" r="1.5" fill="white"/>
+    <!-- Blink -->
+    <ellipse cx="33" cy="34" rx="5" ry="4" fill="#c4956a" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="57" cy="34" rx="5" ry="4" fill="#c4956a" opacity="0">
+      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <!-- Nose -->
+    <ellipse cx="45" cy="41" rx="3.5" ry="2.5" fill="#2D2D3F"/>
+    <ellipse cx="44" cy="40.5" rx="1" ry="0.7" fill="#5a5a7a"/>
+    <!-- Mouth -->
+    <path d="M41,44 Q45,48 49,44" stroke="#8a6a4a" stroke-width="1" fill="none"/>
+    <!-- Cheeks -->
+    <ellipse cx="24" cy="42" rx="5" ry="3.5" fill="#f4a6a0" opacity="0.35"/>
+    <ellipse cx="66" cy="42" rx="5" ry="3.5" fill="#f4a6a0" opacity="0.35"/>
+    <!-- Body -->
+    <ellipse cx="45" cy="75" rx="24" ry="20" fill="#c4956a"/>
+    <ellipse cx="45" cy="77" rx="16" ry="14" fill="#e8c9a0"/>
+    <!-- Bow tie -->
+    <path d="M37,58 L45,62 L53,58 L45,54 Z" fill="#ff6b6b"/>
+    <circle cx="45" cy="58" r="2.5" fill="#ff8888"/>
+    <!-- Paws -->
+    <ellipse cx="28" cy="90" rx="9" ry="6" fill="#c4956a"/>
+    <ellipse cx="28" cy="91" rx="5" ry="3" fill="#e8c9a0"/>
+    <ellipse cx="62" cy="90" rx="9" ry="6" fill="#c4956a"/>
+    <ellipse cx="62" cy="91" rx="5" ry="3" fill="#e8c9a0"/>
+    <!-- Breathing -->
+    <animateTransform attributeName="transform" type="translate" values="600,65;600,63;600,65" dur="3s" repeatCount="indefinite" additive="replace"/>
+  </g>
+
+  <!-- Bear sparkles -->
+  <g filter="url(#softglow)">
+    <text x="690" y="85" font-size="12" fill="#fbbf24" opacity="0.7">
+      <animate attributeName="y" values="85;68;85" dur="3.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/>
+      &#10022;
+    </text>
+    <text x="680" y="72" font-size="8" fill="#a78bfa" opacity="0.5">
+      <animate attributeName="y" values="72;56;72" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.8s" repeatCount="indefinite"/>
       &#10022;
     </text>
   </g>
 
   <!-- Title -->
-  <text x="350" y="90" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="52" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
+  <text x="400" y="98" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="52" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi &amp; Kuma</text>
 
   <!-- Subtitle -->
-  <text x="350" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#94a3b8" text-anchor="middle" font-weight="300">Desktop Tamagotchi Cat for macOS</text>
+  <text x="400" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pets for macOS</text>
 
   <!-- Feature pills -->
-  <g transform="translate(350, 145)" text-anchor="middle">
-    <!-- Pill backgrounds -->
-    <rect x="-228" y="0" width="90" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
-    <rect x="-128" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
-    <rect x="-28" y="0" width="90" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-    <rect x="72" y="0" width="90" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
-    <rect x="172" y="0" width="60" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
-    <!-- Pill text -->
-    <text x="-183" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">25+ behaviors</text>
-    <text x="-83" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">cat diary</text>
-    <text x="17" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">pixel art</text>
-    <text x="117" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single file</text>
-    <text x="202" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">free</text>
+  <g transform="translate(400, 155)" text-anchor="middle">
+    <rect x="-278" y="0" width="90" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
+    <rect x="-178" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
+    <rect x="-78" y="0" width="90" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+    <rect x="22" y="0" width="100" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
+    <rect x="132" y="0" width="90" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+    <text x="-233" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">25+ behaviors</text>
+    <text x="-133" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">cat diary</text>
+    <text x="-33" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">kawaii vector</text>
+    <text x="72" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single file</text>
+    <text x="177" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">pay what you want</text>
   </g>
 
+  <!-- Version badge -->
+  <rect x="345" y="195" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+  <text x="400" y="210" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">v2.1 &mdash; Free Forever</text>
+
   <!-- Bottom URL -->
-  <text x="350" y="198" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
+  <text x="400" y="245" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
 </svg>

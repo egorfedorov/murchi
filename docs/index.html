@@ -3,57 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Murchi — Desktop Tamagotchi Cat for macOS</title>
-    <meta name="description" content="Murchi is a pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
-    <meta name="keywords" content="tamagotchi, desktop pet, virtual pet, pixel cat, macOS pet, desktop tamagotchi, murchi, digital pet, virtual cat">
+    <title>Murchi & Kuma — Kawaii Desktop Pets for macOS</title>
+    <meta name="description" content="Murchi & Kuma are kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. Feed, play, love. 25+ behaviors, diary, toys, accessories.">
+    <meta name="keywords" content="tamagotchi, desktop pet, virtual pet, kawaii cat, kawaii bear, macOS pet, desktop tamagotchi, murchi, kuma, digital pet">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://murchi.pet">
-    <meta property="og:title" content="Murchi — Desktop Tamagotchi Cat for macOS">
-    <meta property="og:description" content="A pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
+    <meta property="og:title" content="Murchi & Kuma — Kawaii Desktop Pets for macOS">
+    <meta property="og:description" content="Kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. 25+ behaviors, diary, toys, sound effects.">
     <meta property="og:image" content="https://murchi.pet/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Murchi">
+    <meta property="og:site_name" content="Murchi & Kuma">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Murchi — Desktop Tamagotchi Cat for macOS">
-    <meta name="twitter:description" content="A pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
+    <meta name="twitter:title" content="Murchi & Kuma — Kawaii Desktop Pets for macOS">
+    <meta name="twitter:description" content="Kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. 25+ behaviors, diary, toys, sound effects.">
     <meta name="twitter:image" content="https://murchi.pet/og.png">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-deep: #08081a;
-            --bg-card: #111128;
-            --purple: #7c5cbf;
-            --purple-light: #a78bfa;
-            --blue: #3b82f6;
-            --pink: #f472b6;
-            --green: #34d399;
-            --yellow: #fbbf24;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --border: rgba(255,255,255,0.06);
+            --bg-deep: #0c0a1a;
+            --bg-mid: #151030;
+            --bg-card: rgba(255,255,255,0.04);
+            --bg-card-hover: rgba(255,255,255,0.08);
+            --purple: #9b7fd4;
+            --purple-light: #c4b1f0;
+            --blue: #6ba3f7;
+            --pink: #f0a0c8;
+            --pink-hot: #ff6b9d;
+            --green: #7ddba3;
+            --yellow: #ffd07a;
+            --text: #e8e4f0;
+            --text-dim: #8a82a0;
+            --border: rgba(255,255,255,0.08);
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
         }
 
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Nunito', -apple-system, sans-serif;
             background: var(--bg-deep);
             color: var(--text);
             overflow-x: hidden;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        /* Ambient background */
+        /* === AMBIENT BACKGROUND === */
         .ambient {
             position: fixed;
             inset: 0;
@@ -64,56 +69,84 @@
         .ambient-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.12;
-            animation: orbFloat 20s ease-in-out infinite;
+            filter: blur(140px);
+            opacity: 0.10;
+            animation: orbFloat 25s ease-in-out infinite;
         }
         .ambient-orb:nth-child(1) {
-            width: 600px; height: 600px;
-            background: #7c5cbf;
-            top: -200px; left: -100px;
+            width: 700px; height: 700px;
+            background: linear-gradient(135deg, #7c5cbf, #5b4a9e);
+            top: -250px; left: -200px;
         }
         .ambient-orb:nth-child(2) {
-            width: 500px; height: 500px;
-            background: #3b82f6;
-            bottom: -150px; right: -100px;
-            animation-delay: -7s;
+            width: 600px; height: 600px;
+            background: linear-gradient(135deg, #4a8af5, #6ba3f7);
+            bottom: -200px; right: -150px;
+            animation-delay: -8s;
         }
         .ambient-orb:nth-child(3) {
+            width: 500px; height: 500px;
+            background: linear-gradient(135deg, #f472b6, #ff6b9d);
+            top: 40%; left: 40%;
+            animation-delay: -16s;
+        }
+        .ambient-orb:nth-child(4) {
             width: 400px; height: 400px;
-            background: #f472b6;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -14s;
+            background: linear-gradient(135deg, #7ddba3, #34d399);
+            top: 60%; left: 10%;
+            animation-delay: -12s;
         }
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -40px) scale(1.05); }
-            66% { transform: translate(-20px, 30px) scale(0.95); }
+            25% { transform: translate(40px, -50px) scale(1.05); }
+            50% { transform: translate(-30px, 40px) scale(0.97); }
+            75% { transform: translate(20px, -20px) scale(1.03); }
+        }
+
+        /* Stars */
+        .stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1060px;
             margin: 0 auto;
             padding: 0 24px;
             position: relative;
             z-index: 1;
         }
 
-        /* Language switcher */
+        /* === LANGUAGE SELECTOR === */
         .lang-bar {
             position: fixed;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
-            background: rgba(8, 8, 26, 0.8);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: rgba(12, 10, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             padding: 8px 0;
+            transition: transform 0.3s;
         }
         .lang-bar .container {
             display: flex;
-            align-items: center;
             justify-content: center;
             gap: 4px;
             flex-wrap: wrap;
@@ -122,327 +155,191 @@
             background: none;
             border: 1px solid transparent;
             color: var(--text-dim);
-            font-size: 12px;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 13px;
             font-family: inherit;
+            transition: all 0.2s;
         }
-        .lang-btn:hover { color: var(--text); border-color: var(--border); }
+        .lang-btn:hover {
+            color: var(--text);
+            border-color: var(--border);
+        }
         .lang-btn.active {
             color: white;
-            background: rgba(124, 92, 191, 0.3);
+            background: rgba(155, 127, 212, 0.25);
             border-color: var(--purple);
         }
 
-        /* Hero */
+        /* === HERO === */
         .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 100px 0 40px;
+            padding: 100px 24px 60px;
+            position: relative;
         }
-        .hero h1 {
-            font-size: 72px;
+        .hero-content {
+            max-width: 800px;
+        }
+        .hero-title {
+            font-size: clamp(2.8rem, 7vw, 5rem);
             font-weight: 900;
-            background: linear-gradient(135deg, var(--purple-light), var(--pink), var(--yellow));
+            background: linear-gradient(135deg, var(--purple-light), var(--pink), var(--blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: -3px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
         }
-        .hero .tagline {
-            font-size: 22px;
+        .hero-tagline {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
             color: var(--text-dim);
-            font-weight: 300;
-            max-width: 520px;
-            margin: 0 auto 36px;
+            margin-bottom: 40px;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* Download button */
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, var(--purple), var(--blue));
-            color: white;
-            text-decoration: none;
-            font-size: 19px;
-            font-weight: 600;
-            padding: 16px 36px;
-            border-radius: 16px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 30px rgba(124, 92, 191, 0.4);
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(124, 92, 191, 0.6);
-        }
-        .download-btn svg { width: 22px; height: 22px; }
-        .download-sub {
-            display: block;
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--text-dim);
-        }
-        .cta-row {
+        /* Characters display */
+        .characters-display {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .character-wrap {
+            position: relative;
+        }
+        .character-wrap.murchi svg {
+            animation: floatMurchi 4s ease-in-out infinite;
+        }
+        .character-wrap.kuma svg {
+            animation: floatKuma 4s ease-in-out infinite;
+            animation-delay: -1.5s;
+        }
+        @keyframes floatMurchi {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes floatKuma {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Shadow beneath characters */
+        .char-shadow {
+            width: 80px;
+            height: 12px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.3), transparent);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: shadowPulse 4s ease-in-out infinite;
+        }
+        .kuma .char-shadow { animation-delay: -1.5s; }
+        @keyframes shadowPulse {
+            0%, 100% { transform: scaleX(1); opacity: 0.5; }
+            50% { transform: scaleX(0.8); opacity: 0.3; }
+        }
+
+        /* Blink animation for eyes */
+        @keyframes blink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.05); }
+        }
+        .murchi-eyes { animation: blink 4s ease-in-out infinite; transform-origin: center; }
+        .kuma-eyes { animation: blink 4.5s ease-in-out infinite 1s; transform-origin: center; }
+
+        /* Breathing */
+        @keyframes breathe {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.02); }
+        }
+
+        /* Tail wag */
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(8deg); }
+            75% { transform: rotate(-8deg); }
+        }
+        .murchi-tail { animation: tailWag 2s ease-in-out infinite; transform-origin: 20% 90%; }
+
+        /* Ear twitch */
+        @keyframes earTwitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            93% { transform: rotate(-5deg); }
+            96% { transform: rotate(3deg); }
+        }
+        .murchi-ear-right { animation: earTwitch 6s ease-in-out infinite; transform-origin: bottom left; }
+
+        /* Hero actions */
+        .hero-actions {
+            display: flex;
             gap: 16px;
-            margin-top: 20px;
+            justify-content: center;
             flex-wrap: wrap;
         }
-        .github-btn {
+
+        /* === BUTTONS === */
+        .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 24px;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            background: rgba(255,255,255,0.04);
-            transition: all 0.3s ease;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--purple), #7c5cbf);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 25px rgba(124, 92, 191, 0.3);
         }
-        .github-btn:hover {
-            border-color: var(--yellow);
-            background: rgba(251,191,36,0.08);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(124, 92, 191, 0.45);
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: var(--glass);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255,255,255,0.2);
             transform: translateY(-2px);
         }
-        .github-btn svg { width: 20px; height: 20px; fill: currentColor; }
-        .github-btn .star-icon { color: var(--yellow); font-size: 16px; }
-        .github-sub {
-            display: block;
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-dim);
-            margin-top: 2px;
-        }
 
-        /* ── Interactive Demo ── */
-        .demo-section {
-            padding: 40px 0 60px;
-        }
-        .demo-label {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-dim);
-            margin-bottom: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        .desktop-frame {
-            position: relative;
-            max-width: 820px;
-            margin: 0 auto;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.08),
-                0 20px 80px rgba(0, 0, 0, 0.6),
-                0 0 120px rgba(124, 92, 191, 0.08);
-        }
-        /* Titlebar */
-        .desktop-titlebar {
-            background: linear-gradient(180deg, #3a3a4a, #2a2a3a);
-            height: 32px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            gap: 7px;
-        }
-        .tb-dot {
-            width: 12px; height: 12px;
-            border-radius: 50%;
-        }
-        .tb-dot.r { background: #ff5f57; }
-        .tb-dot.y { background: #febc2e; }
-        .tb-dot.g { background: #28c840; }
-        .desktop-titlebar-text {
-            flex: 1;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            font-weight: 500;
-            margin-right: 50px;
-        }
-        /* Canvas area */
-        .desktop-screen {
-            position: relative;
-            background: linear-gradient(180deg, #1a1a3e 0%, #0e0e2a 60%, #16162e 100%);
-            height: 420px;
-            cursor: pointer;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        /* Wallpaper decorations */
-        .wallpaper-grid {
-            position: absolute;
-            inset: 0;
-            background-image:
-                radial-gradient(circle at 20% 30%, rgba(124, 92, 191, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
-        }
-        .wallpaper-dots {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        /* Fake dock */
-        .fake-dock {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 14px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .dock-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            transition: transform 0.15s;
-        }
-        .dock-icon:hover { transform: scale(1.3) translateY(-6px); }
-        .dock-icon.finder { background: linear-gradient(135deg, #35a8f0, #1d7dd9); }
-        .dock-icon.safari { background: linear-gradient(135deg, #54b5f0, #2d8fd9); }
-        .dock-icon.music { background: linear-gradient(135deg, #fa5c5c, #d93b3b); }
-        .dock-icon.terminal { background: linear-gradient(135deg, #2d2d3f, #1a1a2e); }
-        .dock-icon.notes { background: linear-gradient(135deg, #fdd835, #e6b800); }
-
-        /* Cat canvas */
-        #demo-canvas {
-            position: absolute;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            pointer-events: none;
-        }
-        /* Particles */
-        .demo-particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 14px;
-            animation: particleUp 1s ease-out forwards;
-            z-index: 10;
-        }
-        @keyframes particleUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
-        }
-        /* Speech bubble */
-        .demo-bubble {
-            position: absolute;
-            background: rgba(255,255,255,0.95);
-            color: #1a1a2e;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 12px;
-            white-space: nowrap;
-            pointer-events: none;
-            animation: bubblePop 2.5s ease-out forwards;
-            z-index: 10;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-        .demo-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid rgba(255,255,255,0.95);
-        }
-        @keyframes bubblePop {
-            0% { opacity: 0; transform: translateY(4px) scale(0.8); }
-            10% { opacity: 1; transform: translateY(0) scale(1); }
-            80% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-6px); }
-        }
-        /* Stat bars overlay */
-        .demo-stats {
-            position: absolute;
-            pointer-events: none;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .demo-stats.visible { opacity: 1; }
-        .demo-stat-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-        }
-        .demo-stat-icon { width: 14px; text-align: center; }
-        .demo-stat-bar {
-            width: 60px; height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .demo-stat-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.5s ease;
-        }
-        .demo-stat-pct {
-            font-size: 9px;
-            color: rgba(255,255,255,0.6);
-            font-family: 'SF Mono', monospace;
-            min-width: 24px;
-        }
-        /* Click hint */
-        .click-hint {
-            position: absolute;
-            bottom: 76px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            animation: hintPulse 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 5;
-        }
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        /* Sections */
+        /* === SECTIONS === */
         .section {
-            padding: 70px 0;
+            padding: 100px 0;
         }
         .section-title {
-            font-size: 36px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
             font-weight: 800;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             background: linear-gradient(135deg, var(--text), var(--purple-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -451,315 +348,575 @@
         .section-subtitle {
             text-align: center;
             color: var(--text-dim);
-            font-size: 16px;
-            margin-bottom: 40px;
+            font-size: 1.05rem;
+            margin-bottom: 50px;
             max-width: 500px;
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* Feature cards — bento grid */
-        .bento {
+        /* === CHARACTERS SECTION === */
+        .char-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .bento-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 18px;
+        .char-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 36px 28px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .char-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .char-card svg {
+            margin-bottom: 20px;
+        }
+        .char-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .char-card .char-role {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+        }
+        .char-traits {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .trait {
+            background: rgba(255,255,255,0.06);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* === FEATURES GRID === */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             padding: 28px 24px;
-            transition: border-color 0.3s, transform 0.3s;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* === PAY WHAT YOU WANT === */
+        .pwyw-section {
+            padding: 100px 0;
+        }
+        .pwyw-card {
+            max-width: 580px;
+            margin: 0 auto;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 48px 40px;
+            text-align: center;
+            backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
         }
-        .bento-card::before {
+        .pwyw-card::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(124, 92, 191, 0.06), transparent 70%);
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--purple), var(--pink), var(--blue));
         }
-        .bento-card:hover {
-            border-color: rgba(124, 92, 191, 0.25);
-            transform: translateY(-2px);
+        .pwyw-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(240, 160, 200, 0.15), rgba(155, 127, 212, 0.15));
+            border: 1px solid rgba(240, 160, 200, 0.2);
+            color: var(--pink);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
-        .bento-card.wide { grid-column: span 2; }
-        .bento-icon {
-            font-size: 32px;
-            margin-bottom: 14px;
+        .pwyw-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .bento-card h3 {
-            font-size: 17px;
+        .pwyw-subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Price buttons */
+        .price-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .price-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 60px;
         }
-        .bento-card p {
-            font-size: 13px;
+        .price-btn:hover {
+            border-color: var(--purple);
+            background: rgba(155, 127, 212, 0.1);
+        }
+        .price-btn.active {
+            border-color: var(--purple);
+            background: rgba(155, 127, 212, 0.2);
+            box-shadow: 0 0 20px rgba(155, 127, 212, 0.2);
+        }
+        .price-custom {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+        .price-custom input {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            width: 50px;
+            outline: none;
+        }
+        .price-custom input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .price-message {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .price-message.free {
+            color: var(--text-dim);
+        }
+        .price-message.paid {
+            color: var(--pink);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--purple), #7c5cbf, var(--pink-hot));
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 6px 30px rgba(124, 92, 191, 0.35);
+        }
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(124, 92, 191, 0.5);
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Pay flow */
+        .pay-flow {
+            margin-bottom: 8px;
+        }
+        .pay-amount {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple-light), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .pay-instruction {
+            font-size: 1rem;
             color: var(--text-dim);
             line-height: 1.5;
         }
 
-        /* Install steps */
-        .steps {
-            display: grid;
-            gap: 12px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .step {
-            display: flex;
+        .crypto-download {
+            margin-top: 16px;
+            display: inline-flex;
             align-items: center;
-            gap: 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px 22px;
-            transition: border-color 0.3s;
-        }
-        .step:hover { border-color: rgba(124, 92, 191, 0.2); }
-        .step-num {
-            width: 36px; height: 36px; min-width: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--purple), var(--blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 8px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
             font-weight: 700;
-            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.3);
         }
-        .step-text {
-            font-size: 14px;
-            color: var(--text-dim);
+        .crypto-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(52, 211, 153, 0.4);
         }
-        .step-text strong { color: var(--text); }
 
-        /* Pay what you want */
-        .pay-section { text-align: center; padding: 60px 0; }
-        .pay-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 44px 32px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .charity-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(251, 191, 36, 0.12));
-            border: 1px solid rgba(52, 211, 153, 0.25);
-            border-radius: 24px;
-            padding: 7px 18px;
-            font-size: 13px;
-            color: var(--green);
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        .pay-card h2 { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
-        .pay-card .subtitle {
+        .pwyw-note {
+            margin-top: 20px;
+            font-size: 0.8rem;
             color: var(--text-dim);
-            font-size: 14px;
-            margin-bottom: 28px;
         }
-        .crypto-grid { display: grid; gap: 10px; margin-top: 20px; }
+
+        /* Crypto wallets */
+        .crypto-section {
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .crypto-title {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .crypto-wallets {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .crypto-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 14px;
+            gap: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px 18px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .crypto-row:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
+            background: rgba(155, 127, 212, 0.08);
+            border-color: rgba(155, 127, 212, 0.2);
         }
-        .crypto-icon {
-            width: 34px; height: 34px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px; min-width: 34px;
+        .crypto-row .crypto-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            flex-shrink: 0;
         }
-        .crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #e68a00); }
-        .crypto-icon.eth { background: linear-gradient(135deg, #627eea, #4c64c8); }
-        .crypto-icon.sol { background: linear-gradient(135deg, #9945ff, #14f195); }
-        .crypto-info { flex: 1; text-align: left; }
-        .crypto-label { font-size: 13px; font-weight: 600; }
-        .crypto-addr {
-            font-size: 10px;
-            color: var(--text-dim);
+        .crypto-icon.btc { background: rgba(247, 147, 26, 0.15); color: #f7931a; }
+        .crypto-icon.eth { background: rgba(98, 126, 234, 0.15); color: #627eea; }
+        .crypto-icon.sol { background: rgba(153, 69, 255, 0.15); color: #9945ff; }
+        .crypto-row .crypto-info {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+        .crypto-row .crypto-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+        }
+        .crypto-row .crypto-name span {
+            font-weight: 400;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .crypto-row .crypto-addr {
             font-family: 'SF Mono', 'Fira Code', monospace;
-            word-break: break-all;
-        }
-        .copy-btn {
-            background: rgba(255,255,255,0.07);
-            border: none;
-            color: var(--text-dim);
-            font-size: 11px;
-            padding: 5px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.4);
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
+            margin-top: 3px;
         }
-        .copy-btn:hover { background: rgba(255,255,255,0.14); color: var(--text); }
-        .copy-btn.copied { background: rgba(52, 211, 153, 0.2); color: var(--green); }
-        .charity-note {
-            margin-top: 20px;
-            padding: 14px;
-            background: rgba(52, 211, 153, 0.04);
-            border: 1px solid rgba(52, 211, 153, 0.12);
-            border-radius: 12px;
-            font-size: 13px;
-            color: var(--green);
+        .crypto-row .crypto-copy {
+            font-size: 0.9rem;
+            color: var(--purple-light);
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            padding: 6px 14px;
+            background: rgba(167,139,250,0.1);
+            border-radius: 8px;
         }
+        .crypto-row:hover .crypto-copy { color: var(--pink); }
 
-        /* Donation wall */
-        .donations-section { padding: 40px 0; text-align: center; }
-        .donations-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 600px;
+        /* Charity table */
+        .charity-section {
+            padding: 80px 0 40px;
+        }
+        .charity-section h2 {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--pink), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .charity-section .charity-sub {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+        .charity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            max-width: 900px;
             margin: 0 auto;
         }
-        .empty-donations {
-            color: var(--text-dim);
-            font-size: 14px;
-            padding: 20px 0;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
-            color: var(--text-dim);
-            font-size: 12px;
-        }
-        footer a { color: var(--purple-light); text-decoration: none; }
-
-        /* Roadmap */
-        .roadmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px;
-        }
-        .roadmap-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
+        .charity-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
             padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
         }
-        .roadmap-card:hover { border-color: rgba(124, 92, 191, 0.25); }
-        .roadmap-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 16px 16px 0 0;
+        .charity-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.15);
         }
-        .roadmap-card.soon::before { background: linear-gradient(90deg, var(--green), #2dd4bf); }
-        .roadmap-card.next::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
-        .roadmap-card.future::before { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
-        .roadmap-phase {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            margin-bottom: 12px;
+        .charity-card .charity-emoji {
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
-        .roadmap-card.soon .roadmap-phase {
-            background: rgba(52, 211, 153, 0.12);
-            color: var(--green);
-        }
-        .roadmap-card.next .roadmap-phase {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--blue);
-        }
-        .roadmap-card.future .roadmap-phase {
-            background: rgba(244, 114, 182, 0.12);
-            color: var(--pink);
-        }
-        .roadmap-card h3 {
-            font-size: 16px;
+        .charity-card h3 {
+            color: var(--text);
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-        .roadmap-list {
-            list-style: none;
-            padding: 0;
-        }
-        .roadmap-list li {
-            font-size: 13px;
+        .charity-card p {
             color: var(--text-dim);
-            padding: 4px 0;
-            padding-left: 20px;
-            position: relative;
+            font-size: 0.82rem;
+            line-height: 1.5;
         }
-        .roadmap-list li::before {
-            content: '';
-            position: absolute;
-            left: 2px;
-            top: 10px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            border: 1.5px solid var(--text-dim);
-        }
-        .roadmap-card.soon .roadmap-list li.done::before {
-            background: var(--green);
-            border-color: var(--green);
+        .charity-card .charity-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--purple-light);
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
-        /* Scroll reveal */
+        /* === GITHUB SECTION === */
+        .github-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .github-link:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .github-link svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* === INSTALL STEPS === */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        .step:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+        .step-num {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--purple), var(--pink-hot));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin: 0 auto 14px;
+            color: white;
+        }
+        .step-text {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+        .step-text strong {
+            color: var(--text);
+        }
+
+        /* === FOOTER === */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+        footer a {
+            color: var(--purple-light);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* === SCROLL REVEAL === */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transition: opacity 0.7s ease, transform 0.7s ease;
         }
         .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        /* === RESPONSIVE === */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 48px; letter-spacing: -2px; }
-            .hero .tagline { font-size: 17px; }
-            .desktop-screen { height: 320px; }
-            .bento { grid-template-columns: 1fr; }
-            .bento-card.wide { grid-column: span 1; }
-            .download-btn { font-size: 16px; padding: 14px 28px; }
-            .fake-dock { gap: 6px; padding: 5px 10px; }
-            .dock-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
+            .hero { padding: 80px 16px 40px; }
+            .characters-display { gap: 16px; }
+            .characters-display svg { width: 120px; height: auto; }
+            .char-cards { grid-template-columns: 1fr; max-width: 400px; }
+            .pwyw-card { padding: 36px 24px; margin: 0 16px; }
+            .price-options { gap: 8px; }
+            .price-btn { padding: 8px 14px; font-size: 0.9rem; min-width: 50px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .steps { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 480px) {
-            .hero h1 { font-size: 38px; }
-            .desktop-screen { height: 260px; }
+            .steps { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
 
-<!-- Ambient bg -->
 <div class="ambient">
     <div class="ambient-orb"></div>
     <div class="ambient-orb"></div>
     <div class="ambient-orb"></div>
+    <div class="ambient-orb"></div>
 </div>
+<div class="stars" id="stars"></div>
 
 <!-- Language bar -->
-<div class="lang-bar">
+<nav class="lang-bar">
     <div class="container">
         <button class="lang-btn active" data-lang="en">English</button>
         <button class="lang-btn" data-lang="ru">Русский</button>
@@ -770,176 +927,257 @@
         <button class="lang-btn" data-lang="de">Deutsch</button>
         <button class="lang-btn" data-lang="fr">Francais</button>
         <button class="lang-btn" data-lang="pt">Portugues</button>
-        <button class="lang-btn" data-lang="tr">Turkce</button>
+        <button class="lang-btn" data-lang="ar">العربية</button>
     </div>
-</div>
+</nav>
 
-<!-- Hero -->
+<!-- ===================== HERO ===================== -->
 <section class="hero">
-    <h1>Murchi</h1>
-    <p class="tagline" data-i18n="tagline">Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.</p>
-    <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="download-btn" id="download-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>
-            <span data-i18n="download">Download for macOS</span>
-            <span class="download-sub">v2.0 &middot; DMG &middot; macOS 12+</span>
-        </span>
-    </a>
-    <div class="cta-row">
-        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="github-btn">
-            <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            <span>
+    <div class="hero-content">
+        <div class="characters-display">
+            <!-- MURCHI: kawaii gray-blue cat -->
+            <div class="character-wrap murchi">
+                <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Tail -->
+                    <g class="murchi-tail">
+                        <path d="M30 140 Q10 130 8 110 Q6 90 18 85" stroke="#7a8a9a" stroke-width="8" stroke-linecap="round" fill="none"/>
+                    </g>
+                    <!-- Body -->
+                    <ellipse cx="80" cy="132" rx="45" ry="40" fill="#8a9aaa"/>
+                    <ellipse cx="80" cy="130" rx="43" ry="38" fill="#96a6b6"/>
+                    <!-- Belly -->
+                    <ellipse cx="80" cy="138" rx="28" ry="24" fill="#b0bec5"/>
+                    <!-- Left ear -->
+                    <polygon points="48,55 35,20 62,45" fill="#8a9aaa"/>
+                    <polygon points="50,52 40,28 59,47" fill="#e8a0b0"/>
+                    <!-- Right ear -->
+                    <g class="murchi-ear-right">
+                        <polygon points="112,55 125,20 98,45" fill="#8a9aaa"/>
+                        <polygon points="110,52 120,28 101,47" fill="#e8a0b0"/>
+                    </g>
+                    <!-- Head -->
+                    <circle cx="80" cy="68" r="35" fill="#96a6b6"/>
+                    <!-- Eyes -->
+                    <g class="murchi-eyes">
+                        <ellipse cx="67" cy="65" rx="6" ry="7" fill="#2e7d32"/>
+                        <ellipse cx="93" cy="65" rx="6" ry="7" fill="#2e7d32"/>
+                        <circle cx="65" cy="63" r="2.5" fill="white" opacity="0.9"/>
+                        <circle cx="91" cy="63" r="2.5" fill="white" opacity="0.9"/>
+                        <ellipse cx="67" cy="65" rx="3" ry="4" fill="#1b5e20"/>
+                        <ellipse cx="93" cy="65" rx="3" ry="4" fill="#1b5e20"/>
+                    </g>
+                    <!-- Nose -->
+                    <ellipse cx="80" cy="74" rx="3" ry="2.2" fill="#e8a0b0"/>
+                    <!-- Mouth -->
+                    <path d="M76 77 Q80 81 84 77" stroke="#7a6a6a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    <!-- Whiskers -->
+                    <line x1="40" y1="70" x2="58" y2="72" stroke="#c0c8d0" stroke-width="1.2" opacity="0.6"/>
+                    <line x1="38" y1="76" x2="57" y2="76" stroke="#c0c8d0" stroke-width="1.2" opacity="0.6"/>
+                    <line x1="102" y1="72" x2="120" y2="70" stroke="#c0c8d0" stroke-width="1.2" opacity="0.6"/>
+                    <line x1="103" y1="76" x2="122" y2="76" stroke="#c0c8d0" stroke-width="1.2" opacity="0.6"/>
+                    <!-- Cheeks -->
+                    <circle cx="56" cy="76" r="7" fill="#ffb0c0" opacity="0.35"/>
+                    <circle cx="104" cy="76" r="7" fill="#ffb0c0" opacity="0.35"/>
+                    <!-- Collar -->
+                    <path d="M55 98 Q80 108 105 98" stroke="#ffd740" stroke-width="5" fill="none" stroke-linecap="round"/>
+                    <!-- Bell -->
+                    <circle cx="80" cy="106" r="5" fill="#42a5f5"/>
+                    <circle cx="80" cy="106" r="3" fill="#64b5f6"/>
+                    <line x1="80" y1="106" x2="80" y2="111" stroke="#42a5f5" stroke-width="1.5"/>
+                    <!-- Paws -->
+                    <ellipse cx="60" cy="165" rx="12" ry="8" fill="#b0bec5"/>
+                    <ellipse cx="100" cy="165" rx="12" ry="8" fill="#b0bec5"/>
+                </svg>
+                <div class="char-shadow"></div>
+            </div>
+
+            <!-- KUMA: kawaii white bear -->
+            <div class="character-wrap kuma">
+                <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="80" cy="132" rx="48" ry="42" fill="#e8e0d8"/>
+                    <ellipse cx="80" cy="130" rx="46" ry="40" fill="#f0ece8"/>
+                    <!-- Belly -->
+                    <ellipse cx="80" cy="138" rx="30" ry="26" fill="#faf6f2"/>
+                    <!-- Left ear -->
+                    <circle cx="50" cy="38" r="16" fill="#e8e0d8"/>
+                    <circle cx="50" cy="38" r="10" fill="#f5c0c8"/>
+                    <!-- Right ear -->
+                    <circle cx="110" cy="38" r="16" fill="#e8e0d8"/>
+                    <circle cx="110" cy="38" r="10" fill="#f5c0c8"/>
+                    <!-- Head -->
+                    <circle cx="80" cy="68" r="38" fill="#f0ece8"/>
+                    <!-- Eyes -->
+                    <g class="kuma-eyes">
+                        <circle cx="66" cy="65" r="4" fill="#2a2a2a"/>
+                        <circle cx="94" cy="65" r="4" fill="#2a2a2a"/>
+                        <circle cx="64.5" cy="63.5" r="1.8" fill="white" opacity="0.85"/>
+                        <circle cx="92.5" cy="63.5" r="1.8" fill="white" opacity="0.85"/>
+                    </g>
+                    <!-- Nose -->
+                    <ellipse cx="80" cy="74" rx="4" ry="3" fill="#4a3a30"/>
+                    <!-- Mouth -->
+                    <path d="M75 78 Q80 82 85 78" stroke="#6a5a50" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    <!-- Cheeks -->
+                    <circle cx="54" cy="77" r="9" fill="#ffb0c0" opacity="0.3"/>
+                    <circle cx="106" cy="77" r="9" fill="#ffb0c0" opacity="0.3"/>
+                    <!-- Paws -->
+                    <ellipse cx="58" cy="165" rx="14" ry="9" fill="#e8e0d8"/>
+                    <ellipse cx="102" cy="165" rx="14" ry="9" fill="#e8e0d8"/>
+                    <!-- Paw pads -->
+                    <ellipse cx="58" cy="167" rx="6" ry="4" fill="#f5c0c8" opacity="0.5"/>
+                    <ellipse cx="102" cy="167" rx="6" ry="4" fill="#f5c0c8" opacity="0.5"/>
+                </svg>
+                <div class="char-shadow"></div>
+            </div>
+        </div>
+
+        <h1 class="hero-title">Murchi & Kuma</h1>
+        <p class="hero-tagline" data-i18n="tagline">Your kawaii desktop companions for macOS. A cute cat and bear that live on your screen.</p>
+
+        <div class="hero-actions">
+            <a href="#get" class="btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="download">Download for macOS</span>
+            </a>
+            <a href="https://github.com/egorfedorov/murchi" target="_blank" class="btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 <span data-i18n="github_star">Star on GitHub</span>
-                <span class="github-sub" data-i18n="github_sub">Help Murchi grow!</span>
-            </span>
-            <span class="star-icon">&#9733;</span>
-        </a>
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- Interactive Demo -->
-<section class="demo-section">
+<!-- ===================== CHARACTERS ===================== -->
+<section class="section reveal">
     <div class="container">
-        <p class="demo-label" data-i18n="demo_label">Live Preview — click the cat!</p>
-        <div class="desktop-frame">
-            <div class="desktop-titlebar">
-                <div class="tb-dot r"></div>
-                <div class="tb-dot y"></div>
-                <div class="tb-dot g"></div>
-                <div class="desktop-titlebar-text">macOS Desktop</div>
+        <h2 class="section-title" data-i18n="chars_title">Meet the Duo</h2>
+        <p class="section-subtitle" data-i18n="chars_subtitle">Two friends, two personalities, one desktop</p>
+
+        <div class="char-cards">
+            <div class="char-card">
+                <svg width="100" height="110" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="80" cy="132" rx="45" ry="40" fill="#96a6b6"/>
+                    <ellipse cx="80" cy="138" rx="28" ry="24" fill="#b0bec5"/>
+                    <polygon points="48,55 35,20 62,45" fill="#8a9aaa"/>
+                    <polygon points="50,52 40,28 59,47" fill="#e8a0b0"/>
+                    <polygon points="112,55 125,20 98,45" fill="#8a9aaa"/>
+                    <polygon points="110,52 120,28 101,47" fill="#e8a0b0"/>
+                    <circle cx="80" cy="68" r="35" fill="#96a6b6"/>
+                    <ellipse cx="67" cy="65" rx="5" ry="6" fill="#2e7d32"/>
+                    <ellipse cx="93" cy="65" rx="5" ry="6" fill="#2e7d32"/>
+                    <circle cx="65.5" cy="63.5" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="91.5" cy="63.5" r="2" fill="white" opacity="0.9"/>
+                    <ellipse cx="80" cy="74" rx="3" ry="2" fill="#e8a0b0"/>
+                    <path d="M76 77 Q80 81 84 77" stroke="#7a6a6a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="56" cy="76" r="7" fill="#ffb0c0" opacity="0.35"/>
+                    <circle cx="104" cy="76" r="7" fill="#ffb0c0" opacity="0.35"/>
+                    <path d="M55 98 Q80 108 105 98" stroke="#ffd740" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <circle cx="80" cy="106" r="4" fill="#42a5f5"/>
+                </svg>
+                <h3>Murchi</h3>
+                <p class="char-role" data-i18n="murchi_role">The Curious Cat</p>
+                <div class="char-traits">
+                    <span class="trait" data-i18n="trait_playful">Playful</span>
+                    <span class="trait" data-i18n="trait_curious">Curious</span>
+                    <span class="trait" data-i18n="trait_fish">Loves Fish</span>
+                </div>
             </div>
-            <div class="desktop-screen" id="desktop-screen">
-                <div class="wallpaper-grid"></div>
-                <div class="wallpaper-dots"></div>
-                <canvas id="demo-canvas" width="64" height="64"></canvas>
-                <div class="demo-stats" id="demo-stats"></div>
-                <div class="click-hint" id="click-hint" data-i18n="click_hint">Click the cat to pet it</div>
-                <div class="fake-dock">
-                    <div class="dock-icon finder">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="10" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="white" stroke="none"/><path d="M9 15c1.5 1.5 4.5 1.5 6 0"/></svg>
-                    </div>
-                    <div class="dock-icon safari">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M16 8l-6 2.5L8 16l6-2.5z" fill="rgba(255,255,255,0.3)"/></svg>
-                    </div>
-                    <div class="dock-icon music">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    </div>
-                    <div class="dock-icon terminal">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                    </div>
-                    <div class="dock-icon notes">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
-                    </div>
+            <div class="char-card">
+                <svg width="100" height="110" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="80" cy="132" rx="46" ry="40" fill="#f0ece8"/>
+                    <ellipse cx="80" cy="138" rx="30" ry="26" fill="#faf6f2"/>
+                    <circle cx="50" cy="38" r="14" fill="#e8e0d8"/>
+                    <circle cx="50" cy="38" r="9" fill="#f5c0c8"/>
+                    <circle cx="110" cy="38" r="14" fill="#e8e0d8"/>
+                    <circle cx="110" cy="38" r="9" fill="#f5c0c8"/>
+                    <circle cx="80" cy="68" r="38" fill="#f0ece8"/>
+                    <circle cx="66" cy="65" r="3.5" fill="#2a2a2a"/>
+                    <circle cx="94" cy="65" r="3.5" fill="#2a2a2a"/>
+                    <circle cx="64.8" cy="63.8" r="1.5" fill="white" opacity="0.85"/>
+                    <circle cx="92.8" cy="63.8" r="1.5" fill="white" opacity="0.85"/>
+                    <ellipse cx="80" cy="74" rx="4" ry="3" fill="#4a3a30"/>
+                    <path d="M75 78 Q80 82 85 78" stroke="#6a5a50" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="54" cy="77" r="9" fill="#ffb0c0" opacity="0.3"/>
+                    <circle cx="106" cy="77" r="9" fill="#ffb0c0" opacity="0.3"/>
+                </svg>
+                <h3>Kuma</h3>
+                <p class="char-role" data-i18n="kuma_role">The Gentle Bear</p>
+                <div class="char-traits">
+                    <span class="trait" data-i18n="trait_calm">Calm</span>
+                    <span class="trait" data-i18n="trait_cuddly">Cuddly</span>
+                    <span class="trait" data-i18n="trait_honey">Loves Honey</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features -->
+<!-- ===================== FEATURES ===================== -->
 <section class="section reveal">
     <div class="container">
-        <h2 class="section-title" data-i18n="features_title">Everything a Cat Needs</h2>
-        <p class="section-subtitle" data-i18n="features_subtitle">A full Tamagotchi experience right on your desktop</p>
-        <div class="bento">
-            <div class="bento-card wide">
-                <div class="bento-icon">🎮</div>
+        <h2 class="section-title" data-i18n="features_title">Everything They Need</h2>
+        <p class="section-subtitle" data-i18n="features_subtitle">A full Tamagotchi experience on your desktop</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#127918;</span>
                 <h3 data-i18n="f1_title">25+ Behaviors</h3>
-                <p data-i18n="f1_desc">Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.</p>
+                <p data-i18n="f1_desc">Walking, sleeping, zoomies, grooming, bathing, chasing butterflies, watching birds, knocking glasses off tables, and much more.</p>
             </div>
-            <div class="bento-card">
-                <div class="bento-icon">🐟</div>
+            <div class="feature-card">
+                <span class="feature-icon">&#127836;</span>
                 <h3 data-i18n="f2_title">Feed & Care</h3>
-                <p data-i18n="f2_desc">Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.</p>
+                <p data-i18n="f2_desc">Fish, milk, treats, honey. Keep hunger, happiness, energy, hygiene, and health balanced.</p>
             </div>
-            <div class="bento-card">
-                <div class="bento-icon">🧶</div>
+            <div class="feature-card">
+                <span class="feature-icon">&#129528;</span>
                 <h3 data-i18n="f3_title">Toys & Accessories</h3>
-                <p data-i18n="f3_desc">Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.</p>
+                <p data-i18n="f3_desc">Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers, and more.</p>
             </div>
-            <div class="bento-card wide">
-                <div class="bento-icon">📖</div>
-                <h3 data-i18n="f7_title">Cat Diary</h3>
-                <p data-i18n="f7_desc">Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.</p>
+            <div class="feature-card">
+                <span class="feature-icon">&#128211;</span>
+                <h3 data-i18n="f7_title">Pet Diary</h3>
+                <p data-i18n="f7_desc">Your pet writes a personal blog about its day. Read about meals, adventures, butterflies, and birthday celebrations.</p>
             </div>
-            <div class="bento-card">
-                <div class="bento-icon">⬆️</div>
+            <div class="feature-card">
+                <span class="feature-icon">&#11088;</span>
                 <h3 data-i18n="f4_title">Level Up & Evolve</h3>
-                <p data-i18n="f4_desc">Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.</p>
+                <p data-i18n="f4_desc">Earn XP by caring. Evolve through 5 stages from Baby to Cosmic form.</p>
             </div>
-            <div class="bento-card">
-                <div class="bento-icon">✨</div>
+            <div class="feature-card">
+                <span class="feature-icon">&#10024;</span>
                 <h3 data-i18n="f5_title">Particle Magic</h3>
-                <p data-i18n="f5_desc">Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.</p>
+                <p data-i18n="f5_desc">Hearts, stars, sparkles, poof clouds, paw prints, and sleep Z particles.</p>
             </div>
-            <div class="bento-card">
-                <div class="bento-icon">🖥️</div>
+            <div class="feature-card">
+                <span class="feature-icon">&#128187;</span>
                 <h3 data-i18n="f8_title">Lives on Your Dock</h3>
                 <p data-i18n="f8_desc">Walks on the macOS Dock as a physical platform. Falls off the edges!</p>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Roadmap -->
-<section class="section reveal">
-    <div class="container">
-        <h2 class="section-title" data-i18n="roadmap_title">Roadmap</h2>
-        <p class="section-subtitle" data-i18n="roadmap_subtitle">What's coming next for Murchi</p>
-        <div class="roadmap-grid">
-            <div class="roadmap-card soon">
-                <div class="roadmap-phase" data-i18n="roadmap_v21">v2.1 — Coming Soon</div>
-                <h3 data-i18n="roadmap_v21_title">More Items & Mini-Games</h3>
-                <ul class="roadmap-list">
-                    <li class="done" data-i18n="r1_1">25+ cat behaviors</li>
-                    <li class="done" data-i18n="r1_2">Cat diary with blog entries</li>
-                    <li class="done" data-i18n="r1_3">5 accessories (hat, bow tie, crown, glasses, flower)</li>
-                    <li data-i18n="r1_4">15+ new accessories (scarves, sunglasses, bandanas...)</li>
-                    <li data-i18n="r1_5">New foods: sushi, cake, pizza, ice cream</li>
-                    <li data-i18n="r1_6">Mini-games: catch the fish, dodge the vacuum</li>
-                    <li data-i18n="r1_7">Seasonal events (Halloween, Christmas, New Year)</li>
-                </ul>
+            <div class="feature-card">
+                <span class="feature-icon">&#128266;</span>
+                <h3 data-i18n="f6_title">Sound Effects</h3>
+                <p data-i18n="f6_desc">Meows, purrs, munching, splashing. Toggle sounds on or off anytime.</p>
             </div>
-            <div class="roadmap-card next">
-                <div class="roadmap-phase" data-i18n="roadmap_v22">v2.2 — Next Up</div>
-                <h3 data-i18n="roadmap_v22_title">Social & Multiplayer</h3>
-                <ul class="roadmap-list">
-                    <li data-i18n="r2_1">Visit friends' cats on their desktops</li>
-                    <li data-i18n="r2_2">Cat mood music & ambient sounds</li>
-                    <li data-i18n="r2_3">Desktop widgets (stats, diary preview)</li>
-                    <li data-i18n="r2_4">iCloud sync between Macs</li>
-                    <li data-i18n="r2_5">Custom color skins & patterns</li>
-                    <li data-i18n="r2_6">Photo mode with custom backgrounds</li>
-                </ul>
-            </div>
-            <div class="roadmap-card future">
-                <div class="roadmap-phase" data-i18n="roadmap_v3">v3.0 — The Future</div>
-                <h3 data-i18n="roadmap_v3_title">New Pets & Worlds</h3>
-                <ul class="roadmap-list">
-                    <li data-i18n="r3_1">New pet types: dog, hamster, parrot, bunny</li>
-                    <li data-i18n="r3_2">Pet houses & furniture decorating</li>
-                    <li data-i18n="r3_3">Multi-pet households</li>
-                    <li data-i18n="r3_4">iOS companion app</li>
-                    <li data-i18n="r3_5">AI personality — unique dialog for each cat</li>
-                    <li data-i18n="r3_6">Community marketplace for accessories</li>
-                </ul>
+            <div class="feature-card">
+                <span class="feature-icon">&#129528;</span>
+                <h3 data-i18n="f9_title">Switch Pets</h3>
+                <p data-i18n="f9_desc">Switch between Murchi the cat and Kuma the bear anytime. Each has unique animations and personality.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Install -->
+<!-- ===================== INSTALL ===================== -->
 <section class="section reveal">
     <div class="container">
         <h2 class="section-title" data-i18n="install_title">Get Started in Seconds</h2>
+        <p class="section-subtitle" data-i18n="install_subtitle">No account needed. No internet required.</p>
         <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <div class="step-text" data-i18n="step1">Download <strong>Murchi.dmg</strong> above</div>
+                <div class="step-text" data-i18n="step1">Download <strong>Murchi.dmg</strong></div>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
@@ -951,409 +1189,165 @@
             </div>
             <div class="step">
                 <div class="step-num">4</div>
-                <div class="step-text" data-i18n="step4">Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon</div>
+                <div class="step-text" data-i18n="step4">Your pet appears on the desktop! <strong>Cmd+Shift+M</strong> to summon</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Pay what you want -->
-<section class="pay-section reveal">
-    <div class="pay-card">
-        <div class="charity-badge" data-i18n="charity_badge">50% goes to animal charity</div>
-        <h2 data-i18n="pay_title">Pay What You Want</h2>
-        <p class="subtitle" data-i18n="pay_subtitle">Murchi is free forever. Support development if you'd like — half goes to animal rescue.</p>
-        <div class="crypto-grid">
-            <div class="crypto-row" onclick="copyAddr(this, 'bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d')">
-                <div class="crypto-icon btc">BTC</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">Bitcoin</div>
-                    <div class="crypto-addr">bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d</div>
-                </div>
-                <button class="copy-btn" data-i18n="copy">Copy</button>
+<!-- ===================== PAY WHAT YOU WANT ===================== -->
+<section class="pwyw-section reveal" id="get">
+    <div class="container">
+        <div class="pwyw-card">
+            <div class="pwyw-badge" data-i18n="pwyw_badge">50% goes to animal shelters &middot; 50% supports development</div>
+            <h2 class="pwyw-title" data-i18n="pwyw_title">Name Your Price</h2>
+            <p class="pwyw-subtitle" data-i18n="pwyw_subtitle">Murchi & Kuma are free forever. If you'd like to support us, every dollar helps real animals.</p>
+
+            <div class="price-options">
+                <button class="price-btn active" data-price="0">$0</button>
+                <button class="price-btn" data-price="3">$3</button>
+                <button class="price-btn" data-price="5">$5</button>
+                <button class="price-btn" data-price="10">$10</button>
+                <button class="price-btn" data-price="20">$20</button>
+                <button class="price-btn price-custom" data-price="custom">$<input type="number" min="1" max="999" placeholder="..." id="custom-price"></button>
             </div>
-            <div class="crypto-row" onclick="copyAddr(this, '0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91')">
-                <div class="crypto-icon eth">ETH</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">ETH / USDT / USDC</div>
-                    <div class="crypto-addr">0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91</div>
-                </div>
-                <button class="copy-btn" data-i18n="copy">Copy</button>
+
+            <div class="price-message free" id="price-message">
+                <span data-i18n="price_free">That's okay! Murchi & Kuma love you anyway &#128149;</span>
             </div>
-            <div class="crypto-row" onclick="copyAddr(this, 'CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9')">
-                <div class="crypto-icon sol">SOL</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">Solana</div>
-                    <div class="crypto-addr">CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9</div>
+
+            <!-- Free download button (shown when $0) -->
+            <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="download-btn" id="free-dl-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="get_free">Download Free</span>
+            </a>
+
+            <!-- Pay amount display (shown when $X > 0) -->
+            <div class="pay-flow" id="pay-flow" style="display:none">
+                <div class="pay-amount" id="pay-amount">Pay $5</div>
+                <div class="pay-instruction" data-i18n="pay_instruction">Send the amount to one of the addresses below, then download</div>
+            </div>
+
+            <p class="pwyw-note" data-i18n="pwyw_note">macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB</p>
+
+            <div class="crypto-section" id="crypto-section" style="display:none">
+                <div class="crypto-title" data-i18n="crypto_title">We accept crypto payments</div>
+                <div class="crypto-wallets">
+                    <div class="crypto-row" onclick="copyAddr(this, 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')" title="Copy BTC address">
+                        <div class="crypto-icon btc">&#8383;</div>
+                        <div class="crypto-info">
+                            <div class="crypto-name">BTC <span>Bitcoin</span></div>
+                            <div class="crypto-addr">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+                        </div>
+                        <div class="crypto-copy" data-i18n="copy">Copy</div>
+                    </div>
+                    <div class="crypto-row" onclick="copyAddr(this, '0x71C7656EC7ab88b098defB751B7401B5f6d8976F')" title="Copy ERC-20 address">
+                        <div class="crypto-icon eth">&#9830;</div>
+                        <div class="crypto-info">
+                            <div class="crypto-name">ERC-20 <span>ETH, USDT, USDC & other tokens</span></div>
+                            <div class="crypto-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                        </div>
+                        <div class="crypto-copy" data-i18n="copy">Copy</div>
+                    </div>
+                    <div class="crypto-row" onclick="copyAddr(this, 'DRpbCBMxVnDK7maPMoGQfFaCRJNen4STmkF7Rexz1UV6')" title="Copy Solana address">
+                        <div class="crypto-icon sol">&#9788;</div>
+                        <div class="crypto-info">
+                            <div class="crypto-name">Solana <span>SOL, SPL tokens</span></div>
+                            <div class="crypto-addr">DRpbCBMxVnDK7maPMoGQfFaCRJNen4STmkF7Rexz1UV6</div>
+                        </div>
+                        <div class="crypto-copy" data-i18n="copy">Copy</div>
+                    </div>
                 </div>
-                <button class="copy-btn" data-i18n="copy">Copy</button>
+                <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="crypto-download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="download_after_pay">Download Murchi & Kuma</span>
+                </a>
             </div>
         </div>
-        <div class="charity-note" data-i18n="charity_note">50% of every donation goes to animal shelters and rescue organizations</div>
     </div>
 </section>
 
-<!-- Donations -->
-<section class="donations-section reveal">
-    <div class="donations-card">
-        <h2 class="section-title" data-i18n="donations_title">Donation Wall</h2>
-        <p class="empty-donations" data-i18n="donations_empty">Be the first to support Murchi and help animals!</p>
+<!-- ===================== CHARITY FUNDS ===================== -->
+<section class="charity-section reveal">
+    <div class="container">
+        <h2 data-i18n="charity_title">Where Your Money Goes</h2>
+        <p class="charity-sub" data-i18n="charity_sub">50% of all payments go directly to these animal welfare organizations</p>
+        <div class="charity-grid">
+            <a href="https://bestfriends.org" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#128062;</div>
+                <h3>Best Friends Animal Society</h3>
+                <p>Leading the movement to save the lives of cats and dogs in shelters across the USA. No-kill by 2025.</p>
+                <span class="charity-link">bestfriends.org &rarr;</span>
+            </a>
+            <a href="https://www.aspca.org" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#128049;</div>
+                <h3>ASPCA</h3>
+                <p>Fighting animal cruelty since 1866. Provides rescue, adoption, veterinary care and advocacy for animals.</p>
+                <span class="charity-link">aspca.org &rarr;</span>
+            </a>
+            <a href="https://www.alleycat.org" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#128008;</div>
+                <h3>Alley Cat Allies</h3>
+                <p>Protecting and improving cats' lives through TNR (Trap-Neuter-Return) and advocacy programs worldwide.</p>
+                <span class="charity-link">alleycat.org &rarr;</span>
+            </a>
+            <a href="https://www.ifaw.org" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#127758;</div>
+                <h3>IFAW</h3>
+                <p>International Fund for Animal Welfare. Rescuing animals in crisis and protecting wildlife around the globe.</p>
+                <span class="charity-link">ifaw.org &rarr;</span>
+            </a>
+            <a href="https://www.worldanimalprotection.org" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#128059;</div>
+                <h3>World Animal Protection</h3>
+                <p>Ending animal suffering worldwide. Campaigns for better laws and directly helps animals in disasters.</p>
+                <span class="charity-link">worldanimalprotection.org &rarr;</span>
+            </a>
+            <a href="https://www.felinefriends.org.uk" target="_blank" class="charity-card">
+                <div class="charity-emoji">&#129505;</div>
+                <h3>Feline Friends</h3>
+                <p>Dedicated cat rescue charity. Finds loving homes for stray and abandoned cats through foster care.</p>
+                <span class="charity-link">felinefriends.org.uk &rarr;</span>
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- Footer -->
+<!-- ===================== GITHUB ===================== -->
+<section class="github-section reveal">
+    <div class="container">
+        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="github-link">
+            <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span data-i18n="github_cta">Star on GitHub</span>
+            <img src="https://img.shields.io/github/stars/egorfedorov/murchi?style=social" alt="GitHub stars" style="height:20px;">
+        </a>
+    </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
 <footer>
     <div class="container">
-        <p>&copy; 2026 <a href="https://murchi.pet">murchi.pet</a> &middot; <span data-i18n="footer_made">Made with love for cats everywhere</span></p>
+        <p>&copy; 2026 <a href="https://murchi.pet">murchi.pet</a> &middot; <span data-i18n="footer_made">Made with love for animals everywhere</span></p>
     </div>
 </footer>
 
 <script>
 // ══════════════════════════════════════════════
-//  INTERACTIVE CAT DEMO
+//  STARS BACKGROUND
 // ══════════════════════════════════════════════
-
 (function() {
-    const screen = document.getElementById('desktop-screen');
-    const canvas = document.getElementById('demo-canvas');
-    const ctx = canvas.getContext('2d');
-    const statsEl = document.getElementById('demo-stats');
-    const hintEl = document.getElementById('click-hint');
-
-    const SCALE = 4;
-    canvas.width = 16 * SCALE;
-    canvas.height = 16 * SCALE;
-    canvas.style.width = (16 * SCALE) + 'px';
-    canvas.style.height = (16 * SCALE) + 'px';
-
-    // Sprites
-    const T = 0, B = 0x2D2D3F, G = 0x9898B0, GD = 0x7E7E98, P = 0xFFBBCC, W = 0xF0F0F8;
-    const GR = 0x88DD88, Y = 0xFFDD33, BL = 0x55AAFF;
-
-    const sprites = {
-        idle: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        walk1: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,B,W,W,B,G,G,G,G,G,G,B,W,W,B,T],
-            [T,T,B,B,T,B,B,B,B,B,B,T,B,B,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        walk2: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,B,G,G,G,G,G,G,B,W,B,T,T],
-            [T,T,T,B,T,T,B,B,B,B,T,T,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        happy: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,B,G,G,G,G,B,B,G,G,B,T],
-            [T,B,G,G,G,B,G,G,G,G,B,G,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        sleep: [
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,B,B,B,B,B,B,B,G,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,B,B,B,G,G,G,G,B,B,B,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,P,P,G,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
-            [T,B,B,G,G,G,G,G,G,G,G,G,G,B,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,T,B,B,B,B,B,B,B,B,B,B,B,B,T,T],
-        ],
-    };
-
-    function drawSprite(data, flipX) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let y = 0; y < 16; y++) {
-            for (let x = 0; x < 16; x++) {
-                const hex = data[y][x];
-                if (!hex) continue;
-                const r = (hex >> 16) & 0xFF;
-                const g = (hex >> 8) & 0xFF;
-                const b = hex & 0xFF;
-                ctx.fillStyle = `rgb(${r},${g},${b})`;
-                const px = flipX ? (15 - x) : x;
-                ctx.fillRect(px * SCALE, y * SCALE, SCALE, SCALE);
-            }
-        }
+    const c = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = (Math.random() * 5) + 's';
+        s.style.animationDuration = (2 + Math.random() * 3) + 's';
+        s.style.width = s.style.height = (1 + Math.random() * 2) + 'px';
+        c.appendChild(s);
     }
-
-    // Cat state
-    const rect = screen.getBoundingClientRect;
-    let catX = 300, catY = 0;
-    let targetX = null;
-    let facingRight = true;
-    let behavior = 'idle'; // idle, walking, sleeping, happy
-    let frame = 0;
-    let behaviorTimer = 0;
-    let showStats = false;
-    let statsTimer = 0;
-    let hintHidden = false;
-
-    // Stats
-    const demoStats = {
-        food: 72, happy: 85, energy: 60, social: 55, clean: 90, health: 95
-    };
-    const statColors = {
-        food: '#ff8c40', happy: '#ff5a80', energy: '#4dc0ff',
-        social: '#a66dff', clean: '#40e899', health: '#ff4d5a'
-    };
-    const statIcons = {
-        food: '🍖', happy: '❤️', energy: '⚡',
-        social: '👥', clean: '🚿', health: '💚'
-    };
-
-    function buildStatsHTML() {
-        let html = '';
-        for (const [key, val] of Object.entries(demoStats)) {
-            html += `<div class="demo-stat-row" style="transform:translateX(-10px);opacity:0;animation:statSlide 0.3s ${Object.keys(demoStats).indexOf(key) * 0.06}s forwards">
-                <div class="demo-stat-icon">${statIcons[key]}</div>
-                <div class="demo-stat-bar"><div class="demo-stat-fill" style="width:${val}%;background:${statColors[key]}"></div></div>
-                <div class="demo-stat-pct">${val}%</div>
-            </div>`;
-        }
-        return html;
-    }
-
-    // Ground Y (just above dock)
-    function getGroundY() {
-        return screen.clientHeight - 72;
-    }
-    function getDockLeft() {
-        const sw = screen.clientWidth;
-        const dw = document.querySelector('.fake-dock').offsetWidth;
-        return (sw - dw) / 2;
-    }
-    function getDockRight() {
-        return getDockLeft() + document.querySelector('.fake-dock').offsetWidth;
-    }
-
-    // Position cat
-    function updateCatPosition() {
-        const groundY = getGroundY();
-        canvas.style.left = catX + 'px';
-        canvas.style.top = (groundY - canvas.height) + 'px';
-        // Stats follow cat
-        statsEl.style.left = (catX - 10) + 'px';
-        statsEl.style.top = (groundY - canvas.height - 65) + 'px';
-    }
-
-    // Particles
-    function spawnParticle(emoji, x, y) {
-        const p = document.createElement('div');
-        p.className = 'demo-particle';
-        p.textContent = emoji;
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        p.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
-        screen.appendChild(p);
-        setTimeout(() => p.remove(), 1500);
-    }
-
-    // Speech bubble
-    function showBubble(text) {
-        const b = document.createElement('div');
-        b.className = 'demo-bubble';
-        b.textContent = text;
-        b.style.left = (catX + canvas.width / 2) + 'px';
-        b.style.top = (getGroundY() - canvas.height - 24) + 'px';
-        b.style.transform = 'translateX(-50%)';
-        screen.appendChild(b);
-        setTimeout(() => b.remove(), 2500);
-    }
-
-    const bubbles = [
-        "Purrrr~", "Meow!", "Love you!", "*happy*", "More pets!",
-        "Nya~", "*purrs*", "Hehe~", "Yay!", "*nuzzle*"
-    ];
-
-    // Click handler
-    screen.addEventListener('click', function(e) {
-        const rect = screen.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        const catRight = catX + canvas.width;
-        const catTop = getGroundY() - canvas.height;
-
-        // Check if clicked on cat
-        if (clickX >= catX && clickX <= catRight && clickY >= catTop && clickY <= getGroundY()) {
-            // Pet the cat!
-            behavior = 'happy';
-            behaviorTimer = 90;
-            if (!hintHidden) {
-                hintEl.style.display = 'none';
-                hintHidden = true;
-            }
-
-            // Show stats
-            statsEl.innerHTML = buildStatsHTML();
-            statsEl.classList.add('visible');
-            showStats = true;
-            statsTimer = 120;
-
-            // Particles
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => {
-                    const px = catX + 10 + Math.random() * (canvas.width - 20);
-                    const py = catTop - 5 + Math.random() * 20;
-                    spawnParticle(['❤️', '💖', '💕', '✨'][i % 4], px, py);
-                }, i * 120);
-            }
-
-            // Bubble
-            showBubble(bubbles[Math.floor(Math.random() * bubbles.length)]);
-
-            // Animate stats change
-            demoStats.happy = Math.min(100, demoStats.happy + 3);
-            demoStats.social = Math.min(100, demoStats.social + 2);
-        }
-    });
-
-    // Main loop
-    function tick() {
-        frame++;
-
-        // Behavior AI
-        if (behaviorTimer > 0) {
-            behaviorTimer--;
-            if (behaviorTimer === 0) {
-                behavior = 'idle';
-                targetX = null;
-            }
-        }
-
-        if (behavior === 'idle' && frame % 120 === 0 && Math.random() < 0.6) {
-            // Start walking
-            const sw = screen.clientWidth;
-            targetX = 40 + Math.random() * (sw - 120);
-            behavior = 'walking';
-            behaviorTimer = 300;
-        }
-
-        if (behavior === 'idle' && frame % 600 === 0 && Math.random() < 0.3) {
-            behavior = 'sleeping';
-            behaviorTimer = 200;
-        }
-
-        // Walking
-        if (behavior === 'walking' && targetX !== null) {
-            const speed = 1.2;
-            const dx = targetX - catX;
-            if (Math.abs(dx) < speed * 2) {
-                catX = targetX;
-                targetX = null;
-                behavior = 'idle';
-                behaviorTimer = 0;
-            } else {
-                catX += dx > 0 ? speed : -speed;
-                facingRight = dx > 0;
-            }
-        }
-
-        // Clamp
-        const maxX = screen.clientWidth - canvas.width - 10;
-        catX = Math.max(10, Math.min(maxX, catX));
-
-        // Draw sprite
-        let sprite;
-        if (behavior === 'sleeping') {
-            sprite = sprites.sleep;
-        } else if (behavior === 'happy') {
-            sprite = sprites.happy;
-        } else if (behavior === 'walking') {
-            sprite = (Math.floor(frame / 8) % 2 === 0) ? sprites.walk1 : sprites.walk2;
-        } else {
-            sprite = sprites.idle;
-        }
-        drawSprite(sprite, !facingRight);
-
-        // Stats timer
-        if (showStats) {
-            statsTimer--;
-            if (statsTimer <= 0) {
-                statsEl.classList.remove('visible');
-                showStats = false;
-            }
-        }
-
-        updateCatPosition();
-        requestAnimationFrame(tick);
-    }
-
-    // Init
-    catX = screen.clientWidth / 2 - canvas.width / 2;
-    updateCatPosition();
-    drawSprite(sprites.idle, false);
-
-    // Inject stat animation keyframes
-    const styleTag = document.createElement('style');
-    styleTag.textContent = `@keyframes statSlide { to { transform: translateX(0); opacity: 1; } }`;
-    document.head.appendChild(styleTag);
-
-    requestAnimationFrame(tick);
 })();
-
 
 // ══════════════════════════════════════════════
 //  SCROLL REVEAL
@@ -1365,359 +1359,660 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+// ══════════════════════════════════════════════
+//  PAY WHAT YOU WANT
+// ══════════════════════════════════════════════
+(function() {
+    const btns = document.querySelectorAll('.price-btn');
+    const msg = document.getElementById('price-message');
+    const freeDlBtn = document.getElementById('free-dl-btn');
+    const payFlow = document.getElementById('pay-flow');
+    const payAmount = document.getElementById('pay-amount');
+    const cryptoSection = document.getElementById('crypto-section');
+    const customInput = document.getElementById('custom-price');
+    let selectedPrice = 0;
+
+    function updateUI(price) {
+        selectedPrice = price;
+        const t = translations[currentLang] || translations.en;
+
+        if (price === 0) {
+            msg.className = 'price-message free';
+            msg.querySelector('span').innerHTML = t.price_free || "That's okay! Murchi &amp; Kuma love you anyway &#128149;";
+            freeDlBtn.style.display = 'inline-flex';
+            payFlow.style.display = 'none';
+            cryptoSection.style.display = 'none';
+        } else {
+            msg.className = 'price-message paid';
+            msg.querySelector('span').innerHTML = t.price_paid || "Thank you! &#128149; You're helping real animals";
+            freeDlBtn.style.display = 'none';
+            payFlow.style.display = 'block';
+            payAmount.textContent = (t.pay_amount || 'Pay ${price}').replace('${price}', '$' + price);
+            cryptoSection.style.display = 'block';
+        }
+    }
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            btns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const p = this.dataset.price;
+            if (p === 'custom') {
+                customInput.focus();
+                updateUI(parseInt(customInput.value) || 0);
+            } else {
+                customInput.value = '';
+                updateUI(parseInt(p));
+            }
+        });
+    });
+
+    customInput.addEventListener('input', function() {
+        updateUI(parseInt(this.value) || 0);
+        btns.forEach(b => b.classList.remove('active'));
+        this.closest('.price-btn').classList.add('active');
+    });
+})();
 
 // ══════════════════════════════════════════════
-//  COPY ADDRESS
+//  COPY CRYPTO ADDRESS
 // ══════════════════════════════════════════════
 function copyAddr(row, addr) {
-    navigator.clipboard.writeText(addr);
-    const btn = row.querySelector('.copy-btn');
-    btn.textContent = translations[currentLang].copied || 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => {
-        btn.textContent = translations[currentLang].copy || 'Copy';
-        btn.classList.remove('copied');
-    }, 2000);
+    navigator.clipboard.writeText(addr).then(() => {
+        const copyEl = row.querySelector('.crypto-copy');
+        const orig = copyEl.textContent;
+        copyEl.textContent = 'Copied!';
+        copyEl.style.color = '#34d399';
+        setTimeout(() => {
+            copyEl.textContent = orig;
+            copyEl.style.color = '';
+        }, 2000);
+    });
 }
-
 
 // ══════════════════════════════════════════════
 //  TRANSLATIONS
 // ══════════════════════════════════════════════
 const translations = {
     en: {
-        tagline: "Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.",
+        tagline: "Your kawaii desktop companions for macOS. A cute cat and bear that live on your screen.",
         download: "Download for macOS",
         github_star: "Star on GitHub",
-        github_sub: "Help Murchi grow!",
-        demo_label: "Live Preview — click the cat!",
-        click_hint: "Click the cat to pet it",
-        features_title: "Everything a Cat Needs",
-        features_subtitle: "A full Tamagotchi experience right on your desktop",
-        f1_title: "25+ Behaviors", f1_desc: "Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.",
-        f2_title: "Feed & Care", f2_desc: "Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.",
-        f3_title: "Toys & Accessories", f3_desc: "Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.",
-        f4_title: "Level Up & Evolve", f4_desc: "Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.",
-        f5_title: "Particle Magic", f5_desc: "Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.",
-        f7_title: "Cat Diary", f7_desc: "Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.",
-        f8_title: "Lives on Your Dock", f8_desc: "Walks on the macOS Dock as a physical platform. Falls off the edges!",
+        chars_title: "Meet the Duo",
+        chars_subtitle: "Two friends, two personalities, one desktop",
+        murchi_role: "The Curious Cat",
+        kuma_role: "The Gentle Bear",
+        trait_playful: "Playful",
+        trait_curious: "Curious",
+        trait_fish: "Loves Fish",
+        trait_calm: "Calm",
+        trait_cuddly: "Cuddly",
+        trait_honey: "Loves Honey",
+        features_title: "Everything They Need",
+        features_subtitle: "A full Tamagotchi experience on your desktop",
+        f1_title: "25+ Behaviors",
+        f1_desc: "Walking, sleeping, zoomies, grooming, bathing, chasing butterflies, watching birds, knocking glasses off tables, and much more.",
+        f2_title: "Feed & Care",
+        f2_desc: "Fish, milk, treats, honey. Keep hunger, happiness, energy, hygiene, and health balanced.",
+        f3_title: "Toys & Accessories",
+        f3_desc: "Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers, and more.",
+        f4_title: "Level Up & Evolve",
+        f4_desc: "Earn XP by caring. Evolve through 5 stages from Baby to Cosmic form.",
+        f5_title: "Particle Magic",
+        f5_desc: "Hearts, stars, sparkles, poof clouds, paw prints, and sleep Z particles.",
+        f6_title: "Sound Effects",
+        f6_desc: "Meows, purrs, munching, splashing. Toggle sounds on or off anytime.",
+        f7_title: "Pet Diary",
+        f7_desc: "Your pet writes a personal blog about its day. Read about meals, adventures, butterflies, and birthday celebrations.",
+        f8_title: "Lives on Your Dock",
+        f8_desc: "Walks on the macOS Dock as a physical platform. Falls off the edges!",
+        f9_title: "Switch Pets",
+        f9_desc: "Switch between Murchi the cat and Kuma the bear anytime. Each has unique animations and personality.",
         install_title: "Get Started in Seconds",
-        step1: "Download <strong>Murchi.dmg</strong> above",
+        install_subtitle: "No account needed. No internet required.",
+        step1: "Download <strong>Murchi.dmg</strong>",
         step2: "Open the DMG and drag <strong>Murchi</strong> to Applications",
         step3: "Launch it. If macOS blocks: <strong>Settings > Privacy > Open Anyway</strong>",
-        step4: "Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon",
-        charity_badge: "50% goes to animal charity",
-        pay_title: "Pay What You Want",
-        pay_subtitle: "Murchi is free forever. Support development if you'd like — half goes to animal rescue.",
-        copy: "Copy", copied: "Copied!",
-        charity_note: "50% of every donation goes to animal shelters and rescue organizations",
-        donations_title: "Donation Wall",
-        donations_empty: "Be the first to support Murchi and help animals!",
-        roadmap_title: "Roadmap",
-        roadmap_subtitle: "What's coming next for Murchi",
-        roadmap_v21: "v2.1 — Coming Soon",
-        roadmap_v21_title: "More Items & Mini-Games",
-        r1_1: "25+ cat behaviors", r1_2: "Cat diary with blog entries", r1_3: "5 accessories (hat, bow tie, crown, glasses, flower)",
-        r1_4: "15+ new accessories (scarves, sunglasses, bandanas...)", r1_5: "New foods: sushi, cake, pizza, ice cream",
-        r1_6: "Mini-games: catch the fish, dodge the vacuum", r1_7: "Seasonal events (Halloween, Christmas, New Year)",
-        roadmap_v22: "v2.2 — Next Up",
-        roadmap_v22_title: "Social & Multiplayer",
-        r2_1: "Visit friends' cats on their desktops", r2_2: "Cat mood music & ambient sounds",
-        r2_3: "Desktop widgets (stats, diary preview)", r2_4: "iCloud sync between Macs",
-        r2_5: "Custom color skins & patterns", r2_6: "Photo mode with custom backgrounds",
-        roadmap_v3: "v3.0 — The Future",
-        roadmap_v3_title: "New Pets & Worlds",
-        r3_1: "New pet types: dog, hamster, parrot, bunny", r3_2: "Pet houses & furniture decorating",
-        r3_3: "Multi-pet households", r3_4: "iOS companion app",
-        r3_5: "AI personality — unique dialog for each cat", r3_6: "Community marketplace for accessories",
-        footer_made: "Made with love for cats everywhere"
+        step4: "Your pet appears on the desktop! <strong>Cmd+Shift+M</strong> to summon",
+        pwyw_badge: "50% goes to animal shelters &middot; 50% supports development",
+        pwyw_title: "Name Your Price",
+        pwyw_subtitle: "Murchi & Kuma are free forever. If you'd like to support us, every dollar helps real animals.",
+        price_free: "That's okay! Murchi & Kuma love you anyway &#128149;",
+        price_paid: "Thank you! &#128149; You're helping real animals",
+        get_btn: "Get Murchi & Kuma",
+        pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "Star on GitHub",
+        footer_made: "Made with love for animals everywhere",
+        crypto_title: "We accept crypto payments",
+        copy: "Copy",
+        charity_title: "Where Your Money Goes",
+        charity_sub: "50% of all payments go directly to these animal welfare organizations",
+        get_free: "Download Free",
+        pay_amount: "Pay ${price}",
+        pay_instruction: "Send the amount to one of the addresses below, then download",
+        download_after_pay: "Download Murchi & Kuma"
     },
     ru: {
-        tagline: "Тамагочи на рабочем столе. Пиксельный кот для macOS. Корми, играй, люби.",
+        tagline: "Кавайные питомцы на рабочем столе macOS. Милый кот и медведь, которые живут на вашем экране.",
         download: "Скачать для macOS",
         github_star: "Звезда на GitHub",
-        github_sub: "Помоги Murchi расти!",
-        demo_label: "Живое превью — кликни на кота!",
-        click_hint: "Нажми на кота, чтобы погладить",
-        features_title: "Все, что нужно коту",
+        chars_title: "Познакомьтесь с друзьями",
+        chars_subtitle: "Два друга, два характера, один рабочий стол",
+        murchi_role: "Любопытный кот",
+        kuma_role: "Нежный мишка",
+        trait_playful: "Игривый",
+        trait_curious: "Любопытный",
+        trait_fish: "Любит рыбку",
+        trait_calm: "Спокойный",
+        trait_cuddly: "Обнимашка",
+        trait_honey: "Любит мёд",
+        features_title: "Всё, что им нужно",
         features_subtitle: "Полный тамагочи прямо на рабочем столе",
-        f1_title: "25+ действий", f1_desc: "Ходит, спит, бегает, умывается, купается, гуляет, ловит бабочек, наблюдает за птицами, скидывает стаканы со стола и многое другое.",
-        f2_title: "Корми и ухаживай", f2_desc: "Рыбка, молоко, лакомства. Следи за голодом, счастьем, энергией, гигиеной и здоровьем.",
-        f3_title: "Игрушки и аксессуары", f3_desc: "Мышка, клубок, лазер. Шляпы, бабочки, короны, очки, цветы.",
-        f4_title: "Уровни и эволюция", f4_desc: "Получай опыт за заботу. Эволюция от малыша до Космического Мурчи.",
-        f5_title: "Магия частиц", f5_desc: "Сердечки, звёзды, блёстки, облачка, следы лап, Zzz во сне.",
-        f7_title: "Дневник кота", f7_desc: "Мурчи ведёт личный блог — когда его кормили, играли, видел бабочку, заболел, праздновал день рождения. Читай как настоящий журнал питомца.",
-        f8_title: "Живёт на Доке", f8_desc: "Ходит по Доку macOS как по платформе. Падает с краёв!",
+        f1_title: "25+ действий",
+        f1_desc: "Ходит, спит, бегает, умывается, купается, ловит бабочек, наблюдает за птицами, скидывает стаканы и многое другое.",
+        f2_title: "Корми и ухаживай",
+        f2_desc: "Рыбка, молоко, лакомства, мёд. Следи за голодом, счастьем, энергией, гигиеной и здоровьем.",
+        f3_title: "Игрушки и аксессуары",
+        f3_desc: "Мышка, клубок, лазер. Шляпы, бабочки, короны, очки, цветы и многое другое.",
+        f4_title: "Уровни и эволюция",
+        f4_desc: "Получай опыт за заботу. Эволюция через 5 стадий от малыша до Космической формы.",
+        f5_title: "Магия частиц",
+        f5_desc: "Сердечки, звёзды, блёстки, облачка, следы лап, Zzz во сне.",
+        f6_title: "Звуковые эффекты",
+        f6_desc: "Мяуканье, мурчание, чавканье, плеск. Включай и выключай звуки в любое время.",
+        f7_title: "Дневник питомца",
+        f7_desc: "Питомец ведёт личный блог о своём дне. Читай о еде, приключениях, бабочках и праздниках.",
+        f8_title: "Живёт на Доке",
+        f8_desc: "Ходит по Доку macOS как по платформе. Падает с краёв!",
+        f9_title: "Смена питомца",
+        f9_desc: "Переключайся между котом Мурчи и мишкой Кумой в любое время. У каждого свои анимации и характер.",
         install_title: "Начни за секунды",
-        step1: "Скачай <strong>Murchi.dmg</strong> выше",
+        install_subtitle: "Без аккаунта. Без интернета.",
+        step1: "Скачай <strong>Murchi.dmg</strong>",
         step2: "Открой DMG и перетащи <strong>Murchi</strong> в Applications",
         step3: "Запусти. Если macOS блокирует: <strong>Настройки > Конфиденциальность > Всё равно открыть</strong>",
-        step4: "Мурчи на рабочем столе! <strong>Cmd+Shift+M</strong> чтобы позвать",
-        charity_badge: "50% на благотворительность для животных",
-        pay_title: "Заплати сколько хочешь",
-        pay_subtitle: "Мурчи бесплатен навсегда. Хотите поддержать — половина идёт на помощь животным.",
-        copy: "Копировать", copied: "Скопировано!",
-        charity_note: "50% каждого доната идёт в приюты для животных",
-        donations_title: "Стена донатов",
-        donations_empty: "Стань первым, кто поддержит Мурчи и поможет животным!",
-        roadmap_title: "Планы",
-        roadmap_subtitle: "Что будет дальше в Мурчи",
-        roadmap_v21: "v2.1 — Скоро",
-        roadmap_v21_title: "Больше предметов и мини-игры",
-        r1_1: "25+ действий кота", r1_2: "Дневник с записями", r1_3: "5 аксессуаров (шляпа, бабочка, корона, очки, цветок)",
-        r1_4: "15+ новых аксессуаров (шарфы, очки, банданы...)", r1_5: "Новая еда: суши, торт, пицца, мороженое",
-        r1_6: "Мини-игры: поймай рыбку, уклонись от пылесоса", r1_7: "Сезонные ивенты (Хэллоуин, Рождество, Новый год)",
-        roadmap_v22: "v2.2 — Далее",
-        roadmap_v22_title: "Социальное и мультиплеер",
-        r2_1: "Ходить в гости к котам друзей", r2_2: "Музыка настроения и звуки",
-        r2_3: "Виджеты для рабочего стола", r2_4: "Синхронизация через iCloud",
-        r2_5: "Кастомные скины и расцветки", r2_6: "Фото-режим с фонами",
-        roadmap_v3: "v3.0 — Будущее",
-        roadmap_v3_title: "Новые питомцы и миры",
-        r3_1: "Новые питомцы: собака, хомяк, попугай, кролик", r3_2: "Домики и мебель",
-        r3_3: "Несколько питомцев одновременно", r3_4: "iOS приложение-компаньон",
-        r3_5: "AI-личность — уникальные диалоги для каждого кота", r3_6: "Маркетплейс аксессуаров от сообщества",
-        footer_made: "Сделано с любовью к котикам по всему миру"
+        step4: "Питомец на рабочем столе! <strong>Cmd+Shift+M</strong> чтобы позвать",
+        pwyw_badge: "50% в приюты для животных &middot; 50% на разработку",
+        pwyw_title: "Назови свою цену",
+        pwyw_subtitle: "Мурчи и Кума бесплатны навсегда. Хотите поддержать — каждый доллар помогает настоящим животным.",
+        price_free: "Всё в порядке! Мурчи и Кума всё равно вас любят &#128149;",
+        price_paid: "Спасибо! &#128149; Вы помогаете настоящим животным",
+        get_btn: "Скачать Мурчи и Куму",
+        pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "Звезда на GitHub",
+        footer_made: "Сделано с любовью ко всем животным",
+        crypto_title: "Мы принимаем оплату криптой",
+        copy: "Копировать",
+        charity_title: "Куда идут деньги",
+        charity_sub: "50% всех оплат идут напрямую в фонды помощи животным",
+        get_free: "Скачать бесплатно",
+        pay_amount: "Оплатить ${price}",
+        pay_instruction: "Отправьте сумму на один из адресов ниже, затем скачайте",
+        download_after_pay: "Скачать Murchi & Kuma"
     },
     es: {
-        tagline: "Tu Tamagotchi de escritorio. Un gato pixel para macOS. Alimenta, juega, ama.",
+        tagline: "Tus companeros kawaii de escritorio para macOS. Un gato y un oso adorables que viven en tu pantalla.",
         download: "Descargar para macOS",
         github_star: "Estrella en GitHub",
-        github_sub: "Ayuda a Murchi a crecer!",
-        demo_label: "Vista previa en vivo — haz clic en el gato!",
-        click_hint: "Haz clic en el gato para acariciarlo",
-        features_title: "Todo lo que un gato necesita",
+        chars_title: "Conoce al duo",
+        chars_subtitle: "Dos amigos, dos personalidades, un escritorio",
+        murchi_role: "El gato curioso",
+        kuma_role: "El oso gentil",
+        trait_playful: "Jugueton",
+        trait_curious: "Curioso",
+        trait_fish: "Ama el pescado",
+        trait_calm: "Tranquilo",
+        trait_cuddly: "Amoroso",
+        trait_honey: "Ama la miel",
+        features_title: "Todo lo que necesitan",
         features_subtitle: "Una experiencia Tamagotchi completa en tu escritorio",
-        f1_title: "25+ comportamientos", f1_desc: "Caminar, dormir, correr, acicalarse, banarse, pasear, perseguir mariposas, observar pajaros, tirar vasos de la mesa y mucho mas.",
-        f2_title: "Alimenta y cuida", f2_desc: "Pescado, leche, golosinas. Controla hambre, felicidad, energia, higiene y salud.",
-        f3_title: "Juguetes y accesorios", f3_desc: "Raton, ovillo, laser. Sombreros, pajaritas, coronas, gafas, flores.",
-        f4_title: "Sube de nivel", f4_desc: "Gana XP cuidando. Evoluciona de bebe a Murchi Cosmico en 5 etapas.",
-        f5_title: "Magia de particulas", f5_desc: "Corazones, estrellas, destellos, nubes, huellas, particulas Z al dormir.",
-        f7_title: "Diario del gato", f7_desc: "Murchi escribe un blog personal sobre su dia — comidas, juegos, mariposas, enfermedades, cumpleanos. Leelo como un diario real.",
-        f8_title: "Vive en tu Dock", f8_desc: "Camina sobre el Dock de macOS como plataforma. Se cae por los bordes!",
+        f1_title: "25+ comportamientos",
+        f1_desc: "Caminar, dormir, correr, acicalarse, banarse, perseguir mariposas, observar pajaros, tirar vasos y mucho mas.",
+        f2_title: "Alimenta y cuida",
+        f2_desc: "Pescado, leche, golosinas, miel. Equilibra hambre, felicidad, energia, higiene y salud.",
+        f3_title: "Juguetes y accesorios",
+        f3_desc: "Raton, ovillo, laser. Sombreros, pajaritas, coronas, gafas, flores y mas.",
+        f4_title: "Sube de nivel",
+        f4_desc: "Gana XP cuidando. Evoluciona en 5 etapas de bebe a forma cosmica.",
+        f5_title: "Magia de particulas",
+        f5_desc: "Corazones, estrellas, destellos, nubes, huellas y particulas Z al dormir.",
+        f6_title: "Efectos de sonido",
+        f6_desc: "Maullidos, ronroneos, masticacion, chapoteo. Activa o desactiva los sonidos.",
+        f7_title: "Diario de mascota",
+        f7_desc: "Tu mascota escribe un blog personal. Lee sobre comidas, aventuras, mariposas y celebraciones.",
+        f8_title: "Vive en tu Dock",
+        f8_desc: "Camina sobre el Dock de macOS como plataforma. Se cae por los bordes!",
+        f9_title: "Cambia de mascota",
+        f9_desc: "Cambia entre Murchi el gato y Kuma el oso. Cada uno tiene animaciones y personalidad unica.",
         install_title: "Empieza en segundos",
-        step1: "Descarga <strong>Murchi.dmg</strong> arriba",
+        install_subtitle: "Sin cuenta. Sin internet.",
+        step1: "Descarga <strong>Murchi.dmg</strong>",
         step2: "Abre el DMG y arrastra <strong>Murchi</strong> a Aplicaciones",
         step3: "Abrelo. Si macOS bloquea: <strong>Ajustes > Privacidad > Abrir de todos modos</strong>",
-        step4: "Murchi aparece en tu escritorio! <strong>Cmd+Shift+M</strong> para invocarlo",
-        charity_badge: "50% va a caridad animal",
-        pay_title: "Paga lo que quieras",
-        pay_subtitle: "Murchi es gratis para siempre. Apoya el desarrollo si quieres — la mitad va al rescate animal.",
-        copy: "Copiar", copied: "Copiado!",
-        charity_note: "El 50% de cada donacion va a refugios y organizaciones de rescate animal",
-        donations_title: "Muro de donaciones",
-        donations_empty: "Se el primero en apoyar a Murchi y ayudar a los animales!",
-        footer_made: "Hecho con amor para los gatos de todo el mundo"
+        step4: "Tu mascota en el escritorio! <strong>Cmd+Shift+M</strong> para invocarlo",
+        pwyw_badge: "50% para refugios animales &middot; 50% para desarrollo",
+        pwyw_title: "Pon tu precio",
+        pwyw_subtitle: "Murchi y Kuma son gratis para siempre. Si quieres apoyar, cada dolar ayuda a animales reales.",
+        price_free: "Esta bien! Murchi y Kuma te quieren igual &#128149;",
+        price_paid: "Gracias! &#128149; Estas ayudando a animales reales",
+        get_btn: "Obtener Murchi y Kuma",
+        pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "Estrella en GitHub",
+        footer_made: "Hecho con amor para los animales de todo el mundo",
+        crypto_title: "O paga con cripto",
+        copy: "Copiar",
+        charity_title: "A donde va tu dinero",
+        charity_sub: "50% de los pagos van directamente a organizaciones de bienestar animal",
+        get_free: "Descargar gratis",
+        pay_amount: "Pagar ${price}",
+        pay_instruction: "Envia el monto a una de las direcciones abajo, luego descarga",
+        download_after_pay: "Descargar Murchi & Kuma"
     },
     zh: {
-        tagline: "桌面上的电子宠物。macOS上的像素猫。喂食、玩耍、爱护。",
+        tagline: "macOS上的卡哇伊桌面伙伴。一只可爱的猫和熊住在你的屏幕上。",
         download: "下载 macOS 版",
         github_star: "GitHub 上加星",
-        github_sub: "帮助 Murchi 成长！",
-        demo_label: "实时预览 — 点击猫咪！",
-        click_hint: "点击猫咪来抚摸它",
-        features_title: "猫咪所需的一切",
+        chars_title: "认识这对搭档",
+        chars_subtitle: "两个朋友，两种性格，一个桌面",
+        murchi_role: "好奇的猫咪",
+        kuma_role: "温柔的小熊",
+        trait_playful: "爱玩",
+        trait_curious: "好奇",
+        trait_fish: "爱吃鱼",
+        trait_calm: "安静",
+        trait_cuddly: "爱抱抱",
+        trait_honey: "爱吃蜂蜜",
+        features_title: "它们需要的一切",
         features_subtitle: "桌面上的完整电子宠物体验",
-        f1_title: "25+ 种行为", f1_desc: "走路、睡觉、狂奔、梳理、洗澡、散步、追蝴蝶、看鸟、把杯子推下桌子等等。你的猫有自己的生活。",
-        f2_title: "喂食和照顾", f2_desc: "鱼、牛奶、零食。管理饥饿、快乐、能量、卫生和健康。",
-        f3_title: "玩具和配饰", f3_desc: "玩具鼠、毛线球、激光笔。帽子、领结、皇冠、眼镜、花朵。",
-        f4_title: "升级进化", f4_desc: "通过照顾获取经验。从宝宝进化到宇宙Murchi，共5个阶段。",
-        f5_title: "粒子魔法", f5_desc: "爱心、星星、闪光、烟雾、爪印、睡眠Z粒子。",
-        f7_title: "猫咪日记", f7_desc: "Murchi写个人博客记录每天——什么时候吃饭、玩耍、看到蝴蝶、生病、过生日。像真正的宠物日记一样阅读。",
-        f8_title: "住在Dock上", f8_desc: "在macOS Dock上走来走去。会从边缘掉下去！",
+        f1_title: "25+ 种行为",
+        f1_desc: "走路、睡觉、狂奔、梳理、洗澡、追蝴蝶、看鸟、把杯子推下桌子等等。",
+        f2_title: "喂食和照顾",
+        f2_desc: "鱼、牛奶、零食、蜂蜜。平衡饥饿、快乐、能量、卫生和健康。",
+        f3_title: "玩具和配饰",
+        f3_desc: "玩具鼠、毛线球、激光笔。帽子、领结、皇冠、眼镜、花朵等。",
+        f4_title: "升级进化",
+        f4_desc: "照顾获取经验。从宝宝到宇宙形态共5个阶段。",
+        f5_title: "粒子魔法",
+        f5_desc: "爱心、星星、闪光、烟雾、爪印和睡眠Z粒子。",
+        f6_title: "音效",
+        f6_desc: "喵叫、咕噜、咀嚼、泼水。随时开关声音。",
+        f7_title: "宠物日记",
+        f7_desc: "宠物写个人博客记录每天。阅读关于饮食、冒险、蝴蝶和生日庆祝。",
+        f8_title: "住在Dock上",
+        f8_desc: "在macOS Dock上走来走去。会从边缘掉下去！",
+        f9_title: "切换宠物",
+        f9_desc: "随时在猫咪Murchi和小熊Kuma之间切换。每个都有独特的动画和性格。",
         install_title: "几秒钟开始",
-        step1: "下载上方的 <strong>Murchi.dmg</strong>",
-        step2: "打开 DMG，将 <strong>Murchi</strong> 拖入应用程序",
+        install_subtitle: "无需账户。无需网络。",
+        step1: "下载 <strong>Murchi.dmg</strong>",
+        step2: "打开DMG，将 <strong>Murchi</strong> 拖入应用程序",
         step3: "启动它。如果macOS阻止：<strong>设置 > 隐私 > 仍然打开</strong>",
-        step4: "Murchi出现在桌面！<strong>Cmd+Shift+M</strong> 召唤",
-        charity_badge: "50% 捐给动物慈善",
-        pay_title: "随意付费",
-        pay_subtitle: "Murchi永久免费。想支持就支持——一半捐给动物救助。",
-        copy: "复制", copied: "已复制！",
-        charity_note: "每笔捐款的50%捐给动物收容所和救助组织",
-        donations_title: "捐赠墙",
-        donations_empty: "成为第一个支持Murchi和帮助动物的人！",
-        footer_made: "用爱为全世界的猫咪制作"
+        step4: "宠物出现在桌面！<strong>Cmd+Shift+M</strong> 召唤",
+        pwyw_badge: "50%捐给动物收容所 &middot; 50%支持开发",
+        pwyw_title: "随意定价",
+        pwyw_subtitle: "Murchi和Kuma永久免费。想支持就支持，每一分钱都帮助真正的动物。",
+        price_free: "没关系！Murchi和Kuma一样爱你 &#128149;",
+        price_paid: "谢谢！&#128149; 你在帮助真正的动物",
+        get_btn: "获取 Murchi 和 Kuma",
+        pwyw_note: "macOS 12+ &middot; 通用版 (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "GitHub 上加星",
+        footer_made: "用爱为全世界的动物制作",
+        crypto_title: "或用加密货币支付",
+        copy: "复制",
+        charity_title: "您的钱去了哪里",
+        charity_sub: "50%的付款直接捐给动物福利组织",
+        get_free: "免费下载",
+        pay_amount: "支付 ${price}",
+        pay_instruction: "将金额发送到以下地址之一，然后下载",
+        download_after_pay: "下载 Murchi & Kuma"
     },
     ja: {
-        tagline: "デスクトップのたまごっち。macOSのピクセル猫。餌をあげて、遊んで、愛して。",
+        tagline: "macOSのカワイイデスクトップコンパニオン。可愛い猫とクマがあなたの画面に住んでいます。",
         download: "macOS版をダウンロード",
         github_star: "GitHub でスターを",
-        github_sub: "Murchi を応援しよう！",
-        demo_label: "ライブプレビュー — 猫をクリック！",
-        click_hint: "猫をクリックして撫でよう",
-        features_title: "猫に必要な全て",
+        chars_title: "二人に会おう",
+        chars_subtitle: "二人の友達、二つの個性、一つのデスクトップ",
+        murchi_role: "好奇心旺盛な猫",
+        kuma_role: "優しいクマ",
+        trait_playful: "遊び好き",
+        trait_curious: "好奇心旺盛",
+        trait_fish: "魚が大好き",
+        trait_calm: "穏やか",
+        trait_cuddly: "甘えん坊",
+        trait_honey: "はちみつ好き",
+        features_title: "必要なものすべて",
         features_subtitle: "デスクトップで完全なたまごっち体験",
-        f1_title: "25以上の行動", f1_desc: "歩く、寝る、走り回る、毛づくろい、お風呂、散歩、蝶を追いかける、鳥を見る、コップを落とすなど。猫は自分の生活を持っています。",
-        f2_title: "餌やり＆お世話", f2_desc: "魚、ミルク、おやつ。空腹、幸福度、体力、衛生、健康を管理。",
-        f3_title: "おもちゃ＆アクセサリー", f3_desc: "ネズミ、毛糸玉、レーザー。帽子、蝶ネクタイ、王冠、眼鏡、花。",
-        f4_title: "レベルアップ＆進化", f4_desc: "お世話でXPを獲得。ベビーからコスミックMurchiまで5段階の進化。",
-        f5_title: "パーティクルマジック", f5_desc: "ハート、星、キラキラ、煙、足跡、睡眠Zパーティクル。",
-        f7_title: "猫の日記", f7_desc: "Murchiが日々のブログを書きます — いつ食べた、遊んだ、蝶を見た、病気になった、誕生日を祝った。本物のペット日記として読めます。",
-        f8_title: "Dockに住む", f8_desc: "macOSのDockの上を歩きます。端から落ちることも！",
+        f1_title: "25以上の行動",
+        f1_desc: "歩く、寝る、走り回る、毛づくろい、お風呂、蝶を追いかける、鳥を見る、コップを落とすなど。",
+        f2_title: "餌やり＆お世話",
+        f2_desc: "魚、ミルク、おやつ、はちみつ。空腹、幸福度、体力、衛生、健康のバランス。",
+        f3_title: "おもちゃ＆アクセサリー",
+        f3_desc: "ネズミ、毛糸玉、レーザー。帽子、蝶ネクタイ、王冠、眼鏡、花など。",
+        f4_title: "レベルアップ＆進化",
+        f4_desc: "お世話でXPを獲得。ベビーからコスミック形態まで5段階。",
+        f5_title: "パーティクルマジック",
+        f5_desc: "ハート、星、キラキラ、煙、足跡、睡眠Zパーティクル。",
+        f6_title: "サウンドエフェクト",
+        f6_desc: "ニャー、ゴロゴロ、もぐもぐ、バシャ。いつでもサウンドのオンオフ。",
+        f7_title: "ペット日記",
+        f7_desc: "ペットが毎日のブログを書きます。食事、冒険、蝶、誕生日について読めます。",
+        f8_title: "Dockに住む",
+        f8_desc: "macOSのDockの上を歩きます。端から落ちることも！",
+        f9_title: "ペット切替",
+        f9_desc: "猫のMurchiとクマのKumaをいつでも切り替え。それぞれ独自のアニメーションと個性。",
         install_title: "数秒で始められます",
-        step1: "上の <strong>Murchi.dmg</strong> をダウンロード",
+        install_subtitle: "アカウント不要。ネット不要。",
+        step1: "<strong>Murchi.dmg</strong> をダウンロード",
         step2: "DMGを開いて <strong>Murchi</strong> をアプリケーションにドラッグ",
         step3: "起動。macOSがブロックしたら：<strong>設定 > プライバシー > このまま開く</strong>",
-        step4: "Murchiがデスクトップに！<strong>Cmd+Shift+M</strong> で呼び出し",
-        charity_badge: "50%が動物チャリティーに",
-        pay_title: "お好きな金額で",
-        pay_subtitle: "Murchiは永久無料。サポートしたい方はどうぞ — 半分が動物救助に。",
-        copy: "コピー", copied: "コピーしました！",
-        charity_note: "全寄付の50%が動物シェルターや保護団体に届きます",
-        donations_title: "寄付の壁",
-        donations_empty: "Murchiを最初に応援して動物を助けよう！",
-        footer_made: "世界中の猫への愛を込めて"
+        step4: "ペットがデスクトップに！<strong>Cmd+Shift+M</strong> で呼び出し",
+        pwyw_badge: "50%が動物シェルターに &middot; 50%が開発支援に",
+        pwyw_title: "お好きな価格で",
+        pwyw_subtitle: "MurchiとKumaは永久無料。サポートしたい方はどうぞ — すべてが本物の動物を助けます。",
+        price_free: "大丈夫！MurchiとKumaはあなたが大好きです &#128149;",
+        price_paid: "ありがとう！&#128149; 本物の動物を助けています",
+        get_btn: "Murchi と Kuma を入手",
+        pwyw_note: "macOS 12+ &middot; ユニバーサル (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "GitHub でスターを",
+        footer_made: "世界中の動物への愛を込めて",
+        crypto_title: "暗号通貨で支払う",
+        copy: "コピー",
+        charity_title: "お支払いの行き先",
+        charity_sub: "お支払いの50%は動物福祉団体に直接届けられます",
+        get_free: "無料ダウンロード",
+        pay_amount: "${price} を支払う",
+        pay_instruction: "以下のアドレスに送金してからダウンロードしてください",
+        download_after_pay: "Murchi & Kuma をダウンロード"
     },
     ko: {
-        tagline: "데스크탑 다마고치. macOS의 픽셀 고양이. 먹이주고, 놀아주고, 사랑하세요.",
+        tagline: "macOS의 귀여운 데스크탑 반려동물. 귀여운 고양이와 곰이 화면에 살아요.",
         download: "macOS용 다운로드",
         github_star: "GitHub 스타",
-        github_sub: "Murchi 성장을 도와주세요!",
-        demo_label: "라이브 미리보기 — 고양이를 클릭하세요!",
-        click_hint: "고양이를 클릭해서 쓰다듬기",
-        features_title: "고양이에게 필요한 모든 것",
+        chars_title: "듀오를 만나세요",
+        chars_subtitle: "두 친구, 두 성격, 하나의 데스크탑",
+        murchi_role: "호기심 많은 고양이",
+        kuma_role: "다정한 곰",
+        trait_playful: "장난꾸러기",
+        trait_curious: "호기심 많은",
+        trait_fish: "생선 좋아함",
+        trait_calm: "차분한",
+        trait_cuddly: "포근한",
+        trait_honey: "꿀 좋아함",
+        features_title: "필요한 모든 것",
         features_subtitle: "데스크탑에서 완전한 다마고치 체험",
-        f1_title: "25가지 이상의 행동", f1_desc: "걷기, 자기, 달리기, 그루밍, 목욕, 산책, 나비 쫓기, 새 구경, 컵 떨어뜨리기 등. 고양이는 자기만의 삶을 살아요.",
-        f2_title: "먹이 & 돌보기", f2_desc: "생선, 우유, 간식. 배고픔, 행복, 에너지, 위생, 건강 관리.",
-        f3_title: "장난감 & 액세서리", f3_desc: "쥐, 실타래, 레이저. 모자, 나비넥타이, 왕관, 안경, 꽃.",
-        f4_title: "레벨 업 & 진화", f4_desc: "돌보며 XP 획득. 아기에서 코스믹 Murchi까지 5단계 진화.",
-        f5_title: "파티클 마법", f5_desc: "하트, 별, 반짝임, 연기, 발자국, 수면 Z 파티클.",
-        f7_title: "고양이 일기", f7_desc: "Murchi가 매일 블로그를 써요 — 밥 먹은 시간, 놀이, 나비, 아픈 날, 생일. 진짜 반려동물 일기처럼 읽어보세요.",
-        f8_title: "Dock 위에서 살아요", f8_desc: "macOS Dock 위를 걸어다녀요. 가장자리에서 떨어지기도!",
+        f1_title: "25가지 이상의 행동",
+        f1_desc: "걷기, 자기, 달리기, 그루밍, 목욕, 나비 쫓기, 새 구경, 컵 떨어뜨리기 등.",
+        f2_title: "먹이 & 돌보기",
+        f2_desc: "생선, 우유, 간식, 꿀. 배고픔, 행복, 에너지, 위생, 건강 균형.",
+        f3_title: "장난감 & 액세서리",
+        f3_desc: "쥐, 실타래, 레이저. 모자, 나비넥타이, 왕관, 안경, 꽃 등.",
+        f4_title: "레벨 업 & 진화",
+        f4_desc: "돌보며 XP 획득. 아기에서 코스믹 형태까지 5단계.",
+        f5_title: "파티클 마법",
+        f5_desc: "하트, 별, 반짝임, 연기, 발자국, 수면 Z 파티클.",
+        f6_title: "사운드 효과",
+        f6_desc: "야옹, 골골, 냠냠, 첨벙. 언제든 사운드 온오프.",
+        f7_title: "반려동물 일기",
+        f7_desc: "반려동물이 매일 블로그를 써요. 식사, 모험, 나비, 생일에 대해 읽어보세요.",
+        f8_title: "Dock에서 살아요",
+        f8_desc: "macOS Dock 위를 걸어다녀요. 가장자리에서 떨어지기도!",
+        f9_title: "반려동물 전환",
+        f9_desc: "고양이 Murchi와 곰 Kuma를 언제든 전환. 각각 고유한 애니메이션과 성격.",
         install_title: "몇 초면 시작",
-        step1: "위에서 <strong>Murchi.dmg</strong> 다운로드",
+        install_subtitle: "계정 불필요. 인터넷 불필요.",
+        step1: "<strong>Murchi.dmg</strong> 다운로드",
         step2: "DMG를 열고 <strong>Murchi</strong>를 응용 프로그램으로 드래그",
         step3: "실행. macOS가 차단하면: <strong>설정 > 개인정보 > 그래도 열기</strong>",
-        step4: "Murchi가 데스크탑에! <strong>Cmd+Shift+M</strong>으로 소환",
-        charity_badge: "50%가 동물 자선단체에",
-        pay_title: "원하는 만큼 지불",
-        pay_subtitle: "Murchi는 영원히 무료. 지원하고 싶다면 — 절반이 동물 구조에.",
-        copy: "복사", copied: "복사됨!",
-        charity_note: "모든 기부금의 50%가 동물 보호소와 구조 단체에",
-        donations_title: "기부 벽",
-        donations_empty: "Murchi를 처음으로 응원하고 동물을 도와주세요!",
-        footer_made: "전 세계 고양이를 위한 사랑으로"
+        step4: "데스크탑에 반려동물이! <strong>Cmd+Shift+M</strong>으로 소환",
+        pwyw_badge: "50%가 동물 보호소에 &middot; 50%가 개발 지원에",
+        pwyw_title: "가격을 정하세요",
+        pwyw_subtitle: "Murchi와 Kuma는 영원히 무료. 지원하고 싶다면, 모든 금액이 실제 동물을 돕습니다.",
+        price_free: "괜찮아요! Murchi와 Kuma는 당신을 사랑해요 &#128149;",
+        price_paid: "감사합니다! &#128149; 실제 동물을 돕고 있어요",
+        get_btn: "Murchi와 Kuma 받기",
+        pwyw_note: "macOS 12+ &middot; 유니버설 (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "GitHub 스타",
+        footer_made: "전 세계 동물을 위한 사랑으로",
+        crypto_title: "암호화폐로 결제",
+        copy: "복사",
+        charity_title: "결제금은 어디로",
+        charity_sub: "모든 결제금의 50%는 동물복지 단체에 직접 전달됩니다",
+        get_free: "무료 다운로드",
+        pay_amount: "${price} 결제",
+        pay_instruction: "아래 주소 중 하나로 금액을 보낸 후 다운로드하세요",
+        download_after_pay: "Murchi & Kuma 다운로드"
     },
     de: {
-        tagline: "Dein Desktop-Tamagotchi. Eine Pixel-Katze fur macOS. Futtern, spielen, lieben.",
+        tagline: "Deine kawaii Desktop-Begleiter fur macOS. Eine susse Katze und ein Bar leben auf deinem Bildschirm.",
         download: "Fur macOS herunterladen",
         github_star: "Stern auf GitHub",
-        github_sub: "Hilf Murchi zu wachsen!",
-        demo_label: "Live-Vorschau — klick die Katze!",
-        click_hint: "Klicke die Katze zum Streicheln",
-        features_title: "Alles was eine Katze braucht",
+        chars_title: "Lerne das Duo kennen",
+        chars_subtitle: "Zwei Freunde, zwei Personlichkeiten, ein Desktop",
+        murchi_role: "Die neugierige Katze",
+        kuma_role: "Der sanfte Bar",
+        trait_playful: "Verspielt",
+        trait_curious: "Neugierig",
+        trait_fish: "Liebt Fisch",
+        trait_calm: "Ruhig",
+        trait_cuddly: "Kuschelig",
+        trait_honey: "Liebt Honig",
+        features_title: "Alles was sie brauchen",
         features_subtitle: "Ein vollstandiges Tamagotchi-Erlebnis auf deinem Desktop",
-        f1_title: "25+ Verhaltensweisen", f1_desc: "Laufen, schlafen, rennen, putzen, baden, spazieren, Schmetterlinge jagen, Vogel beobachten, Glaser vom Tisch werfen und vieles mehr.",
-        f2_title: "Futtern & Pflegen", f2_desc: "Fisch, Milch, Leckerlis. Verwalte Hunger, Gluck, Energie, Hygiene und Gesundheit.",
-        f3_title: "Spielzeug & Zubehor", f3_desc: "Maus, Wollknauel, Laserpointer. Hute, Fliegen, Kronen, Brillen, Blumen.",
-        f4_title: "Level-Aufstieg & Evolution", f4_desc: "Sammle XP durch Pflege. Entwickle dich vom Baby zum Kosmischen Murchi in 5 Stufen.",
-        f5_title: "Partikel-Magie", f5_desc: "Herzen, Sterne, Glitzer, Rauchwolken, Pfotenabdrucke, Schlaf-Z-Partikel.",
-        f7_title: "Katzen-Tagebuch", f7_desc: "Murchi schreibt ein personliches Blog uber seinen Tag — Futterung, Spiel, Schmetterlinge, Krankheit, Geburtstag. Lies es wie ein echtes Haustier-Journal.",
-        f8_title: "Lebt auf dem Dock", f8_desc: "Lauft auf dem macOS Dock als Plattform. Fallt uber den Rand!",
+        f1_title: "25+ Verhaltensweisen",
+        f1_desc: "Laufen, schlafen, rennen, putzen, baden, Schmetterlinge jagen, Vogel beobachten, Glaser vom Tisch werfen und mehr.",
+        f2_title: "Futtern & Pflegen",
+        f2_desc: "Fisch, Milch, Leckerlis, Honig. Hunger, Gluck, Energie, Hygiene und Gesundheit ausbalancieren.",
+        f3_title: "Spielzeug & Zubehor",
+        f3_desc: "Maus, Wollknauel, Laserpointer. Hute, Fliegen, Kronen, Brillen, Blumen und mehr.",
+        f4_title: "Level-Aufstieg & Evolution",
+        f4_desc: "Sammle XP durch Pflege. Entwickle dich in 5 Stufen vom Baby zur kosmischen Form.",
+        f5_title: "Partikel-Magie",
+        f5_desc: "Herzen, Sterne, Glitzer, Rauchwolken, Pfotenabdrucke und Schlaf-Z-Partikel.",
+        f6_title: "Soundeffekte",
+        f6_desc: "Miau, Schnurren, Mampfen, Platschen. Sounds jederzeit ein- oder ausschalten.",
+        f7_title: "Haustier-Tagebuch",
+        f7_desc: "Dein Haustier schreibt ein personliches Blog. Lies uber Mahlzeiten, Abenteuer, Schmetterlinge und Geburtstage.",
+        f8_title: "Lebt auf dem Dock",
+        f8_desc: "Lauft auf dem macOS Dock als Plattform. Fallt uber den Rand!",
+        f9_title: "Haustier wechseln",
+        f9_desc: "Wechsle jederzeit zwischen Katze Murchi und Bar Kuma. Jeder hat einzigartige Animationen und Personlichkeit.",
         install_title: "In Sekunden starten",
-        step1: "Lade oben <strong>Murchi.dmg</strong> herunter",
-        step2: "Offne die DMG und ziehe <strong>Murchi</strong> in Programme",
-        step3: "Starte es. Falls macOS blockiert: <strong>Einstellungen > Datenschutz > Trotzdem offnen</strong>",
-        step4: "Murchi auf dem Desktop! <strong>Cmd+Shift+M</strong> zum Herbeirufen",
-        charity_badge: "50% gehen an Tierschutz",
-        pay_title: "Zahl was du willst",
-        pay_subtitle: "Murchi ist fur immer kostenlos. Unterstutze die Entwicklung — die Halfte geht an Tierrettung.",
-        copy: "Kopieren", copied: "Kopiert!",
-        charity_note: "50% jeder Spende gehen an Tierheime und Rettungsorganisationen",
-        donations_title: "Spendenwand",
-        donations_empty: "Sei der Erste, der Murchi unterstutzt und Tieren hilft!",
-        footer_made: "Mit Liebe fur Katzen uberall auf der Welt gemacht"
+        install_subtitle: "Kein Konto notig. Kein Internet erforderlich.",
+        step1: "<strong>Murchi.dmg</strong> herunterladen",
+        step2: "DMG offnen und <strong>Murchi</strong> in Programme ziehen",
+        step3: "Starten. Falls macOS blockiert: <strong>Einstellungen > Datenschutz > Trotzdem offnen</strong>",
+        step4: "Dein Haustier auf dem Desktop! <strong>Cmd+Shift+M</strong> zum Herbeirufen",
+        pwyw_badge: "50% fur Tierheime &middot; 50% fur Entwicklung",
+        pwyw_title: "Nenn deinen Preis",
+        pwyw_subtitle: "Murchi und Kuma sind fur immer kostenlos. Wenn du unterstutzen mochtest, hilft jeder Dollar echten Tieren.",
+        price_free: "Kein Problem! Murchi und Kuma lieben dich trotzdem &#128149;",
+        price_paid: "Danke! &#128149; Du hilfst echten Tieren",
+        get_btn: "Murchi & Kuma holen",
+        pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "Stern auf GitHub",
+        footer_made: "Mit Liebe fur Tiere uberall auf der Welt gemacht",
+        crypto_title: "Oder mit Krypto bezahlen",
+        copy: "Kopieren",
+        charity_title: "Wohin Ihr Geld geht",
+        charity_sub: "50% aller Zahlungen gehen direkt an Tierschutzorganisationen",
+        get_free: "Kostenlos herunterladen",
+        pay_amount: "${price} bezahlen",
+        pay_instruction: "Senden Sie den Betrag an eine der Adressen unten, dann laden Sie herunter",
+        download_after_pay: "Murchi & Kuma herunterladen"
     },
     fr: {
-        tagline: "Votre Tamagotchi de bureau. Un chat pixel pour macOS. Nourrir, jouer, aimer.",
+        tagline: "Vos compagnons kawaii de bureau pour macOS. Un chat et un ours mignons vivent sur votre ecran.",
         download: "Telecharger pour macOS",
         github_star: "Etoile sur GitHub",
-        github_sub: "Aidez Murchi a grandir !",
-        demo_label: "Apercu en direct — cliquez sur le chat !",
-        click_hint: "Cliquez sur le chat pour le caresser",
-        features_title: "Tout ce dont un chat a besoin",
+        chars_title: "Decouvrez le duo",
+        chars_subtitle: "Deux amis, deux personnalites, un bureau",
+        murchi_role: "Le chat curieux",
+        kuma_role: "L'ours doux",
+        trait_playful: "Joueur",
+        trait_curious: "Curieux",
+        trait_fish: "Aime le poisson",
+        trait_calm: "Calme",
+        trait_cuddly: "Calin",
+        trait_honey: "Aime le miel",
+        features_title: "Tout ce dont ils ont besoin",
         features_subtitle: "Une experience Tamagotchi complete sur votre bureau",
-        f1_title: "25+ comportements", f1_desc: "Marcher, dormir, courir, se toiletter, se baigner, se promener, chasser des papillons, observer des oiseaux, faire tomber des verres et bien plus.",
-        f2_title: "Nourrir et soigner", f2_desc: "Poisson, lait, friandises. Gerez la faim, le bonheur, l'energie, l'hygiene et la sante.",
-        f3_title: "Jouets et accessoires", f3_desc: "Souris, pelote, laser. Chapeaux, noeuds papillon, couronnes, lunettes, fleurs.",
-        f4_title: "Monter de niveau", f4_desc: "Gagnez de l'XP en prenant soin. Evoluez de bebe a Murchi Cosmique en 5 etapes.",
-        f5_title: "Magie des particules", f5_desc: "Coeurs, etoiles, etincelles, nuages, empreintes, particules Z au sommeil.",
-        f7_title: "Journal du chat", f7_desc: "Murchi tient un blog personnel — repas, jeux, papillons, maladie, anniversaire. Lisez-le comme un vrai journal d'animal.",
-        f8_title: "Vit sur le Dock", f8_desc: "Marche sur le Dock macOS comme une plateforme. Tombe des bords !",
-        install_title: "Commencez en quelques secondes",
-        step1: "Telechargez <strong>Murchi.dmg</strong> ci-dessus",
+        f1_title: "25+ comportements",
+        f1_desc: "Marcher, dormir, courir, se toiletter, se baigner, chasser des papillons, observer des oiseaux, faire tomber des verres et plus.",
+        f2_title: "Nourrir et soigner",
+        f2_desc: "Poisson, lait, friandises, miel. Equilibrez faim, bonheur, energie, hygiene et sante.",
+        f3_title: "Jouets et accessoires",
+        f3_desc: "Souris, pelote, laser. Chapeaux, noeuds papillon, couronnes, lunettes, fleurs et plus.",
+        f4_title: "Monter de niveau",
+        f4_desc: "Gagnez de l'XP en prenant soin. Evoluez en 5 etapes du bebe a la forme cosmique.",
+        f5_title: "Magie des particules",
+        f5_desc: "Coeurs, etoiles, etincelles, nuages, empreintes et particules Z au sommeil.",
+        f6_title: "Effets sonores",
+        f6_desc: "Miaulements, ronronnements, mastication, eclaboussures. Activez ou desactivez les sons.",
+        f7_title: "Journal de l'animal",
+        f7_desc: "Votre animal ecrit un blog personnel. Lisez ses repas, aventures, papillons et anniversaires.",
+        f8_title: "Vit sur le Dock",
+        f8_desc: "Marche sur le Dock macOS comme une plateforme. Tombe des bords !",
+        f9_title: "Changer d'animal",
+        f9_desc: "Passez du chat Murchi a l'ours Kuma a tout moment. Chacun a des animations et une personnalite uniques.",
+        install_title: "Commencez en secondes",
+        install_subtitle: "Pas de compte. Pas d'internet.",
+        step1: "Telechargez <strong>Murchi.dmg</strong>",
         step2: "Ouvrez le DMG et glissez <strong>Murchi</strong> dans Applications",
         step3: "Lancez-le. Si macOS bloque : <strong>Reglages > Confidentialite > Ouvrir quand meme</strong>",
-        step4: "Murchi sur votre bureau ! <strong>Cmd+Shift+M</strong> pour l'invoquer",
-        charity_badge: "50% pour la charite animale",
-        pay_title: "Payez ce que vous voulez",
-        pay_subtitle: "Murchi est gratuit pour toujours. Soutenez si vous le souhaitez — la moitie va au sauvetage animal.",
-        copy: "Copier", copied: "Copie !",
-        charity_note: "50% de chaque don va aux refuges et organisations de sauvetage d'animaux",
-        donations_title: "Mur des dons",
-        donations_empty: "Soyez le premier a soutenir Murchi et aider les animaux !",
-        footer_made: "Fait avec amour pour les chats du monde entier"
+        step4: "Votre animal sur le bureau ! <strong>Cmd+Shift+M</strong> pour l'invoquer",
+        pwyw_badge: "50% pour les refuges &middot; 50% pour le developpement",
+        pwyw_title: "Fixez votre prix",
+        pwyw_subtitle: "Murchi et Kuma sont gratuits pour toujours. Si vous souhaitez soutenir, chaque dollar aide de vrais animaux.",
+        price_free: "C'est ok ! Murchi et Kuma vous aiment quand meme &#128149;",
+        price_paid: "Merci ! &#128149; Vous aidez de vrais animaux",
+        get_btn: "Obtenir Murchi et Kuma",
+        pwyw_note: "macOS 12+ &middot; Universel (Apple Silicon + Intel) &middot; ~5 Mo",
+        github_cta: "Etoile sur GitHub",
+        footer_made: "Fait avec amour pour les animaux du monde entier",
+        crypto_title: "Ou payez en crypto",
+        copy: "Copier",
+        charity_title: "Ou va votre argent",
+        charity_sub: "50% des paiements vont directement aux organisations de protection animale",
+        get_free: "Telecharger gratuitement",
+        pay_amount: "Payer ${price}",
+        pay_instruction: "Envoyez le montant a l'une des adresses ci-dessous, puis telechargez",
+        download_after_pay: "Telecharger Murchi & Kuma"
     },
     pt: {
-        tagline: "Seu Tamagotchi de desktop. Um gato pixel para macOS. Alimente, brinque, ame.",
+        tagline: "Seus companheiros kawaii de desktop para macOS. Um gato e um urso fofos que vivem na sua tela.",
         download: "Baixar para macOS",
         github_star: "Estrela no GitHub",
-        github_sub: "Ajude o Murchi a crescer!",
-        demo_label: "Preview ao vivo — clique no gato!",
-        click_hint: "Clique no gato para acariciar",
-        features_title: "Tudo que um gato precisa",
+        chars_title: "Conheca a dupla",
+        chars_subtitle: "Dois amigos, duas personalidades, um desktop",
+        murchi_role: "O gato curioso",
+        kuma_role: "O urso gentil",
+        trait_playful: "Brincalhao",
+        trait_curious: "Curioso",
+        trait_fish: "Ama peixe",
+        trait_calm: "Calmo",
+        trait_cuddly: "Fofo",
+        trait_honey: "Ama mel",
+        features_title: "Tudo que eles precisam",
         features_subtitle: "Uma experiencia Tamagotchi completa no seu desktop",
-        f1_title: "25+ comportamentos", f1_desc: "Andar, dormir, correr, se limpar, tomar banho, passear, perseguir borboletas, observar passaros, derrubar copos e muito mais.",
-        f2_title: "Alimentar e cuidar", f2_desc: "Peixe, leite, petiscos. Gerencie fome, felicidade, energia, higiene e saude.",
-        f3_title: "Brinquedos e acessorios", f3_desc: "Rato, novelo, laser. Chapeus, gravatas-borboleta, coroas, oculos, flores.",
-        f4_title: "Subir de nivel", f4_desc: "Ganhe XP cuidando. Evolua de bebe a Murchi Cosmico em 5 estagios.",
-        f5_title: "Magia de particulas", f5_desc: "Coracoes, estrelas, brilhos, nuvens, pegadas, particulas Z ao dormir.",
-        f7_title: "Diario do gato", f7_desc: "Murchi escreve um blog pessoal sobre seu dia — refeicoes, brincadeiras, borboletas, doencas, aniversario. Leia como um diario de pet real.",
-        f8_title: "Vive no Dock", f8_desc: "Anda no Dock do macOS como plataforma. Cai das bordas!",
+        f1_title: "25+ comportamentos",
+        f1_desc: "Andar, dormir, correr, se limpar, tomar banho, perseguir borboletas, observar passaros, derrubar copos e muito mais.",
+        f2_title: "Alimentar e cuidar",
+        f2_desc: "Peixe, leite, petiscos, mel. Equilibre fome, felicidade, energia, higiene e saude.",
+        f3_title: "Brinquedos e acessorios",
+        f3_desc: "Rato, novelo, laser. Chapeus, gravatas-borboleta, coroas, oculos, flores e mais.",
+        f4_title: "Subir de nivel",
+        f4_desc: "Ganhe XP cuidando. Evolua em 5 estagios de bebe a forma cosmica.",
+        f5_title: "Magia de particulas",
+        f5_desc: "Coracoes, estrelas, brilhos, nuvens, pegadas e particulas Z ao dormir.",
+        f6_title: "Efeitos sonoros",
+        f6_desc: "Miados, ronronados, mastigacao, respingos. Ative ou desative os sons.",
+        f7_title: "Diario do pet",
+        f7_desc: "Seu pet escreve um blog pessoal. Leia sobre refeicoes, aventuras, borboletas e aniversarios.",
+        f8_title: "Vive no Dock",
+        f8_desc: "Anda no Dock do macOS como plataforma. Cai das bordas!",
+        f9_title: "Trocar pet",
+        f9_desc: "Alterne entre o gato Murchi e o urso Kuma a qualquer momento. Cada um tem animacoes e personalidade unicas.",
         install_title: "Comece em segundos",
-        step1: "Baixe o <strong>Murchi.dmg</strong> acima",
+        install_subtitle: "Sem conta. Sem internet.",
+        step1: "Baixe o <strong>Murchi.dmg</strong>",
         step2: "Abra o DMG e arraste <strong>Murchi</strong> para Aplicativos",
         step3: "Abra. Se o macOS bloquear: <strong>Configuracoes > Privacidade > Abrir mesmo assim</strong>",
-        step4: "Murchi no seu desktop! <strong>Cmd+Shift+M</strong> para invocar",
-        charity_badge: "50% vai para caridade animal",
-        pay_title: "Pague o que quiser",
-        pay_subtitle: "Murchi e gratis para sempre. Apoie se quiser — metade vai para resgate animal.",
-        copy: "Copiar", copied: "Copiado!",
-        charity_note: "50% de cada doacao vai para abrigos e organizacoes de resgate animal",
-        donations_title: "Mural de doacoes",
-        donations_empty: "Seja o primeiro a apoiar o Murchi e ajudar os animais!",
-        footer_made: "Feito com amor para gatos de todo o mundo"
+        step4: "Seu pet no desktop! <strong>Cmd+Shift+M</strong> para invocar",
+        pwyw_badge: "50% para abrigos de animais &middot; 50% para desenvolvimento",
+        pwyw_title: "Defina seu preco",
+        pwyw_subtitle: "Murchi e Kuma sao gratis para sempre. Se quiser apoiar, cada dolar ajuda animais reais.",
+        price_free: "Tudo bem! Murchi e Kuma amam voce mesmo assim &#128149;",
+        price_paid: "Obrigado! &#128149; Voce esta ajudando animais reais",
+        get_btn: "Obter Murchi e Kuma",
+        pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
+        github_cta: "Estrela no GitHub",
+        footer_made: "Feito com amor para os animais de todo o mundo",
+        crypto_title: "Ou pague com cripto",
+        copy: "Copiar",
+        charity_title: "Para onde vai seu dinheiro",
+        charity_sub: "50% de todos os pagamentos vao diretamente para organizacoes de bem-estar animal",
+        get_free: "Baixar gratis",
+        pay_amount: "Pagar ${price}",
+        pay_instruction: "Envie o valor para um dos enderecos abaixo, depois baixe",
+        download_after_pay: "Baixar Murchi & Kuma"
     },
-    tr: {
-        tagline: "Masaustu Tamagotchi'niz. macOS icin piksel kedi. Besle, oyna, sev.",
-        download: "macOS icin indir",
-        github_star: "GitHub'da Yildiz",
-        github_sub: "Murchi'nin buyumesine yardim edin!",
-        demo_label: "Canli onizleme — kediye tikla!",
-        click_hint: "Kediye tiklayarak oksa",
-        features_title: "Bir kedinin ihtiyaci olan her sey",
-        features_subtitle: "Masaustunuzde tam bir Tamagotchi deneyimi",
-        f1_title: "25+ davranis", f1_desc: "Yurume, uyuma, kosma, timar, banyo, gezinti, kelebek kovalama, kus izleme, bardak dusurme ve daha fazlasi.",
-        f2_title: "Besle ve bak", f2_desc: "Balik, sut, odul. Aclik, mutluluk, enerji, hijyen ve saglik yonet.",
-        f3_title: "Oyuncaklar ve aksesuarlar", f3_desc: "Fare, yun yumagi, lazer. Sapkalar, papyonlar, taclar, gozlukler, cicekler.",
-        f4_title: "Seviye atla", f4_desc: "Bakarak XP kazan. Bebekten Kozmik Murchi'ye 5 asamada evrimles.",
-        f5_title: "Parcacik sihiri", f5_desc: "Kalpler, yildizlar, pariltiar, bulutlar, pati izleri, uyku Z parcaciklari.",
-        f7_title: "Kedi gunlugu", f7_desc: "Murchi gunluk blog yazar — yemek, oyun, kelebek, hastalik, dogum gunu. Gercek bir evcil hayvan gunlugu gibi oku.",
-        f8_title: "Dock'ta yasar", f8_desc: "macOS Dock uzerinde platform olarak yurur. Kenarlardan duser!",
-        install_title: "Saniyeler icinde basla",
-        step1: "Yukaridan <strong>Murchi.dmg</strong> indirin",
-        step2: "DMG'yi acin ve <strong>Murchi</strong>'yi Uygulamalar'a surukleyin",
-        step3: "Baslatin. macOS engellerse: <strong>Ayarlar > Gizlilik > Yine de Ac</strong>",
-        step4: "Murchi masaustunuzde! <strong>Cmd+Shift+M</strong> ile cagirin",
-        charity_badge: "%50 hayvan yardimina gidiyor",
-        pay_title: "Istedigin kadar ode",
-        pay_subtitle: "Murchi sonsuza kadar ucretsiz. Desteklemek istersen — yarisi hayvan kurtarmaya.",
-        copy: "Kopyala", copied: "Kopyalandi!",
-        charity_note: "Her bagisin %50'si hayvan barinaklarina ve kurtarma kuruluslarina gider",
-        donations_title: "Bagis duvari",
-        donations_empty: "Murchi'yi destekleyen ve hayvanlara yardim eden ilk kisi olun!",
-        footer_made: "Dunyanin her yerindeki kediler icin sevgiyle yapildi"
+    ar: {
+        tagline: "رفاقك الكاوايي على سطح المكتب لنظام macOS. قطة ودب لطيفان يعيشان على شاشتك.",
+        download: "تحميل لنظام macOS",
+        github_star: "نجمة على GitHub",
+        chars_title: "تعرف على الثنائي",
+        chars_subtitle: "صديقان، شخصيتان، سطح مكتب واحد",
+        murchi_role: "القطة الفضولية",
+        kuma_role: "الدب اللطيف",
+        trait_playful: "مرح",
+        trait_curious: "فضولي",
+        trait_fish: "يحب السمك",
+        trait_calm: "هادئ",
+        trait_cuddly: "محبوب",
+        trait_honey: "يحب العسل",
+        features_title: "كل ما يحتاجونه",
+        features_subtitle: "تجربة تاماغوتشي كاملة على سطح مكتبك",
+        f1_title: "25+ سلوك",
+        f1_desc: "المشي، النوم، الركض، التنظيف، الاستحمام، مطاردة الفراشات، مراقبة الطيور، اسقاط الاكواب والمزيد.",
+        f2_title: "اطعم واعتني",
+        f2_desc: "سمك، حليب، حلوى، عسل. وازن الجوع والسعادة والطاقة والنظافة والصحة.",
+        f3_title: "العاب واكسسوارات",
+        f3_desc: "فار، كرة صوف، ليزر. قبعات، ربطات، تيجان، نظارات، ازهار والمزيد.",
+        f4_title: "ارتقي وتطور",
+        f4_desc: "اكسب XP بالرعاية. تطور عبر 5 مراحل من الرضيع الى الشكل الكوني.",
+        f5_title: "سحر الجسيمات",
+        f5_desc: "قلوب، نجوم، بريق، سحب، اثار اقدام، وجسيمات Z للنوم.",
+        f6_title: "مؤثرات صوتية",
+        f6_desc: "مواء، خرخرة، مضغ، رش. شغل او اطفئ الصوت في اي وقت.",
+        f7_title: "يوميات الحيوان",
+        f7_desc: "حيوانك يكتب مدونة شخصية. اقرأ عن الوجبات والمغامرات والفراشات واحتفالات اعياد الميلاد.",
+        f8_title: "يعيش على الـDock",
+        f8_desc: "يمشي على Dock الـmacOS كمنصة. يسقط من الحواف!",
+        f9_title: "تبديل الحيوان",
+        f9_desc: "بدل بين القطة Murchi والدب Kuma في اي وقت. لكل منهما رسوم متحركة وشخصية فريدة.",
+        install_title: "ابدأ في ثوان",
+        install_subtitle: "بدون حساب. بدون انترنت.",
+        step1: "حمل <strong>Murchi.dmg</strong>",
+        step2: "افتح DMG واسحب <strong>Murchi</strong> الى التطبيقات",
+        step3: "شغله. اذا macOS يمنع: <strong>الاعدادات > الخصوصية > افتح على اي حال</strong>",
+        step4: "حيوانك على سطح المكتب! <strong>Cmd+Shift+M</strong> لاستدعائه",
+        pwyw_badge: "50% لملاجئ الحيوانات &middot; 50% لدعم التطوير",
+        pwyw_title: "حدد سعرك",
+        pwyw_subtitle: "Murchi و Kuma مجانيان للابد. اذا اردت الدعم، كل دولار يساعد حيوانات حقيقية.",
+        price_free: "لا بأس! Murchi و Kuma يحبانك على اي حال &#128149;",
+        price_paid: "شكرا! &#128149; انت تساعد حيوانات حقيقية",
+        get_btn: "احصل على Murchi و Kuma",
+        pwyw_note: "macOS 12+ &middot; عالمي (Apple Silicon + Intel) &middot; ~5 ميغا",
+        github_cta: "نجمة على GitHub",
+        footer_made: "صنع بحب لجميع الحيوانات في العالم",
+        crypto_title: "او ادفع بالعملات المشفرة",
+        copy: "نسخ",
+        charity_title: "اين تذهب اموالك",
+        charity_sub: "50% من جميع المدفوعات تذهب مباشرة الى منظمات رعاية الحيوان",
+        get_free: "تحميل مجاني",
+        pay_amount: "ادفع ${price}",
+        pay_instruction: "ارسل المبلغ الى احد العناوين ادناه ثم قم بالتحميل",
+        download_after_pay: "تحميل Murchi & Kuma"
     }
 };
 
@@ -1726,6 +2021,7 @@ let currentLang = 'en';
 function setLang(lang) {
     currentLang = lang;
     const t = translations[lang];
+    if (!t) return;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerHTML = t[key];
@@ -1733,9 +2029,8 @@ function setLang(lang) {
     document.querySelectorAll('.lang-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.lang === lang);
     });
-    document.querySelectorAll('.copy-btn:not(.copied)').forEach(b => {
-        b.textContent = t.copy || 'Copy';
-    });
+    // Update RTL for Arabic
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     localStorage.setItem('murchi-lang', lang);
 }
 

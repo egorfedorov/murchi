@@ -6,12 +6,689 @@ import UserNotifications
 
 // ═══════════════════════════════════════════════════════════════
 // MURCHI — Desktop Tamagotchi Cat for macOS
-// A pixel-art cat that lives on your desktop, walks around,
+// A kawaii cat that lives on your desktop, walks around,
 // reacts to you, and needs love & care.
 // ═══════════════════════════════════════════════════════════════
 
-// MARK: - Pixel Sprite Data
+// MARK: - Cat Renderer (Vector Kawaii Style)
 
+class CatRenderer {
+    static let shared = CatRenderer()
+    private var cache: [String: NSImage] = [:]
+    let size: CGFloat = 80
+
+    func clearCache() { cache.removeAll() }
+
+    enum CatExpression {
+        case neutral, happy, love, excited, sleeping, blink, eating
+        case annoyed, shocked, sick, straining, curious
+    }
+
+    enum CatPose {
+        case standing, sitting, walkL, walkR, jump, lyingDown, lyingDown2, stretch
+    }
+
+    func getSprite(for behavior: PetBehavior, frame: Int, right: Bool) -> NSImage {
+        let key = "cat_\(behavior.rawValue)_\(frame % 16)_\(right)"
+        if behavior != .lookingAtCursor, let cached = cache[key] { return cached }
+
+        let expression: CatExpression
+        let pose: CatPose
+
+        switch behavior {
+        case .idle:
+            expression = frame % 12 == 0 ? .blink : .neutral
+            pose = .standing
+        case .walking, .edgeWalking, .knockingGlass:
+            expression = .neutral
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .running, .chasingCursor, .chasingToy, .zoomies, .chasingButterfly:
+            expression = .excited
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .sitting, .watchingBird:
+            expression = .neutral
+            pose = .sitting
+        case .sleeping:
+            expression = .sleeping
+            pose = frame % 2 == 0 ? .lyingDown : .lyingDown2
+        case .eating:
+            expression = .eating
+            pose = .sitting
+        case .beingPet, .greeting:
+            expression = .love
+            pose = .standing
+        case .playing:
+            expression = frame % 3 == 0 ? .happy : .excited
+            pose = frame % 2 == 0 ? .standing : .jump
+        case .jumping:
+            expression = .excited
+            pose = .jump
+        case .stretching:
+            expression = .neutral
+            pose = .stretch
+        case .tripping:
+            expression = .shocked
+            pose = .lyingDown
+        case .grooming, .bathing:
+            expression = .annoyed
+            pose = .sitting
+        case .scratching:
+            expression = .annoyed
+            pose = frame % 2 == 0 ? .standing : .stretch
+        case .pooping:
+            expression = .straining
+            pose = .sitting
+        case .sick:
+            expression = .sick
+            pose = .lyingDown
+        case .promenade:
+            expression = .happy
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .openingGift:
+            expression = frame % 3 == 0 ? .excited : .happy
+            pose = .jump
+        case .lookingAtCursor:
+            let mousePos = NSEvent.mouseLocation
+            let img = render(expression: .curious, pose: .standing, lookRight: mousePos.x > 400)
+            return img
+        }
+
+        let img = render(expression: expression, pose: pose, lookRight: right)
+        cache[key] = img
+        return img
+    }
+
+    func render(expression: CatExpression, pose: CatPose, lookRight: Bool) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        ctx.saveGState()
+
+        if !lookRight {
+            ctx.translateBy(x: size, y: 0)
+            ctx.scaleBy(x: -1, y: 1)
+        }
+
+        let cx = size / 2
+        let baseY: CGFloat
+        switch pose {
+        case .standing, .walkL, .walkR: baseY = 6
+        case .sitting: baseY = 4
+        case .jump: baseY = 12
+        case .lyingDown, .lyingDown2: baseY = 3
+        case .stretch: baseY = 4
+        }
+
+        let wobble: CGFloat
+        switch pose {
+        case .walkL: wobble = -1.5
+        case .walkR: wobble = 1.5
+        default: wobble = 0
+        }
+
+        // Body dimensions — head-heavy cat shape
+        let bodyW: CGFloat = 48
+        let bodyH: CGFloat
+        switch pose {
+        case .lyingDown, .lyingDown2: bodyH = 30
+        case .sitting: bodyH = 42
+        default: bodyH = 46
+        }
+
+        let bodyRect: CGRect
+        switch pose {
+        case .lyingDown, .lyingDown2:
+            bodyRect = CGRect(x: cx - bodyW/2 + wobble - 2, y: baseY, width: bodyW + 8, height: bodyH)
+        default:
+            bodyRect = CGRect(x: cx - bodyW/2 + wobble, y: baseY, width: bodyW, height: bodyH)
+        }
+
+        // Cat colors — soft gray-blue like original Murchi
+        let furColor = NSColor(red: 0.6, green: 0.6, blue: 0.69, alpha: 1)
+        let lightFur = NSColor(red: 0.75, green: 0.75, blue: 0.83, alpha: 1)
+        let outlineColor = NSColor(red: 0.18, green: 0.18, blue: 0.28, alpha: 1)
+        let bellyColor = NSColor(red: 0.94, green: 0.93, blue: 0.97, alpha: 1)
+        let darkFur = NSColor(red: 0.5, green: 0.5, blue: 0.6, alpha: 1)
+
+        // ==============================
+        // LAYER 1: TAIL (behind everything)
+        // ==============================
+        if pose != .lyingDown && pose != .lyingDown2 {
+            let tailX = bodyRect.maxX - 8
+            let tailBaseY = baseY + 14
+            let tailWag: CGFloat = (pose == .walkL) ? -4 : (pose == .walkR ? 4 : 0)
+
+            ctx.setLineCap(.round)
+            ctx.setLineJoin(.round)
+
+            // Elegant S-curve cat tail — thin, curling upward
+            let tailPath = CGMutablePath()
+            tailPath.move(to: CGPoint(x: tailX, y: tailBaseY))
+            tailPath.addCurve(
+                to: CGPoint(x: tailX + 6 + tailWag, y: tailBaseY + 32),
+                control1: CGPoint(x: tailX + 14, y: tailBaseY - 4),
+                control2: CGPoint(x: tailX - 4 + tailWag, y: tailBaseY + 20)
+            )
+            // Tip curl
+            tailPath.addQuadCurve(
+                to: CGPoint(x: tailX + 2 + tailWag, y: tailBaseY + 38),
+                control: CGPoint(x: tailX + 12 + tailWag, y: tailBaseY + 36)
+            )
+
+            // Main tail
+            ctx.setStrokeColor(lightFur.cgColor)
+            ctx.setLineWidth(4.5)
+            ctx.addPath(tailPath)
+            ctx.strokePath()
+            // Dark tip
+            let tipPath = CGMutablePath()
+            tipPath.move(to: CGPoint(x: tailX + 6 + tailWag, y: tailBaseY + 32))
+            tipPath.addQuadCurve(
+                to: CGPoint(x: tailX + 2 + tailWag, y: tailBaseY + 38),
+                control: CGPoint(x: tailX + 12 + tailWag, y: tailBaseY + 36)
+            )
+            ctx.setStrokeColor(darkFur.cgColor)
+            ctx.setLineWidth(4)
+            ctx.addPath(tipPath)
+            ctx.strokePath()
+            // Outline
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.0)
+            ctx.addPath(tailPath)
+            ctx.strokePath()
+        }
+
+        // ==============================
+        // LAYER 2: EARS (behind body)
+        // ==============================
+        let earY = bodyRect.maxY - 10
+        let earH: CGFloat = 18
+        let earW: CGFloat = 14
+
+        for side in [-1.0, 1.0] as [CGFloat] {
+            let earCx = cx + side * 15 + wobble
+            let earPath = CGMutablePath()
+            // Wider base that overlaps with the body circle
+            earPath.move(to: CGPoint(x: earCx - earW/2, y: earY - 2))
+            earPath.addLine(to: CGPoint(x: earCx + side * 1, y: earY + earH))
+            earPath.addLine(to: CGPoint(x: earCx + earW/2, y: earY - 2))
+            earPath.closeSubpath()
+
+            // Ear fill
+            ctx.setFillColor(lightFur.cgColor)
+            ctx.addPath(earPath)
+            ctx.fillPath()
+            // Inner ear (pink)
+            let innerPath = CGMutablePath()
+            innerPath.move(to: CGPoint(x: earCx - earW/3.5, y: earY))
+            innerPath.addLine(to: CGPoint(x: earCx + side * 0.8, y: earY + earH - 5))
+            innerPath.addLine(to: CGPoint(x: earCx + earW/3.5, y: earY))
+            innerPath.closeSubpath()
+            ctx.setFillColor(NSColor(red: 1, green: 0.7, blue: 0.78, alpha: 0.6).cgColor)
+            ctx.addPath(innerPath)
+            ctx.fillPath()
+            // Ear outline
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+            ctx.addPath(earPath)
+            ctx.strokePath()
+        }
+
+        // ==============================
+        // LAYER 3: LEGS (behind body)
+        // ==============================
+        if pose != .lyingDown && pose != .lyingDown2 {
+            ctx.setFillColor(lightFur.cgColor)
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+
+            let legY = baseY - 2
+            let legW: CGFloat = 10
+            let legH: CGFloat = 8
+            let leftLegX = cx - 14 + wobble
+            let rightLegX = cx + 4 + wobble
+
+            let leftOff: CGFloat = (pose == .walkL) ? 3 : 0
+            let rightOff: CGFloat = (pose == .walkR) ? 3 : 0
+
+            let ll = CGRect(x: leftLegX, y: legY + leftOff, width: legW, height: legH)
+            let rl = CGRect(x: rightLegX, y: legY + rightOff, width: legW, height: legH)
+
+            for legRect in [ll, rl] {
+                let lp = CGPath(roundedRect: legRect, cornerWidth: 4, cornerHeight: 4, transform: nil)
+                ctx.addPath(lp)
+                ctx.fillPath()
+                // White paw tips
+                let pawRect = CGRect(x: legRect.minX + 1.5, y: legRect.minY, width: legRect.width - 3, height: 3.5)
+                ctx.setFillColor(bellyColor.cgColor)
+                ctx.addPath(CGPath(roundedRect: pawRect, cornerWidth: 2, cornerHeight: 2, transform: nil))
+                ctx.fillPath()
+                ctx.setStrokeColor(outlineColor.cgColor)
+                ctx.addPath(lp)
+                ctx.strokePath()
+            }
+        }
+
+        // ==============================
+        // LAYER 4: BODY (main shape on top)
+        // ==============================
+        // Shadow
+        ctx.setFillColor(NSColor(white: 0.78, alpha: 0.4).cgColor)
+        let shadowRect = bodyRect.offsetBy(dx: 1, dy: -1)
+        ctx.addPath(CGPath(ellipseIn: shadowRect, transform: nil))
+        ctx.fillPath()
+
+        // Body fill
+        ctx.setFillColor(lightFur.cgColor)
+        let bodyPath = CGPath(ellipseIn: bodyRect, transform: nil)
+        ctx.addPath(bodyPath)
+        ctx.fillPath()
+
+        // Soft plush highlight to keep the fur from feeling flat
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.16).cgColor)
+        let bodyHighlightRect = CGRect(x: bodyRect.minX + 6, y: bodyRect.minY + bodyH * 0.42, width: bodyW * 0.42, height: bodyH * 0.3)
+        ctx.addPath(CGPath(ellipseIn: bodyHighlightRect, transform: nil))
+        ctx.fillPath()
+
+        // Belly patch
+        let bellyW = bodyW * 0.6
+        let bellyH = bodyH * 0.45
+        let bellyRect = CGRect(x: cx - bellyW/2 + wobble, y: baseY + 1, width: bellyW, height: bellyH)
+        ctx.setFillColor(bellyColor.cgColor)
+        ctx.addPath(CGPath(ellipseIn: bellyRect, transform: nil))
+        ctx.fillPath()
+
+        // Stripe marks on forehead (darker fur)
+        if pose != .lyingDown && pose != .lyingDown2 {
+            ctx.setStrokeColor(furColor.cgColor)
+            ctx.setLineWidth(1.5)
+            let stripeY = bodyRect.maxY - 6
+            for i in -1...1 {
+                let sx = cx + CGFloat(i) * 5 + wobble
+                let sp = CGMutablePath()
+                sp.move(to: CGPoint(x: sx, y: stripeY))
+                sp.addLine(to: CGPoint(x: sx + CGFloat(i) * 1, y: stripeY + 5))
+                ctx.addPath(sp)
+                ctx.strokePath()
+            }
+        }
+
+        // Body outline
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.8)
+        ctx.addPath(bodyPath)
+        ctx.strokePath()
+
+        // ==============================
+        // LAYER 5: COLLAR (on body)
+        // ==============================
+        if pose != .lyingDown && pose != .lyingDown2 {
+            let collarY = bodyRect.minY + bodyH * 0.58
+            ctx.setStrokeColor(NSColor(red: 1, green: 0.82, blue: 0.15, alpha: 1).cgColor)
+            ctx.setLineWidth(2.5)
+            let collarPath = CGMutablePath()
+            collarPath.move(to: CGPoint(x: cx - 16 + wobble, y: collarY))
+            collarPath.addQuadCurve(
+                to: CGPoint(x: cx + 16 + wobble, y: collarY),
+                control: CGPoint(x: cx + wobble, y: collarY - 5)
+            )
+            ctx.addPath(collarPath)
+            ctx.strokePath()
+            // Bell
+            ctx.setFillColor(NSColor(red: 0.35, green: 0.65, blue: 1, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 3.5 + wobble, y: collarY - 7, width: 7, height: 7))
+            ctx.fillPath()
+            // Bell shine
+            ctx.setFillColor(NSColor.white.withAlphaComponent(0.5).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 1 + wobble, y: collarY - 4, width: 2.5, height: 2.5))
+            ctx.fillPath()
+        }
+
+        // ==============================
+        // LAYER 6: FACE (on top of everything)
+        // ==============================
+        let faceY = bodyRect.minY + bodyH * 0.42
+
+        // Puffy muzzle keeps the face sweeter and more readable at small size
+        let muzzleRect = CGRect(x: cx - 10 + wobble, y: faceY - 3, width: 20, height: 11)
+        ctx.setFillColor(bellyColor.withAlphaComponent(0.95).cgColor)
+        ctx.addPath(CGPath(ellipseIn: muzzleRect, transform: nil))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.45).cgColor)
+        ctx.addPath(CGPath(ellipseIn: muzzleRect.insetBy(dx: 4, dy: 2), transform: nil))
+        ctx.fillPath()
+
+        // Pink cheeks
+        let cheekAlpha: CGFloat = expression == .love ? 1.0 : 0.45
+        let cheekSize: CGFloat = expression == .love ? 11 : 8
+        ctx.setFillColor(NSColor(red: 1, green: 0.5, blue: 0.6, alpha: cheekAlpha).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 22 + wobble, y: faceY - 2, width: cheekSize, height: cheekSize - 1))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 14 + wobble, y: faceY - 2, width: cheekSize, height: cheekSize - 1))
+        ctx.fillPath()
+
+        // Whiskers
+        ctx.setStrokeColor(NSColor(red: 0.35, green: 0.35, blue: 0.45, alpha: 0.45).cgColor)
+        ctx.setLineWidth(0.7)
+        let whiskerY = faceY + 1
+        for i in 0..<3 {
+            let angle: CGFloat = CGFloat(i - 1) * 0.3
+            // Left
+            let wl = CGMutablePath()
+            wl.move(to: CGPoint(x: cx - 10 + wobble, y: whiskerY + CGFloat(i) * 2.5))
+            wl.addLine(to: CGPoint(x: cx - 28 + wobble, y: whiskerY + CGFloat(i) * 2.5 + angle * 8))
+            ctx.addPath(wl)
+            ctx.strokePath()
+            // Right
+            let wr = CGMutablePath()
+            wr.move(to: CGPoint(x: cx + 10 + wobble, y: whiskerY + CGFloat(i) * 2.5))
+            wr.addLine(to: CGPoint(x: cx + 28 + wobble, y: whiskerY + CGFloat(i) * 2.5 + angle * 8))
+            ctx.addPath(wr)
+            ctx.strokePath()
+        }
+
+        // Eyes
+        ctx.setFillColor(outlineColor.cgColor)
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.8)
+        let eyeY = faceY + 7
+        let eyeL = cx - 11 + wobble
+        let eyeR = cx + 6 + wobble
+
+        switch expression {
+        case .neutral, .curious:
+            // Big round cat eyes with green iris
+            let eyeSize: CGFloat = 6
+            // White sclera
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL - 0.5, y: eyeY - 0.5, width: eyeSize + 1, height: eyeSize + 1))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR - 0.5, y: eyeY - 0.5, width: eyeSize + 1, height: eyeSize + 1))
+            ctx.fillPath()
+            // Green iris
+            ctx.setFillColor(NSColor(red: 0.4, green: 0.75, blue: 0.4, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: eyeSize, height: eyeSize))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR, y: eyeY, width: eyeSize, height: eyeSize))
+            ctx.fillPath()
+            // Pupil (vertical slit)
+            ctx.setFillColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 2, y: eyeY + 0.5, width: 2, height: eyeSize - 1))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 2, y: eyeY + 0.5, width: 2, height: eyeSize - 1))
+            ctx.fillPath()
+            // Shine
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY + 3, width: 2.5, height: 2.5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY + 3, width: 2.5, height: 2.5))
+            ctx.fillPath()
+
+        case .happy, .love:
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeL, y: eyeY + 2))
+            path.addQuadCurve(to: CGPoint(x: eyeL + 6, y: eyeY + 2), control: CGPoint(x: eyeL + 3, y: eyeY + 7))
+            ctx.addPath(path)
+            ctx.strokePath()
+            let path2 = CGMutablePath()
+            path2.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path2.addQuadCurve(to: CGPoint(x: eyeR + 6, y: eyeY + 2), control: CGPoint(x: eyeR + 3, y: eyeY + 7))
+            ctx.addPath(path2)
+            ctx.strokePath()
+
+        case .excited:
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL - 0.5, y: eyeY - 0.5, width: 8, height: 8))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR - 0.5, y: eyeY - 0.5, width: 8, height: 8))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor(red: 0.4, green: 0.75, blue: 0.4, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: 7, height: 7))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR, y: eyeY, width: 7, height: 7))
+            ctx.fillPath()
+            ctx.setFillColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 2, y: eyeY + 0.5, width: 3, height: 6))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 2, y: eyeY + 0.5, width: 3, height: 6))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY + 4, width: 2.5, height: 2.5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY + 4, width: 2.5, height: 2.5))
+            ctx.fillPath()
+
+        case .sleeping:
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeL, y: eyeY + 2))
+            path.addLine(to: CGPoint(x: eyeL + 6, y: eyeY + 2))
+            ctx.addPath(path)
+            ctx.strokePath()
+            let path2 = CGMutablePath()
+            path2.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path2.addLine(to: CGPoint(x: eyeR + 6, y: eyeY + 2))
+            ctx.addPath(path2)
+            ctx.strokePath()
+
+        case .blink:
+            // Left eye open
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL - 0.5, y: eyeY - 0.5, width: 7, height: 7))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor(red: 0.4, green: 0.75, blue: 0.4, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: 6, height: 6))
+            ctx.fillPath()
+            ctx.setFillColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 2, y: eyeY + 0.5, width: 2, height: 5))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY + 3, width: 2, height: 2))
+            ctx.fillPath()
+            // Right eye closed
+            ctx.setStrokeColor(outlineColor.cgColor)
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path.addLine(to: CGPoint(x: eyeR + 6, y: eyeY + 2))
+            ctx.addPath(path)
+            ctx.strokePath()
+
+        case .eating:
+            ctx.setLineWidth(1.5)
+            ctx.setStrokeColor(outlineColor.cgColor)
+            let pl = CGMutablePath()
+            pl.move(to: CGPoint(x: eyeL + 5, y: eyeY + 5))
+            pl.addLine(to: CGPoint(x: eyeL + 1, y: eyeY + 2.5))
+            pl.addLine(to: CGPoint(x: eyeL + 5, y: eyeY))
+            ctx.addPath(pl)
+            ctx.strokePath()
+            let pr = CGMutablePath()
+            pr.move(to: CGPoint(x: eyeR, y: eyeY + 5))
+            pr.addLine(to: CGPoint(x: eyeR + 4, y: eyeY + 2.5))
+            pr.addLine(to: CGPoint(x: eyeR, y: eyeY))
+            ctx.addPath(pr)
+            ctx.strokePath()
+
+        case .annoyed:
+            ctx.setFillColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY, width: 4, height: 4))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY, width: 4, height: 4))
+            ctx.fillPath()
+            ctx.setLineWidth(1.5)
+            ctx.setStrokeColor(outlineColor.cgColor)
+            let bl = CGMutablePath()
+            bl.move(to: CGPoint(x: eyeL, y: eyeY + 6))
+            bl.addLine(to: CGPoint(x: eyeL + 6, y: eyeY + 9))
+            ctx.addPath(bl)
+            ctx.strokePath()
+            let br = CGMutablePath()
+            br.move(to: CGPoint(x: eyeR + 6, y: eyeY + 6))
+            br.addLine(to: CGPoint(x: eyeR, y: eyeY + 9))
+            ctx.addPath(br)
+            ctx.strokePath()
+
+        case .shocked:
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL - 1, y: eyeY - 1, width: 9, height: 9))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR - 1, y: eyeY - 1, width: 9, height: 9))
+            ctx.fillPath()
+            ctx.setFillColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY + 1, width: 5, height: 5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY + 1, width: 5, height: 5))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 2, y: eyeY + 3, width: 2.5, height: 2.5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 2, y: eyeY + 3, width: 2.5, height: 2.5))
+            ctx.fillPath()
+
+        case .sick:
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.2)
+            let sp1 = CGMutablePath()
+            sp1.addArc(center: CGPoint(x: eyeL + 3, y: eyeY + 3), radius: 2.5, startAngle: 0, endAngle: .pi * 1.5, clockwise: false)
+            ctx.addPath(sp1)
+            ctx.strokePath()
+            let sp2 = CGMutablePath()
+            sp2.addArc(center: CGPoint(x: eyeR + 3, y: eyeY + 3), radius: 2.5, startAngle: 0, endAngle: .pi * 1.5, clockwise: false)
+            ctx.addPath(sp2)
+            ctx.strokePath()
+
+        case .straining:
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+            for ex in [eyeL, eyeR] {
+                let p = CGMutablePath()
+                p.move(to: CGPoint(x: ex, y: eyeY))
+                p.addLine(to: CGPoint(x: ex + 5, y: eyeY + 5))
+                p.move(to: CGPoint(x: ex + 5, y: eyeY))
+                p.addLine(to: CGPoint(x: ex, y: eyeY + 5))
+                ctx.addPath(p)
+                ctx.strokePath()
+            }
+        }
+
+        // Nose (small pink inverted triangle)
+        let noseX = cx + wobble
+        let noseY = faceY + 2
+        ctx.setFillColor(NSColor(red: 1, green: 0.55, blue: 0.65, alpha: 1).cgColor)
+        let nosePath = CGMutablePath()
+        nosePath.move(to: CGPoint(x: noseX - 2.5, y: noseY + 2.5))
+        nosePath.addLine(to: CGPoint(x: noseX, y: noseY - 0.5))
+        nosePath.addLine(to: CGPoint(x: noseX + 2.5, y: noseY + 2.5))
+        nosePath.closeSubpath()
+        ctx.addPath(nosePath)
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.5).cgColor)
+        ctx.addEllipse(in: CGRect(x: noseX - 0.5, y: noseY + 1.2, width: 1.5, height: 1.2))
+        ctx.fillPath()
+
+        // Mouth
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.2)
+        let mouthY = faceY - 1.5
+
+        switch expression {
+        case .happy, .love, .excited:
+            // Wide smile
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 6 + wobble, y: mouthY + 1))
+            mp.addQuadCurve(to: CGPoint(x: cx + 6 + wobble, y: mouthY + 1), control: CGPoint(x: cx + wobble, y: mouthY - 4))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        case .annoyed, .straining:
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 5 + wobble, y: mouthY))
+            mp.addQuadCurve(to: CGPoint(x: cx + wobble, y: mouthY), control: CGPoint(x: cx - 2.5 + wobble, y: mouthY + 2))
+            mp.addQuadCurve(to: CGPoint(x: cx + 5 + wobble, y: mouthY), control: CGPoint(x: cx + 2.5 + wobble, y: mouthY - 2))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        case .shocked:
+            ctx.setFillColor(NSColor(red: 0.2, green: 0.2, blue: 0.25, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 3 + wobble, y: mouthY - 3, width: 6, height: 5))
+            ctx.fillPath()
+        case .eating:
+            ctx.setFillColor(NSColor(red: 1, green: 0.45, blue: 0.5, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 4 + wobble, y: mouthY - 3, width: 8, height: 5))
+            ctx.fillPath()
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 4 + wobble, y: mouthY - 3, width: 8, height: 5))
+            ctx.strokePath()
+        case .sleeping:
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 2 + wobble, y: mouthY))
+            mp.addQuadCurve(to: CGPoint(x: cx + 2 + wobble, y: mouthY), control: CGPoint(x: cx + wobble, y: mouthY - 2))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        default:
+            // Cat "w" mouth — signature cat mouth
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 5 + wobble, y: mouthY))
+            mp.addQuadCurve(to: CGPoint(x: cx + wobble, y: mouthY + 0.5), control: CGPoint(x: cx - 2.5 + wobble, y: mouthY - 2.5))
+            mp.addQuadCurve(to: CGPoint(x: cx + 5 + wobble, y: mouthY), control: CGPoint(x: cx + 2.5 + wobble, y: mouthY - 2.5))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        }
+
+        // ==============================
+        // LAYER 7: SPECIALS (floating above)
+        // ==============================
+        if expression == .annoyed {
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+            let mx = cx + 20 + wobble
+            let my = bodyRect.maxY
+            let cm = CGMutablePath()
+            cm.move(to: CGPoint(x: mx, y: my))
+            cm.addLine(to: CGPoint(x: mx + 6, y: my + 6))
+            cm.move(to: CGPoint(x: mx + 6, y: my))
+            cm.addLine(to: CGPoint(x: mx, y: my + 6))
+            ctx.addPath(cm)
+            ctx.strokePath()
+        }
+
+        if expression == .love {
+            ctx.setFillColor(NSColor(red: 1, green: 0.3, blue: 0.5, alpha: 0.85).cgColor)
+            let hx = cx + 22 + wobble
+            let hy = bodyRect.maxY + 4
+            let hp = CGMutablePath()
+            hp.move(to: CGPoint(x: hx, y: hy + 3))
+            hp.addQuadCurve(to: CGPoint(x: hx + 4, y: hy + 7), control: CGPoint(x: hx, y: hy + 7))
+            hp.addQuadCurve(to: CGPoint(x: hx + 8, y: hy + 3), control: CGPoint(x: hx + 8, y: hy + 7))
+            hp.addLine(to: CGPoint(x: hx + 4, y: hy))
+            hp.closeSubpath()
+            ctx.addPath(hp)
+            ctx.fillPath()
+        }
+
+        if expression == .sleeping {
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 10, weight: .bold),
+                .foregroundColor: NSColor(white: 0.5, alpha: 0.6)
+            ]
+            let zStr = NSAttributedString(string: "z", attributes: attrs)
+            let line = CTLineCreateWithAttributedString(zStr)
+            ctx.textPosition = CGPoint(x: cx + 22 + wobble, y: bodyRect.maxY)
+            CTLineDraw(line, ctx)
+            let zStr2 = NSAttributedString(string: "Z", attributes: attrs)
+            let line2 = CTLineCreateWithAttributedString(zStr2)
+            ctx.textPosition = CGPoint(x: cx + 26 + wobble, y: bodyRect.maxY + 8)
+            CTLineDraw(line2, ctx)
+        }
+
+        ctx.restoreGState()
+        img.unlockFocus()
+        return img
+    }
+}
+
+// Legacy pixel sprite compatibility
 struct Sprites {
     static let T: UInt32 = 0 // transparent
 
@@ -1314,129 +1991,205 @@ struct SpeechBubbles {
 struct Accessory {
     let name: String
     let minLevel: Int
-    let sprite: [[UInt32]]  // overlay sprite
+    let sprite: [[UInt32]]  // overlay sprite (legacy, kept for compatibility)
+    let vectorDraw: ((CGContext, CGFloat, CGFloat) -> Void)?
 
-    // Hat — yellow party hat
+    init(name: String, minLevel: Int, sprite: [[UInt32]], vectorDraw: ((CGContext, CGFloat, CGFloat) -> Void)? = nil) {
+        self.name = name
+        self.minLevel = minLevel
+        self.sprite = sprite
+        self.vectorDraw = vectorDraw
+    }
+
+    // Hat — yellow party hat (vector kawaii)
     static let partyHat: Accessory = {
-        let T: UInt32 = 0, Y: UInt32 = 0xFFD700, R: UInt32 = 0xFF4444, B: UInt32 = 0x2D2D3F
-        let sprite: [[UInt32]] = [
-            [T,T,T,T,T,T,T,R,R,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,R,Y,Y,R,T,T,T,T,T,T],
-            [T,T,T,T,T,R,Y,Y,Y,Y,R,T,T,T,T,T],
-            [T,T,T,T,R,Y,Y,Y,Y,Y,Y,R,T,T,T,T],
-            [T,T,T,R,Y,Y,Y,Y,Y,Y,Y,Y,R,T,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ]
-        return Accessory(name: "\u{1F389} Party Hat", minLevel: 1, sprite: sprite)
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F389} Party Hat", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            // Yellow triangle hat
+            let hatTop = cy + 38
+            let hatBase = cy + 14
+            ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+            ctx.move(to: CGPoint(x: cx, y: hatTop))
+            ctx.addLine(to: CGPoint(x: cx - 14, y: hatBase))
+            ctx.addLine(to: CGPoint(x: cx + 14, y: hatBase))
+            ctx.closePath()
+            ctx.fillPath()
+            // Outline
+            ctx.setStrokeColor(NSColor(white: 0.15, alpha: 1).cgColor)
+            ctx.setLineWidth(1.5)
+            ctx.move(to: CGPoint(x: cx, y: hatTop))
+            ctx.addLine(to: CGPoint(x: cx - 14, y: hatBase))
+            ctx.addLine(to: CGPoint(x: cx + 14, y: hatBase))
+            ctx.closePath()
+            ctx.strokePath()
+            // Red ball on top
+            ctx.setFillColor(NSColor(red: 1, green: 0.27, blue: 0.27, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 4, y: hatTop - 2, width: 8, height: 8))
+            ctx.fillPath()
+            // Brim
+            ctx.setFillColor(NSColor(white: 0.18, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 16, y: hatBase - 3, width: 32, height: 6))
+            ctx.fillPath()
+        }
     }()
 
-    // Bow tie — red
+    // Bow tie — red (vector kawaii)
     static let bowTie: Accessory = {
-        let T: UInt32 = 0, R: UInt32 = 0xFF3355, RD: UInt32 = 0xCC2244, B: UInt32 = 0x2D2D3F
-        let sprite: [[UInt32]] = [
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,R,R,T,T,B,B,T,T,R,R,T,T,T],  // bow at collar
-            [T,T,R,R,RD,R,B,RD,RD,B,R,RD,R,R,T,T],
-            [T,T,T,R,R,T,T,B,B,T,T,R,R,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ]
-        return Accessory(name: "\u{1F380} Bow Tie", minLevel: 2, sprite: sprite)
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F380} Bow Tie", minLevel: 2, sprite: sprite) { ctx, cx, cy in
+            let bowY = cy - 14
+            // Left wing
+            ctx.setFillColor(NSColor(red: 1, green: 0.2, blue: 0.33, alpha: 1).cgColor)
+            ctx.move(to: CGPoint(x: cx, y: bowY))
+            ctx.addCurve(to: CGPoint(x: cx - 14, y: bowY + 6),
+                         control1: CGPoint(x: cx - 4, y: bowY + 8),
+                         control2: CGPoint(x: cx - 10, y: bowY + 8))
+            ctx.addCurve(to: CGPoint(x: cx, y: bowY),
+                         control1: CGPoint(x: cx - 10, y: bowY - 8),
+                         control2: CGPoint(x: cx - 4, y: bowY - 8))
+            ctx.fillPath()
+            // Right wing
+            ctx.move(to: CGPoint(x: cx, y: bowY))
+            ctx.addCurve(to: CGPoint(x: cx + 14, y: bowY + 6),
+                         control1: CGPoint(x: cx + 4, y: bowY + 8),
+                         control2: CGPoint(x: cx + 10, y: bowY + 8))
+            ctx.addCurve(to: CGPoint(x: cx, y: bowY),
+                         control1: CGPoint(x: cx + 10, y: bowY - 8),
+                         control2: CGPoint(x: cx + 4, y: bowY - 8))
+            ctx.fillPath()
+            // Center knot
+            ctx.setFillColor(NSColor(red: 0.8, green: 0.13, blue: 0.27, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 3, y: bowY - 3, width: 6, height: 6))
+            ctx.fillPath()
+        }
     }()
 
-    // Crown — gold
+    // Crown — gold (vector kawaii)
     static let crown: Accessory = {
-        let T: UInt32 = 0, Y: UInt32 = 0xFFD700, YD: UInt32 = 0xDDB800, R: UInt32 = 0xFF4444, B: UInt32 = 0x2D2D3F
-        let sprite: [[UInt32]] = [
-            [T,T,T,Y,T,T,T,Y,T,T,T,Y,T,T,T,T],
-            [T,T,T,Y,Y,T,T,Y,T,T,Y,Y,T,T,T,T],
-            [T,T,T,Y,Y,Y,Y,Y,Y,Y,Y,Y,T,T,T,T],
-            [T,T,T,YD,R,YD,YD,R,YD,YD,R,YD,T,T,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ]
-        return Accessory(name: "\u{1F451} Crown", minLevel: 5, sprite: sprite)
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F451} Crown", minLevel: 5, sprite: sprite) { ctx, cx, cy in
+            let crownBase = cy + 14
+            let crownTop = cy + 34
+            // Gold base band
+            ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+            ctx.fill(CGRect(x: cx - 16, y: crownBase, width: 32, height: 8))
+            // Three points
+            for px in [cx - 12, cx, cx + 12] as [CGFloat] {
+                ctx.move(to: CGPoint(x: px - 5, y: crownBase + 8))
+                ctx.addLine(to: CGPoint(x: px, y: crownTop))
+                ctx.addLine(to: CGPoint(x: px + 5, y: crownBase + 8))
+                ctx.closePath()
+                ctx.fillPath()
+            }
+            // Gems (red, blue, red)
+            let gemColors: [NSColor] = [
+                NSColor(red: 1, green: 0.2, blue: 0.2, alpha: 1),
+                NSColor(red: 0.2, green: 0.4, blue: 1, alpha: 1),
+                NSColor(red: 1, green: 0.2, blue: 0.2, alpha: 1)
+            ]
+            for (i, gx) in [cx - 10, cx, cx + 10].enumerated() {
+                ctx.setFillColor(gemColors[i].cgColor)
+                ctx.addEllipse(in: CGRect(x: gx - 2.5, y: crownBase + 1, width: 5, height: 5))
+                ctx.fillPath()
+            }
+            // Outline
+            ctx.setStrokeColor(NSColor(white: 0.15, alpha: 1).cgColor)
+            ctx.setLineWidth(1.2)
+            ctx.addRect(CGRect(x: cx - 16, y: crownBase, width: 32, height: 8))
+            ctx.strokePath()
+        }
     }()
 
-    // Sunglasses
+    // Sunglasses (vector kawaii)
     static let sunglasses: Accessory = {
-        let T: UInt32 = 0, B: UInt32 = 0x1A1A2E, G: UInt32 = 0x222244, R: UInt32 = 0x333355
-        let sprite: [[UInt32]] = [
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,B,B,B,B,B,B,B,B,B,B,B,B,T,T],
-            [T,T,B,G,G,B,B,B,B,B,B,G,G,B,T,T],
-            [T,T,B,B,B,B,T,T,T,T,B,B,B,B,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ]
-        return Accessory(name: "\u{1F576} Sunglasses", minLevel: 3, sprite: sprite)
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F576} Sunglasses", minLevel: 3, sprite: sprite) { ctx, cx, cy in
+            let glassY = cy + 4
+            // Bridge
+            ctx.setStrokeColor(NSColor(white: 0.1, alpha: 1).cgColor)
+            ctx.setLineWidth(2)
+            ctx.move(to: CGPoint(x: cx - 4, y: glassY + 5))
+            ctx.addLine(to: CGPoint(x: cx + 4, y: glassY + 5))
+            ctx.strokePath()
+            // Arms
+            ctx.move(to: CGPoint(x: cx - 18, y: glassY + 5))
+            ctx.addLine(to: CGPoint(x: cx - 24, y: glassY + 8))
+            ctx.strokePath()
+            ctx.move(to: CGPoint(x: cx + 18, y: glassY + 5))
+            ctx.addLine(to: CGPoint(x: cx + 24, y: glassY + 8))
+            ctx.strokePath()
+            // Left lens
+            ctx.setFillColor(NSColor(white: 0.1, alpha: 0.85).cgColor)
+            let leftLens = CGRect(x: cx - 18, y: glassY, width: 14, height: 10)
+            let leftPath = CGPath(roundedRect: leftLens, cornerWidth: 3, cornerHeight: 3, transform: nil)
+            ctx.addPath(leftPath)
+            ctx.fillPath()
+            // Right lens
+            let rightLens = CGRect(x: cx + 4, y: glassY, width: 14, height: 10)
+            let rightPath = CGPath(roundedRect: rightLens, cornerWidth: 3, cornerHeight: 3, transform: nil)
+            ctx.addPath(rightPath)
+            ctx.fillPath()
+            // Lens shine
+            ctx.setFillColor(NSColor(white: 1, alpha: 0.3).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 15, y: glassY + 4, width: 4, height: 3))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: cx + 7, y: glassY + 4, width: 4, height: 3))
+            ctx.fillPath()
+        }
     }()
 
-    // Halo — for cosmic level
+    // Halo — for cosmic level (vector kawaii)
     static let halo: Accessory = {
-        let T: UInt32 = 0, H: UInt32 = 0xFFEE88, HG: UInt32 = 0xFFDD44
-        let sprite: [[UInt32]] = [
-            [T,T,T,T,HG,HG,HG,HG,HG,HG,HG,T,T,T,T,T],
-            [T,T,T,HG,H,H,H,H,H,H,H,HG,T,T,T,T],
-            [T,T,T,T,HG,HG,HG,HG,HG,HG,HG,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ]
-        return Accessory(name: "\u{1F607} Halo", minLevel: 10, sprite: sprite)
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F607} Halo", minLevel: 10, sprite: sprite) { ctx, cx, cy in
+            let haloY = cy + 36
+            // Glow
+            ctx.setFillColor(NSColor(red: 1, green: 0.93, blue: 0.53, alpha: 0.3).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 18, y: haloY - 3, width: 36, height: 12))
+            ctx.fillPath()
+            // Halo ring
+            ctx.setStrokeColor(NSColor(red: 1, green: 0.87, blue: 0.27, alpha: 1).cgColor)
+            ctx.setLineWidth(3)
+            ctx.addEllipse(in: CGRect(x: cx - 14, y: haloY, width: 28, height: 8))
+            ctx.strokePath()
+            // Highlight
+            ctx.setStrokeColor(NSColor(red: 1, green: 0.95, blue: 0.7, alpha: 0.7).cgColor)
+            ctx.setLineWidth(1.5)
+            ctx.addArc(center: CGPoint(x: cx, y: haloY + 4), radius: 12, startAngle: .pi * 0.2, endAngle: .pi * 0.8, clockwise: false)
+            ctx.strokePath()
+        }
     }()
 
-    static let all: [Accessory] = [partyHat, bowTie, sunglasses, crown, halo]
+    // Flower — pink flower behind ear (vector kawaii)
+    static let flower: Accessory = {
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F338} Flower", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            let fx = cx + 18
+            let fy = cy + 22
+            let petalSize: CGFloat = 6
+            // Petals (5 around center)
+            ctx.setFillColor(NSColor(red: 1, green: 0.6, blue: 0.7, alpha: 1).cgColor)
+            for i in 0..<5 {
+                let angle = CGFloat(i) * (.pi * 2 / 5) - .pi / 2
+                let px = fx + cos(angle) * 5
+                let py = fy + sin(angle) * 5
+                ctx.addEllipse(in: CGRect(x: px - petalSize/2, y: py - petalSize/2, width: petalSize, height: petalSize))
+                ctx.fillPath()
+            }
+            // Center
+            ctx.setFillColor(NSColor(red: 1, green: 0.9, blue: 0.3, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: fx - 3, y: fy - 3, width: 6, height: 6))
+            ctx.fillPath()
+        }
+    }()
+
+    static let all: [Accessory] = [partyHat, bowTie, sunglasses, crown, flower, halo]
 
     static func available(for level: Int) -> [Accessory] {
         return all.filter { $0.minLevel <= level }
@@ -1453,6 +2206,1102 @@ struct Toy {
 
     enum ToyType {
         case mouseToy, yarnBall, laserDot
+    }
+}
+
+// MARK: - Bear Renderer (Vector Kawaii Style)
+
+class BearRenderer {
+    static let shared = BearRenderer()
+    private var cache: [String: NSImage] = [:]
+    let size: CGFloat = 80
+
+    func clearCache() { cache.removeAll() }
+
+    func getSprite(for behavior: PetBehavior, frame: Int, right: Bool) -> NSImage {
+        let key = "bear_\(behavior.rawValue)_\(frame % 16)_\(right)"
+        if behavior != .lookingAtCursor, let cached = cache[key] { return cached }
+
+        let expression: BearExpression
+        let pose: BearPose
+
+        switch behavior {
+        case .idle:
+            expression = frame % 12 == 0 ? .blink : .neutral
+            pose = .standing
+        case .walking, .edgeWalking, .knockingGlass:
+            expression = .neutral
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .running, .chasingCursor, .chasingToy, .zoomies, .chasingButterfly:
+            expression = .excited
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .sitting, .watchingBird:
+            expression = .neutral
+            pose = .sitting
+        case .sleeping:
+            expression = .sleeping
+            pose = frame % 2 == 0 ? .lyingDown : .lyingDown2
+        case .eating:
+            expression = .eating
+            pose = .sitting
+        case .beingPet, .greeting:
+            expression = .love
+            pose = .standing
+        case .playing:
+            expression = frame % 3 == 0 ? .happy : .excited
+            pose = frame % 2 == 0 ? .standing : .jump
+        case .jumping:
+            expression = .excited
+            pose = .jump
+        case .stretching:
+            expression = .neutral
+            pose = .stretch
+        case .tripping:
+            expression = .shocked
+            pose = .lyingDown
+        case .grooming, .bathing:
+            expression = .annoyed
+            pose = .sitting
+        case .scratching:
+            expression = .annoyed
+            pose = frame % 2 == 0 ? .standing : .stretch
+        case .pooping:
+            expression = .straining
+            pose = .sitting
+        case .sick:
+            expression = .sick
+            pose = .lyingDown
+        case .promenade:
+            expression = .happy
+            pose = frame % 2 == 0 ? .walkL : .walkR
+        case .openingGift:
+            expression = frame % 3 == 0 ? .excited : .happy
+            pose = .jump
+        case .lookingAtCursor:
+            let mousePos = NSEvent.mouseLocation
+            let img = render(expression: .curious, pose: .standing, lookRight: mousePos.x > 400)
+            return right ? img : img  // handled by lookRight
+        }
+
+        let img = render(expression: expression, pose: pose, lookRight: right)
+        cache[key] = img
+        return img
+    }
+
+    enum BearExpression {
+        case neutral, happy, love, excited, sleeping, blink, eating
+        case annoyed, shocked, sick, straining, curious
+    }
+
+    enum BearPose {
+        case standing, sitting, walkL, walkR, jump, lyingDown, lyingDown2, stretch
+    }
+
+    func render(expression: BearExpression, pose: BearPose, lookRight: Bool) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        ctx.saveGState()
+
+        // Flip if looking left
+        if !lookRight {
+            ctx.translateBy(x: size, y: 0)
+            ctx.scaleBy(x: -1, y: 1)
+        }
+
+        let cx = size / 2  // center x
+        let baseY: CGFloat
+
+        switch pose {
+        case .standing, .walkL, .walkR:
+            baseY = 8
+        case .sitting:
+            baseY = 6
+        case .jump:
+            baseY = 14
+        case .lyingDown, .lyingDown2:
+            baseY = 4
+        case .stretch:
+            baseY = 6
+        }
+
+        // Body wobble for walking
+        let wobble: CGFloat
+        switch pose {
+        case .walkL: wobble = -2
+        case .walkR: wobble = 2
+        case .jump: wobble = 0
+        default: wobble = 0
+        }
+
+        let bodyW: CGFloat = 52
+        let bodyH: CGFloat
+
+        switch pose {
+        case .lyingDown, .lyingDown2:
+            bodyH = 28
+        case .sitting:
+            bodyH = 38
+        default:
+            bodyH = 42
+        }
+
+        let bodyRect: CGRect
+        switch pose {
+        case .lyingDown, .lyingDown2:
+            bodyRect = CGRect(x: cx - bodyW/2 + wobble, y: baseY, width: bodyW + 8, height: bodyH)
+        default:
+            bodyRect = CGRect(x: cx - bodyW/2 + wobble, y: baseY, width: bodyW, height: bodyH)
+        }
+
+        let furColor = NSColor(red: 0.99, green: 0.98, blue: 0.95, alpha: 1)
+        let shadowFur = NSColor(red: 0.88, green: 0.87, blue: 0.83, alpha: 1)
+        let muzzleColor = NSColor(red: 1, green: 0.95, blue: 0.96, alpha: 1)
+        let blushColor = NSColor(red: 1, green: 0.62, blue: 0.72, alpha: 0.78)
+        let outlineColor = NSColor(white: 0.15, alpha: 1)
+
+        // === EARS (behind body) ===
+        let earY = bodyRect.maxY - 8
+        let earSize: CGFloat = 12
+        for earX in [cx - 16 + wobble, cx + 10 + wobble] {
+            let earRect = CGRect(x: earX, y: earY, width: earSize, height: earSize)
+            ctx.setFillColor(furColor.cgColor)
+            ctx.addEllipse(in: earRect)
+            ctx.fillPath()
+            ctx.setFillColor(NSColor(red: 1, green: 0.76, blue: 0.82, alpha: 0.55).cgColor)
+            ctx.addEllipse(in: earRect.insetBy(dx: 3, dy: 3))
+            ctx.fillPath()
+            ctx.setFillColor(NSColor.white.withAlphaComponent(0.35).cgColor)
+            ctx.addEllipse(in: CGRect(x: earRect.minX + 2, y: earRect.minY + 6, width: 4, height: 3))
+            ctx.fillPath()
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+            ctx.addEllipse(in: earRect)
+            ctx.strokePath()
+        }
+
+        // === BODY (on top of ears) ===
+        // Body shadow
+        ctx.setFillColor(shadowFur.cgColor)
+        let shadowRect = bodyRect.offsetBy(dx: 1, dy: -1)
+        let shadowPath = CGPath(ellipseIn: shadowRect, transform: nil)
+        ctx.addPath(shadowPath)
+        ctx.fillPath()
+
+        // Body fill (warm cream)
+        ctx.setFillColor(furColor.cgColor)
+        let bodyPath = CGPath(ellipseIn: bodyRect, transform: nil)
+        ctx.addPath(bodyPath)
+        ctx.fillPath()
+
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.18).cgColor)
+        ctx.addPath(CGPath(ellipseIn: CGRect(x: bodyRect.minX + 7, y: bodyRect.minY + bodyH * 0.44, width: bodyRect.width * 0.36, height: bodyRect.height * 0.26), transform: nil))
+        ctx.fillPath()
+
+        ctx.setFillColor(muzzleColor.withAlphaComponent(0.95).cgColor)
+        let bellyPatch = CGRect(x: cx - bodyW * 0.21 + wobble, y: bodyRect.minY + 3, width: bodyW * 0.42, height: bodyH * 0.38)
+        ctx.addPath(CGPath(ellipseIn: bellyPatch, transform: nil))
+        ctx.fillPath()
+
+        // Body outline
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.8)
+        ctx.addPath(bodyPath)
+        ctx.strokePath()
+
+        // === FACE ===
+        let faceY = bodyRect.minY + bodyH * 0.45
+
+        let muzzleRect = CGRect(x: cx - 10 + wobble, y: faceY - 2, width: 20, height: 12)
+        ctx.setFillColor(muzzleColor.cgColor)
+        ctx.addPath(CGPath(ellipseIn: muzzleRect, transform: nil))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.45).cgColor)
+        ctx.addPath(CGPath(ellipseIn: muzzleRect.insetBy(dx: 4, dy: 2), transform: nil))
+        ctx.fillPath()
+
+        // Cheeks (pink circles)
+        let cheekAlpha: CGFloat = expression == .love ? 1.0 : 0.7
+        let cheekSize: CGFloat = expression == .love ? 12 : 10
+        ctx.setFillColor(blushColor.withAlphaComponent(cheekAlpha).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 24 + wobble, y: faceY - 4, width: cheekSize, height: cheekSize - 2))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 14 + wobble, y: faceY - 4, width: cheekSize, height: cheekSize - 2))
+        ctx.fillPath()
+
+        // Eyes
+        ctx.setFillColor(outlineColor.cgColor)
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.8)
+        let eyeY = faceY + 6
+        let eyeL = cx - 12 + wobble
+        let eyeR = cx + 8 + wobble
+
+        switch expression {
+        case .neutral, .curious:
+            // Dot eyes
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: 4, height: 4))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR, y: eyeY, width: 4, height: 4))
+            ctx.fillPath()
+
+        case .happy, .love:
+            // Happy curved eyes (upside-down U)
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeL, y: eyeY + 2))
+            path.addQuadCurve(to: CGPoint(x: eyeL + 5, y: eyeY + 2), control: CGPoint(x: eyeL + 2.5, y: eyeY + 6))
+            ctx.addPath(path)
+            ctx.strokePath()
+            let path2 = CGMutablePath()
+            path2.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path2.addQuadCurve(to: CGPoint(x: eyeR + 5, y: eyeY + 2), control: CGPoint(x: eyeR + 2.5, y: eyeY + 6))
+            ctx.addPath(path2)
+            ctx.strokePath()
+
+        case .excited:
+            // Star/sparkle eyes
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: 5, height: 5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR, y: eyeY, width: 5, height: 5))
+            ctx.fillPath()
+            // Sparkle
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY + 2, width: 2, height: 2))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY + 2, width: 2, height: 2))
+            ctx.fillPath()
+
+        case .sleeping:
+            // Closed eyes (horizontal lines)
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeL, y: eyeY + 2))
+            path.addLine(to: CGPoint(x: eyeL + 5, y: eyeY + 2))
+            ctx.addPath(path)
+            ctx.strokePath()
+            let path2 = CGMutablePath()
+            path2.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path2.addLine(to: CGPoint(x: eyeR + 5, y: eyeY + 2))
+            ctx.addPath(path2)
+            ctx.strokePath()
+
+        case .blink:
+            // One eye open, one closed
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY, width: 4, height: 4))
+            ctx.fillPath()
+            let path = CGMutablePath()
+            path.move(to: CGPoint(x: eyeR, y: eyeY + 2))
+            path.addLine(to: CGPoint(x: eyeR + 5, y: eyeY + 2))
+            ctx.addPath(path)
+            ctx.strokePath()
+
+        case .eating:
+            // > < eyes (squished happy)
+            ctx.setLineWidth(1.5)
+            // Left eye: >
+            let pl = CGMutablePath()
+            pl.move(to: CGPoint(x: eyeL + 4, y: eyeY + 5))
+            pl.addLine(to: CGPoint(x: eyeL + 1, y: eyeY + 2.5))
+            pl.addLine(to: CGPoint(x: eyeL + 4, y: eyeY))
+            ctx.addPath(pl)
+            ctx.strokePath()
+            // Right eye: <
+            let pr = CGMutablePath()
+            pr.move(to: CGPoint(x: eyeR, y: eyeY + 5))
+            pr.addLine(to: CGPoint(x: eyeR + 3, y: eyeY + 2.5))
+            pr.addLine(to: CGPoint(x: eyeR, y: eyeY))
+            ctx.addPath(pr)
+            ctx.strokePath()
+
+        case .annoyed:
+            // Annoyed eyes (angled brows + dots)
+            ctx.addEllipse(in: CGRect(x: eyeL + 1, y: eyeY, width: 3, height: 3))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR + 1, y: eyeY, width: 3, height: 3))
+            ctx.fillPath()
+            // Angry brow marks
+            ctx.setLineWidth(1.5)
+            let bl = CGMutablePath()
+            bl.move(to: CGPoint(x: eyeL, y: eyeY + 6))
+            bl.addLine(to: CGPoint(x: eyeL + 5, y: eyeY + 8))
+            ctx.addPath(bl)
+            ctx.strokePath()
+            let br = CGMutablePath()
+            br.move(to: CGPoint(x: eyeR + 5, y: eyeY + 6))
+            br.addLine(to: CGPoint(x: eyeR, y: eyeY + 8))
+            ctx.addPath(br)
+            ctx.strokePath()
+
+        case .shocked:
+            // Big round eyes
+            ctx.addEllipse(in: CGRect(x: eyeL, y: eyeY - 1, width: 6, height: 6))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: eyeR, y: eyeY - 1, width: 6, height: 6))
+            ctx.fillPath()
+
+        case .sick:
+            // Spiral/dizzy eyes
+            ctx.setLineWidth(1.2)
+            let sp1 = CGMutablePath()
+            sp1.addArc(center: CGPoint(x: eyeL + 2.5, y: eyeY + 2.5), radius: 2, startAngle: 0, endAngle: .pi * 1.5, clockwise: false)
+            ctx.addPath(sp1)
+            ctx.strokePath()
+            let sp2 = CGMutablePath()
+            sp2.addArc(center: CGPoint(x: eyeR + 2.5, y: eyeY + 2.5), radius: 2, startAngle: 0, endAngle: .pi * 1.5, clockwise: false)
+            ctx.addPath(sp2)
+            ctx.strokePath()
+
+        case .straining:
+            // X X eyes
+            ctx.setLineWidth(1.5)
+            for ex in [eyeL, eyeR] {
+                let p = CGMutablePath()
+                p.move(to: CGPoint(x: ex, y: eyeY))
+                p.addLine(to: CGPoint(x: ex + 4, y: eyeY + 4))
+                p.move(to: CGPoint(x: ex + 4, y: eyeY))
+                p.addLine(to: CGPoint(x: ex, y: eyeY + 4))
+                ctx.addPath(p)
+                ctx.strokePath()
+            }
+        }
+
+        // Nose
+        let noseX = cx + wobble
+        let noseY = faceY + 2
+        ctx.setFillColor(NSColor(red: 0.58, green: 0.42, blue: 0.42, alpha: 1).cgColor)
+        let nosePath = CGMutablePath()
+        nosePath.move(to: CGPoint(x: noseX - 2.5, y: noseY + 2.2))
+        nosePath.addLine(to: CGPoint(x: noseX, y: noseY - 0.6))
+        nosePath.addLine(to: CGPoint(x: noseX + 2.5, y: noseY + 2.2))
+        nosePath.closeSubpath()
+        ctx.addPath(nosePath)
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.55).cgColor)
+        ctx.addEllipse(in: CGRect(x: noseX - 0.8, y: noseY + 1, width: 1.4, height: 1.1))
+        ctx.fillPath()
+
+        // Mouth
+        ctx.setStrokeColor(outlineColor.cgColor)
+        ctx.setLineWidth(1.2)
+        let mouthY = faceY - 2
+
+        switch expression {
+        case .happy, .love, .excited:
+            // Cute teddy smile
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 5 + wobble, y: mouthY + 1))
+            mp.addQuadCurve(to: CGPoint(x: cx + wobble, y: mouthY - 1), control: CGPoint(x: cx - 2.2 + wobble, y: mouthY - 3))
+            mp.addQuadCurve(to: CGPoint(x: cx + 5 + wobble, y: mouthY + 1), control: CGPoint(x: cx + 2.2 + wobble, y: mouthY - 3))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        case .annoyed, .straining:
+            // Wavy annoyed mouth
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 5 + wobble, y: mouthY))
+            mp.addQuadCurve(to: CGPoint(x: cx + wobble, y: mouthY), control: CGPoint(x: cx - 2.5 + wobble, y: mouthY + 2))
+            mp.addQuadCurve(to: CGPoint(x: cx + 5 + wobble, y: mouthY), control: CGPoint(x: cx + 2.5 + wobble, y: mouthY - 2))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        case .shocked:
+            // Open mouth O
+            ctx.addEllipse(in: CGRect(x: cx - 3 + wobble, y: mouthY - 3, width: 6, height: 5))
+            ctx.strokePath()
+        case .eating:
+            // Open happy mouth
+            ctx.setFillColor(NSColor(red: 1, green: 0.5, blue: 0.5, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 4 + wobble, y: mouthY - 3, width: 8, height: 5))
+            ctx.fillPath()
+            ctx.addEllipse(in: CGRect(x: cx - 4 + wobble, y: mouthY - 3, width: 8, height: 5))
+            ctx.strokePath()
+        case .sleeping:
+            // Slight open mouth
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 2 + wobble, y: mouthY))
+            mp.addQuadCurve(to: CGPoint(x: cx + 2 + wobble, y: mouthY), control: CGPoint(x: cx + wobble, y: mouthY - 2))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        default:
+            // Neutral small line
+            let mp = CGMutablePath()
+            mp.move(to: CGPoint(x: cx - 3 + wobble, y: mouthY))
+            mp.addLine(to: CGPoint(x: cx + 3 + wobble, y: mouthY))
+            ctx.addPath(mp)
+            ctx.strokePath()
+        }
+
+        // === LEGS (tiny stubs) ===
+        if pose != .lyingDown && pose != .lyingDown2 {
+            ctx.setFillColor(furColor.cgColor)
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+
+            let legY = baseY - 2
+            let legW: CGFloat = 10
+            let legH: CGFloat = 6
+            let leftLegX = cx - 14 + wobble
+            let rightLegX = cx + 4 + wobble
+
+            // Leg offset for walking
+            let leftOff: CGFloat = (pose == .walkL) ? 2 : 0
+            let rightOff: CGFloat = (pose == .walkR) ? 2 : 0
+
+            let ll = CGRect(x: leftLegX, y: legY + leftOff, width: legW, height: legH)
+            let rl = CGRect(x: rightLegX, y: legY + rightOff, width: legW, height: legH)
+
+            for legRect in [ll, rl] {
+                let lp = CGPath(roundedRect: legRect, cornerWidth: 4, cornerHeight: 4, transform: nil)
+                ctx.addPath(lp)
+                ctx.fillPath()
+                ctx.setFillColor(muzzleColor.cgColor)
+                ctx.addPath(CGPath(roundedRect: CGRect(x: legRect.minX + 1.2, y: legRect.minY, width: legRect.width - 2.4, height: 2.4), cornerWidth: 2, cornerHeight: 2, transform: nil))
+                ctx.fillPath()
+                ctx.setFillColor(furColor.cgColor)
+                ctx.addPath(lp)
+                ctx.strokePath()
+            }
+        }
+
+        // === SPECIAL: Angry marks ===
+        if expression == .annoyed {
+            ctx.setStrokeColor(outlineColor.cgColor)
+            ctx.setLineWidth(1.5)
+            let mx = cx + 18 + wobble
+            let my = bodyRect.maxY - 4
+            // Cross mark
+            let cm = CGMutablePath()
+            cm.move(to: CGPoint(x: mx, y: my))
+            cm.addLine(to: CGPoint(x: mx + 6, y: my + 6))
+            cm.move(to: CGPoint(x: mx + 6, y: my))
+            cm.addLine(to: CGPoint(x: mx, y: my + 6))
+            ctx.addPath(cm)
+            ctx.strokePath()
+        }
+
+        // === SPECIAL: Love hearts ===
+        if expression == .love {
+            ctx.setFillColor(NSColor(red: 1, green: 0.3, blue: 0.5, alpha: 0.8).cgColor)
+            let hx = cx + 20 + wobble
+            let hy = bodyRect.maxY + 2
+            // Simple heart shape
+            let hp = CGMutablePath()
+            hp.move(to: CGPoint(x: hx, y: hy + 3))
+            hp.addQuadCurve(to: CGPoint(x: hx + 4, y: hy + 7), control: CGPoint(x: hx, y: hy + 7))
+            hp.addQuadCurve(to: CGPoint(x: hx + 8, y: hy + 3), control: CGPoint(x: hx + 8, y: hy + 7))
+            hp.addLine(to: CGPoint(x: hx + 4, y: hy))
+            hp.closeSubpath()
+            ctx.addPath(hp)
+            ctx.fillPath()
+        }
+
+        // === SPECIAL: Zzz for sleeping ===
+        if expression == .sleeping {
+            ctx.setFillColor(NSColor(white: 0.5, alpha: 0.6).cgColor)
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 10, weight: .bold),
+                .foregroundColor: NSColor(white: 0.5, alpha: 0.6)
+            ]
+            let zStr = NSAttributedString(string: "z", attributes: attrs)
+            let line = CTLineCreateWithAttributedString(zStr)
+            ctx.textPosition = CGPoint(x: cx + 22 + wobble, y: bodyRect.maxY)
+            CTLineDraw(line, ctx)
+            let zStr2 = NSAttributedString(string: "Z", attributes: attrs)
+            let line2 = CTLineCreateWithAttributedString(zStr2)
+            ctx.textPosition = CGPoint(x: cx + 26 + wobble, y: bodyRect.maxY + 8)
+            CTLineDraw(line2, ctx)
+        }
+
+        ctx.restoreGState()
+        img.unlockFocus()
+        return img
+    }
+}
+
+// MARK: - Kawaii Vector Items
+
+class KawaiiItems {
+
+    static func drawSparkle(_ ctx: CGContext, center: CGPoint, radius: CGFloat, color: NSColor, lineWidth: CGFloat = 1.2) {
+        ctx.setStrokeColor(color.cgColor)
+        ctx.setLineWidth(lineWidth)
+        ctx.move(to: CGPoint(x: center.x - radius, y: center.y))
+        ctx.addLine(to: CGPoint(x: center.x + radius, y: center.y))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: center.x, y: center.y - radius))
+        ctx.addLine(to: CGPoint(x: center.x, y: center.y + radius))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: center.x - radius * 0.7, y: center.y - radius * 0.7))
+        ctx.addLine(to: CGPoint(x: center.x + radius * 0.7, y: center.y + radius * 0.7))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: center.x - radius * 0.7, y: center.y + radius * 0.7))
+        ctx.addLine(to: CGPoint(x: center.x + radius * 0.7, y: center.y - radius * 0.7))
+        ctx.strokePath()
+    }
+
+    /// Cute butterfly with wing flap animation (2 frames). Pink/purple wings, small body.
+    static func butterfly(frame: Int) -> NSImage {
+        let size: CGFloat = 36
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+        let cy = size / 2
+        let wingsUp = frame % 2 == 0
+
+        // Body (small dark ellipse)
+        ctx.setFillColor(NSColor(red: 0.25, green: 0.15, blue: 0.3, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 2, y: cy - 6, width: 4, height: 12))
+        ctx.fillPath()
+
+        // Antennae
+        ctx.setStrokeColor(NSColor(red: 0.25, green: 0.15, blue: 0.3, alpha: 1).cgColor)
+        ctx.setLineWidth(1)
+        ctx.move(to: CGPoint(x: cx - 1, y: cy + 6))
+        ctx.addCurve(to: CGPoint(x: cx - 6, y: cy + 12),
+                     control1: CGPoint(x: cx - 3, y: cy + 9),
+                     control2: CGPoint(x: cx - 5, y: cy + 11))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx + 1, y: cy + 6))
+        ctx.addCurve(to: CGPoint(x: cx + 6, y: cy + 12),
+                     control1: CGPoint(x: cx + 3, y: cy + 9),
+                     control2: CGPoint(x: cx + 5, y: cy + 11))
+        ctx.strokePath()
+        // Antenna tips
+        ctx.setFillColor(NSColor(red: 0.25, green: 0.15, blue: 0.3, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 7.5, y: cy + 11, width: 3, height: 3))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 4.5, y: cy + 11, width: 3, height: 3))
+        ctx.fillPath()
+
+        // Wings
+        let wingSpreadY: CGFloat = wingsUp ? 6 : 2
+        let wingSpreadX: CGFloat = wingsUp ? 12 : 10
+
+        // Upper wings (pink-purple gradient look)
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.4, blue: 0.7, alpha: 0.85).cgColor)
+        // Left upper
+        ctx.addEllipse(in: CGRect(x: cx - wingSpreadX - 8, y: cy + wingSpreadY - 4, width: 12, height: 10))
+        ctx.fillPath()
+        // Right upper
+        ctx.addEllipse(in: CGRect(x: cx + wingSpreadX - 4, y: cy + wingSpreadY - 4, width: 12, height: 10))
+        ctx.fillPath()
+
+        // Lower wings (lighter purple)
+        ctx.setFillColor(NSColor(red: 0.7, green: 0.4, blue: 0.9, alpha: 0.75).cgColor)
+        // Left lower
+        ctx.addEllipse(in: CGRect(x: cx - wingSpreadX - 5, y: cy - wingSpreadY - 6, width: 9, height: 8))
+        ctx.fillPath()
+        // Right lower
+        ctx.addEllipse(in: CGRect(x: cx + wingSpreadX - 4, y: cy - wingSpreadY - 6, width: 9, height: 8))
+        ctx.fillPath()
+
+        // Wing pattern dots
+        ctx.setFillColor(NSColor(red: 1, green: 0.7, blue: 0.85, alpha: 0.6).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - wingSpreadX - 4, y: cy + wingSpreadY - 1, width: 4, height: 4))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + wingSpreadX, y: cy + wingSpreadY - 1, width: 4, height: 4))
+        ctx.fillPath()
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Cute little robin/sparrow. Brown body, orange chest, small beak.
+    static func bird() -> NSImage {
+        let size: CGFloat = 30
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+        let cy: CGFloat = 10
+
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.12).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 9, y: cy - 5, width: 18, height: 4))
+        ctx.fillPath()
+
+        // Tail feathers
+        ctx.setFillColor(NSColor(red: 0.45, green: 0.32, blue: 0.22, alpha: 1).cgColor)
+        ctx.move(to: CGPoint(x: cx - 8, y: cy + 4))
+        ctx.addLine(to: CGPoint(x: cx - 14, y: cy + 10))
+        ctx.addLine(to: CGPoint(x: cx - 12, y: cy + 6))
+        ctx.addLine(to: CGPoint(x: cx - 16, y: cy + 8))
+        ctx.addLine(to: CGPoint(x: cx - 10, y: cy + 2))
+        ctx.closePath()
+        ctx.fillPath()
+
+        // Body (brown)
+        ctx.setFillColor(NSColor(red: 0.55, green: 0.38, blue: 0.26, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy - 2, width: 16, height: 14))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.18).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 4, y: cy + 3, width: 6, height: 4))
+        ctx.fillPath()
+
+        // Wing
+        ctx.setFillColor(NSColor(red: 0.47, green: 0.31, blue: 0.23, alpha: 0.95).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 4, y: cy + 1, width: 9, height: 7))
+        ctx.fillPath()
+
+        // Chest (orange)
+        ctx.setFillColor(NSColor(red: 0.95, green: 0.55, blue: 0.25, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 4, y: cy - 1, width: 10, height: 9))
+        ctx.fillPath()
+
+        // Head (brown, slightly smaller)
+        ctx.setFillColor(NSColor(red: 0.55, green: 0.38, blue: 0.26, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 2, y: cy + 8, width: 12, height: 11))
+        ctx.fillPath()
+
+        // Eye (black dot with white highlight)
+        ctx.setFillColor(NSColor(white: 0.1, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + 4, y: cy + 12, width: 3.5, height: 3.5))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + 5, y: cy + 13.5, width: 1.5, height: 1.5))
+        ctx.fillPath()
+
+        // Beak (orange triangle)
+        ctx.setFillColor(NSColor(red: 1, green: 0.65, blue: 0.1, alpha: 1).cgColor)
+        ctx.move(to: CGPoint(x: cx + 10, y: cy + 13))
+        ctx.addLine(to: CGPoint(x: cx + 14, y: cy + 12))
+        ctx.addLine(to: CGPoint(x: cx + 10, y: cy + 11))
+        ctx.closePath()
+        ctx.fillPath()
+
+        // Legs
+        ctx.setStrokeColor(NSColor(red: 0.85, green: 0.55, blue: 0.15, alpha: 1).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.move(to: CGPoint(x: cx - 1, y: cy))
+        ctx.addLine(to: CGPoint(x: cx - 2, y: cy - 4))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx + 3, y: cy))
+        ctx.addLine(to: CGPoint(x: cx + 4, y: cy - 4))
+        ctx.strokePath()
+
+        ctx.setStrokeColor(NSColor(white: 0.2, alpha: 0.7).cgColor)
+        ctx.setLineWidth(1)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy - 2, width: 16, height: 14))
+        ctx.strokePath()
+
+        // Cheek blush
+        ctx.setFillColor(NSColor(red: 1, green: 0.6, blue: 0.5, alpha: 0.4).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + 1, y: cy + 10, width: 4, height: 3))
+        ctx.fillPath()
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Kawaii gift box. Red box with yellow ribbon/bow on top, sparkle.
+    static func gift() -> NSImage {
+        let size: CGFloat = 40
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+        let boxW: CGFloat = 28
+        let boxH: CGFloat = 20
+        let boxX = cx - boxW / 2
+        let boxY: CGFloat = 4
+
+        // Box shadow
+        ctx.setFillColor(NSColor(red: 0.7, green: 0.1, blue: 0.1, alpha: 0.3).cgColor)
+        let shadowRect = CGRect(x: boxX + 2, y: boxY - 2, width: boxW, height: boxH)
+        let shadowPath = CGPath(roundedRect: shadowRect, cornerWidth: 3, cornerHeight: 3, transform: nil)
+        ctx.addPath(shadowPath)
+        ctx.fillPath()
+
+        // Box body (red)
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.2, blue: 0.25, alpha: 1).cgColor)
+        let boxRect = CGRect(x: boxX, y: boxY, width: boxW, height: boxH)
+        let boxPath = CGPath(roundedRect: boxRect, cornerWidth: 3, cornerHeight: 3, transform: nil)
+        ctx.addPath(boxPath)
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.16).cgColor)
+        ctx.addPath(CGPath(roundedRect: CGRect(x: boxX + 3, y: boxY + boxH - 7, width: boxW - 10, height: 4), cornerWidth: 2, cornerHeight: 2, transform: nil))
+        ctx.fillPath()
+
+        // Box outline
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.1, blue: 0.12, alpha: 1).cgColor)
+        ctx.setLineWidth(1.5)
+        ctx.addPath(boxPath)
+        ctx.strokePath()
+
+        // Ribbon vertical stripe
+        ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+        ctx.fill(CGRect(x: cx - 2.5, y: boxY, width: 5, height: boxH))
+
+        // Ribbon horizontal stripe
+        ctx.fill(CGRect(x: boxX, y: boxY + boxH / 2 - 2.5, width: boxW, height: 5))
+
+        // Lid (slightly wider, darker)
+        let lidH: CGFloat = 6
+        let lidRect = CGRect(x: boxX - 2, y: boxY + boxH, width: boxW + 4, height: lidH)
+        ctx.setFillColor(NSColor(red: 0.85, green: 0.15, blue: 0.2, alpha: 1).cgColor)
+        let lidPath = CGPath(roundedRect: lidRect, cornerWidth: 2, cornerHeight: 2, transform: nil)
+        ctx.addPath(lidPath)
+        ctx.fillPath()
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.1, blue: 0.12, alpha: 1).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.addPath(lidPath)
+        ctx.strokePath()
+
+        // Ribbon on lid
+        ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+        ctx.fill(CGRect(x: cx - 2.5, y: boxY + boxH, width: 5, height: lidH))
+
+        // Bow on top
+        let bowY = boxY + boxH + lidH
+        ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+        // Left loop
+        ctx.addEllipse(in: CGRect(x: cx - 9, y: bowY - 1, width: 9, height: 7))
+        ctx.fillPath()
+        // Right loop
+        ctx.addEllipse(in: CGRect(x: cx, y: bowY - 1, width: 9, height: 7))
+        ctx.fillPath()
+        // Center knot
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.7, blue: 0, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 2.5, y: bowY, width: 5, height: 5))
+        ctx.fillPath()
+
+        // Tiny hanging heart tag
+        let tagX = cx + 11
+        let tagY = boxY + boxH + 4
+        ctx.setStrokeColor(NSColor(red: 0.85, green: 0.7, blue: 0.15, alpha: 0.9).cgColor)
+        ctx.setLineWidth(1)
+        ctx.move(to: CGPoint(x: cx + 7, y: bowY + 1))
+        ctx.addLine(to: CGPoint(x: tagX, y: tagY + 1))
+        ctx.strokePath()
+        ctx.setFillColor(NSColor(red: 1, green: 0.82, blue: 0.2, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: tagX - 3, y: tagY - 3, width: 6, height: 6))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor(red: 1, green: 0.42, blue: 0.55, alpha: 0.95).cgColor)
+        let heart = CGMutablePath()
+        heart.move(to: CGPoint(x: tagX, y: tagY - 1))
+        heart.addQuadCurve(to: CGPoint(x: tagX - 2, y: tagY + 1), control: CGPoint(x: tagX - 2, y: tagY - 1))
+        heart.addQuadCurve(to: CGPoint(x: tagX, y: tagY + 3), control: CGPoint(x: tagX - 2, y: tagY + 3))
+        heart.addQuadCurve(to: CGPoint(x: tagX + 2, y: tagY + 1), control: CGPoint(x: tagX + 2, y: tagY + 3))
+        heart.addQuadCurve(to: CGPoint(x: tagX, y: tagY - 1), control: CGPoint(x: tagX + 2, y: tagY - 1))
+        heart.closeSubpath()
+        ctx.addPath(heart)
+        ctx.fillPath()
+
+        // Sparkle
+        let sx: CGFloat = cx + 12, sy: CGFloat = boxY + boxH + 8
+        drawSparkle(ctx, center: CGPoint(x: sx, y: sy), radius: 3, color: NSColor(red: 1, green: 1, blue: 0.7, alpha: 0.9))
+        drawSparkle(ctx, center: CGPoint(x: boxX + 4, y: boxY + boxH + 12), radius: 2, color: NSColor.white.withAlphaComponent(0.7), lineWidth: 0.9)
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Cute glass/cup. Translucent blue, simple shape.
+    static func glass() -> NSImage {
+        let size: CGFloat = 30
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.12).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 7, y: 0, width: 14, height: 3))
+        ctx.fillPath()
+
+        // Glass body (trapezoid shape, wider at top)
+        ctx.setFillColor(NSColor(red: 0.6, green: 0.8, blue: 1, alpha: 0.4).cgColor)
+        ctx.move(to: CGPoint(x: cx - 6, y: 3))
+        ctx.addLine(to: CGPoint(x: cx - 8, y: 22))
+        ctx.addLine(to: CGPoint(x: cx + 8, y: 22))
+        ctx.addLine(to: CGPoint(x: cx + 6, y: 3))
+        ctx.closePath()
+        ctx.fillPath()
+
+        // Rim
+        ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.65).cgColor)
+        ctx.setLineWidth(1.1)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: 20.5, width: 16, height: 3.5))
+        ctx.strokePath()
+
+        // Glass outline
+        ctx.setStrokeColor(NSColor(red: 0.5, green: 0.7, blue: 0.9, alpha: 0.8).cgColor)
+        ctx.setLineWidth(1.5)
+        ctx.move(to: CGPoint(x: cx - 6, y: 3))
+        ctx.addLine(to: CGPoint(x: cx - 8, y: 22))
+        ctx.addLine(to: CGPoint(x: cx + 8, y: 22))
+        ctx.addLine(to: CGPoint(x: cx + 6, y: 3))
+        ctx.closePath()
+        ctx.strokePath()
+
+        // Water inside
+        ctx.setFillColor(NSColor(red: 0.4, green: 0.65, blue: 1, alpha: 0.35).cgColor)
+        ctx.move(to: CGPoint(x: cx - 5.5, y: 3))
+        ctx.addLine(to: CGPoint(x: cx - 7, y: 14))
+        ctx.addLine(to: CGPoint(x: cx + 7, y: 14))
+        ctx.addLine(to: CGPoint(x: cx + 5.5, y: 3))
+        ctx.closePath()
+        ctx.fillPath()
+
+        // Water surface + bubbles
+        ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.45).cgColor)
+        ctx.setLineWidth(0.8)
+        ctx.move(to: CGPoint(x: cx - 6.5, y: 14))
+        ctx.addCurve(to: CGPoint(x: cx + 6.5, y: 14),
+                     control1: CGPoint(x: cx - 2, y: 15.3),
+                     control2: CGPoint(x: cx + 2, y: 12.7))
+        ctx.strokePath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.32).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 2, y: 8, width: 2.2, height: 2.2))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 1.5, y: 11, width: 1.8, height: 1.8))
+        ctx.fillPath()
+
+        // Shine highlight
+        ctx.setStrokeColor(NSColor(white: 1, alpha: 0.5).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.move(to: CGPoint(x: cx - 4, y: 7))
+        ctx.addLine(to: CGPoint(x: cx - 5.5, y: 18))
+        ctx.strokePath()
+
+        // Bottom
+        ctx.setFillColor(NSColor(red: 0.5, green: 0.7, blue: 0.9, alpha: 0.5).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 6, y: 1, width: 12, height: 4))
+        ctx.fillPath()
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Gray toy mouse with pink ears and string tail.
+    static func mouseToy() -> NSImage {
+        let size: CGFloat = 30
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.12).cgColor)
+        ctx.addEllipse(in: CGRect(x: 5, y: 4, width: 18, height: 3))
+        ctx.fillPath()
+
+        // Tail (string)
+        ctx.setStrokeColor(NSColor(red: 0.8, green: 0.5, blue: 0.5, alpha: 1).cgColor)
+        ctx.setLineWidth(1.5)
+        ctx.move(to: CGPoint(x: 3, y: 15))
+        ctx.addCurve(to: CGPoint(x: 0, y: 24),
+                     control1: CGPoint(x: 1, y: 18),
+                     control2: CGPoint(x: -1, y: 21))
+        ctx.strokePath()
+
+        // Body (gray oval)
+        ctx.setFillColor(NSColor(red: 0.65, green: 0.65, blue: 0.68, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 3, y: 7, width: 20, height: 14))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.18).cgColor)
+        ctx.addEllipse(in: CGRect(x: 8, y: 15, width: 7, height: 3.5))
+        ctx.fillPath()
+        // Body outline
+        ctx.setStrokeColor(NSColor(white: 0.3, alpha: 1).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.addEllipse(in: CGRect(x: 3, y: 7, width: 20, height: 14))
+        ctx.strokePath()
+
+        // Head
+        ctx.setFillColor(NSColor(red: 0.65, green: 0.65, blue: 0.68, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 16, y: 9, width: 10, height: 10))
+        ctx.fillPath()
+        ctx.setStrokeColor(NSColor(white: 0.3, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 16, y: 9, width: 10, height: 10))
+        ctx.strokePath()
+
+        // Ears (pink)
+        ctx.setFillColor(NSColor(red: 1, green: 0.7, blue: 0.75, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 19, y: 18, width: 6, height: 7))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: 23, y: 17, width: 6, height: 7))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.35).cgColor)
+        ctx.addEllipse(in: CGRect(x: 20.5, y: 20.5, width: 2, height: 2))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: 24.5, y: 19.5, width: 2, height: 2))
+        ctx.fillPath()
+
+        // Eye
+        ctx.setFillColor(NSColor(white: 0.1, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 22, y: 13, width: 2.5, height: 2.5))
+        ctx.fillPath()
+
+        // Nose (pink dot)
+        ctx.setFillColor(NSColor(red: 1, green: 0.5, blue: 0.55, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: 25, y: 12, width: 2, height: 2))
+        ctx.fillPath()
+
+        // Whiskers
+        ctx.setStrokeColor(NSColor(white: 0.4, alpha: 0.6).cgColor)
+        ctx.setLineWidth(0.6)
+        for dy: CGFloat in [-2, 0, 2] {
+            ctx.move(to: CGPoint(x: 25, y: 13 + dy))
+            ctx.addLine(to: CGPoint(x: 29, y: 12 + dy))
+            ctx.strokePath()
+        }
+
+        // Tiny stitched seam to make it feel like a plush toy
+        ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.55).cgColor)
+        ctx.setLineWidth(0.8)
+        ctx.move(to: CGPoint(x: 10, y: 10))
+        ctx.addLine(to: CGPoint(x: 15, y: 18))
+        ctx.strokePath()
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Red yarn ball with thread lines.
+    static func yarnBall() -> NSImage {
+        let size: CGFloat = 30
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+        let cy = size / 2
+        let r: CGFloat = 11
+
+        // Ball shadow
+        ctx.setFillColor(NSColor(red: 0.6, green: 0.15, blue: 0.15, alpha: 0.3).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - r + 2, y: cy - r - 2, width: r * 2, height: r * 2))
+        ctx.fillPath()
+
+        // Ball body
+        ctx.setFillColor(NSColor(red: 0.88, green: 0.25, blue: 0.25, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2))
+        ctx.fillPath()
+        ctx.setStrokeColor(NSColor(red: 0.68, green: 0.15, blue: 0.16, alpha: 0.9).cgColor)
+        ctx.setLineWidth(1.1)
+        ctx.addEllipse(in: CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2))
+        ctx.strokePath()
+
+        // Thread lines (curved)
+        ctx.setStrokeColor(NSColor(red: 1, green: 0.5, blue: 0.5, alpha: 0.7).cgColor)
+        ctx.setLineWidth(1)
+        ctx.move(to: CGPoint(x: cx - 6, y: cy + 5))
+        ctx.addCurve(to: CGPoint(x: cx + 8, y: cy + 3),
+                     control1: CGPoint(x: cx - 2, y: cy + 10),
+                     control2: CGPoint(x: cx + 4, y: cy - 3))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx - 4, y: cy - 2))
+        ctx.addCurve(to: CGPoint(x: cx + 6, y: cy - 4),
+                     control1: CGPoint(x: cx, y: cy - 8),
+                     control2: CGPoint(x: cx + 3, y: cy + 2))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx - 7, y: cy))
+        ctx.addCurve(to: CGPoint(x: cx + 3, y: cy + 7),
+                     control1: CGPoint(x: cx - 5, y: cy + 6),
+                     control2: CGPoint(x: cx, y: cy + 8))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx - 8, y: cy - 6))
+        ctx.addCurve(to: CGPoint(x: cx + 7, y: cy - 5),
+                     control1: CGPoint(x: cx - 2, y: cy - 10),
+                     control2: CGPoint(x: cx + 2, y: cy - 8))
+        ctx.strokePath()
+
+        // Highlight
+        ctx.setFillColor(NSColor(red: 1, green: 0.7, blue: 0.7, alpha: 0.4).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 4, y: cy + 2, width: 5, height: 4))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor.white.withAlphaComponent(0.18).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 1, y: cy + 5, width: 3, height: 2))
+        ctx.fillPath()
+
+        // Dangling thread
+        ctx.setStrokeColor(NSColor(red: 0.88, green: 0.25, blue: 0.25, alpha: 0.8).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.move(to: CGPoint(x: cx + r - 2, y: cy - 2))
+        ctx.addCurve(to: CGPoint(x: cx + r + 5, y: cy - 10),
+                     control1: CGPoint(x: cx + r + 2, y: cy - 4),
+                     control2: CGPoint(x: cx + r + 4, y: cy - 8))
+        ctx.strokePath()
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Red glowing dot with glow effect.
+    static func laserDot() -> NSImage {
+        let size: CGFloat = 30
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let cx = size / 2
+        let cy = size / 2
+
+        // Outer glow
+        ctx.setFillColor(NSColor(red: 1, green: 0, blue: 0, alpha: 0.15).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 12, y: cy - 12, width: 24, height: 24))
+        ctx.fillPath()
+
+        // Mid glow
+        ctx.setFillColor(NSColor(red: 1, green: 0.1, blue: 0.1, alpha: 0.3).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy - 8, width: 16, height: 16))
+        ctx.fillPath()
+
+        // Inner glow
+        ctx.setFillColor(NSColor(red: 1, green: 0.2, blue: 0.2, alpha: 0.5).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 5, y: cy - 5, width: 10, height: 10))
+        ctx.fillPath()
+
+        // Core dot
+        ctx.setFillColor(NSColor(red: 1, green: 0.1, blue: 0, alpha: 0.95).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 3, y: cy - 3, width: 6, height: 6))
+        ctx.fillPath()
+
+        // Bright center
+        ctx.setFillColor(NSColor(red: 1, green: 0.6, blue: 0.5, alpha: 0.8).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 1.5, y: cy - 1.5, width: 3, height: 3))
+        ctx.fillPath()
+
+        drawSparkle(ctx, center: CGPoint(x: cx + 6, y: cy + 6), radius: 2.2, color: NSColor.white.withAlphaComponent(0.55), lineWidth: 0.9)
+        drawSparkle(ctx, center: CGPoint(x: cx - 7, y: cy - 5), radius: 1.4, color: NSColor(red: 1, green: 0.7, blue: 0.7, alpha: 0.45), lineWidth: 0.7)
+
+        img.unlockFocus()
+        return img
+    }
+
+    /// Renders an accessory using its vectorDraw closure into an NSImage of given size.
+    static func renderAccessory(_ acc: Accessory, size: CGFloat) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        if let ctx = NSGraphicsContext.current?.cgContext, let draw = acc.vectorDraw {
+            draw(ctx, size / 2, size / 2)
+        }
+        img.unlockFocus()
+        return img
     }
 }
 
@@ -1715,6 +3564,8 @@ class StatsHUDView: NSView {
 // MARK: - Main App Delegate
 
 class MurchiDelegate: NSObject, NSApplicationDelegate {
+    let currentVersion = "2.1.0"
+
     // Windows
     var petWindow: NSPanel!
     var bubbleWindow: NSPanel!
@@ -1744,6 +3595,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var walkTargetX: CGFloat? = nil
     var isDragging = false
     var dragOffset: NSPoint = .zero
+    var dragStartScreenPoint: NSPoint = .zero
+    var didDragPet = false
     var lastDecay = Date()
     var lastBubble = Date()
     var bubbleHideTime: Date? = nil
@@ -1753,9 +3606,13 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var isHoveringPet = false
     var lastLevel = 1
     var soundEnabled = true
+    var petType: String = "cat"  // "cat" or "bear"
+    var followingCursor = false
     var clickCount = 0
     var lastClickTime = Date()
     var breathOffset: CGFloat = 0  // idle breathing animation
+    var isGentleDropping = false
+    var gentleDropPhase: CGFloat = 0
 
     // Toy state
     var currentToy: Toy? = nil
@@ -1774,8 +3631,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var butterflyFrame = 0
     var birdWindow: NSPanel?
     var birdPos: NSPoint = .zero
+    var birdFlyAwaySpeed: CGFloat = 0
+    var birdFlyAwayFrame: Int = 0
     var giftWindow: NSPanel?
     var giftPos: NSPoint = .zero
+    var giftPhase: Int = 0  // 0=falling, 1=landed/cat walking, 2=opened
     var pawPrintWindows: [NSPanel] = []
     var pawPrintTimers: [Timer] = []
     var glassWindow: NSPanel?
@@ -1822,7 +3682,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let dockH = screen.visibleFrame.origin.y - screen.frame.origin.y
         if dockH > 4 {
             // Dock takes full screen width, cat can walk across it
-            cachedDockRect = NSRect(x: screen.frame.minX, y: 0, width: screen.frame.width, height: dockH)
+            cachedDockRect = NSRect(x: screen.frame.minX, y: screen.frame.minY, width: screen.frame.width, height: dockH)
             return cachedDockRect
         }
         // Dock might be hidden or on the side
@@ -1831,39 +3691,100 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     var cachedDockBarLeft: CGFloat = 0
-    var cachedDockBarRight: CGFloat = 1440
+    var cachedDockBarRight: CGFloat = 0
 
     func detectDockBarBounds() {
         // Use CGWindowList to find the actual Dock bar window bounds
         guard let winList = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] else { return }
+        let screenObj = NSScreen.main
+        let screenFrame = screenObj?.frame ?? NSRect(x: 0, y: 0, width: screenW, height: screenH)
+        let visibleFrame = screenObj?.visibleFrame ?? screenFrame
+        let expectedDockHeight = max(0, visibleFrame.origin.y - screenFrame.origin.y)
+        var bestRect: CGRect?
+        var bestScore = -CGFloat.greatestFiniteMagnitude
+
         for win in winList {
             guard let owner = win[kCGWindowOwnerName as String] as? String, owner == "Dock",
-                  let name = win[kCGWindowName as String] as? String, name == "Dock",
-                  let bounds = win[kCGWindowBounds as String] as? [String: CGFloat],
-                  let x = bounds["X"], let w = bounds["Width"], let h = bounds["Height"] else { continue }
-            // The actual dock bar (not desktop wallpaper) has a specific height matching dock
-            if h < 200 && h > 20 {
-                cachedDockBarLeft = x
-                cachedDockBarRight = x + w
-                return
+                  let bounds = win[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: bounds) else { continue }
+
+            let normalizedRect = rect.integral
+            guard normalizedRect.width > 80,
+                  normalizedRect.height > 18,
+                  normalizedRect.height < 260 else { continue }
+
+            // Only consider bottom Dock windows. This avoids desktop/wallpaper-owned Dock windows.
+            let bottomDistance = abs(normalizedRect.minY - screenFrame.minY)
+            guard bottomDistance < max(32, expectedDockHeight + 24) else { continue }
+
+            let heightPenalty = expectedDockHeight > 0 ? abs(normalizedRect.height - expectedDockHeight) * 2.5 : 0
+            let widthPenalty: CGFloat = normalizedRect.width >= screenFrame.width - 12 ? 220 : 0
+            let score = normalizedRect.width - heightPenalty - bottomDistance * 3 - widthPenalty
+            if score > bestScore {
+                bestScore = score
+                bestRect = normalizedRect
             }
+        }
+
+        if let rect = bestRect {
+            cachedDockBarLeft = rect.minX
+            cachedDockBarRight = rect.maxX
         }
     }
 
-    func groundYForPet() -> CGFloat {
+    func currentDockBarRect() -> NSRect? {
         let dock = dockRect
-        guard dock.height > 4 else { return floorY }
-        // Cat walks on top of the Dock — add offset so cat is above icons
-        let dockTop = dock.maxY + 8
+        guard dock.height > 4 else { return nil }
 
-        // Check if cat is within the dock bar horizontal bounds
-        // Dock bar is centered, not full width
-        let catCenter = petX + petSize / 2
-        if catCenter < cachedDockBarLeft - 20 || catCenter > cachedDockBarRight + 20 {
+        let detectedWidth = cachedDockBarRight - cachedDockBarLeft
+        if detectedWidth > petSize {
+            let left = max(0, cachedDockBarLeft)
+            let right = min(screenW, cachedDockBarRight)
+            if right - left > petSize {
+                return NSRect(x: left, y: dock.minY, width: right - left, height: dock.height)
+            }
+        }
+
+        return dock
+    }
+
+    func groundY(at originX: CGFloat, width: CGFloat) -> CGFloat {
+        guard let dockBar = currentDockBarRect() else { return floorY }
+        let dockLift = max(6, min(14, dockBar.height * 0.12))
+        let centerX = originX + width / 2
+
+        if centerX < dockBar.minX || centerX > dockBar.maxX {
             return floorY
         }
 
-        return min(dockTop, 200)
+        return dockBar.maxY + dockLift
+    }
+
+    func groundYForPet() -> CGFloat {
+        groundY(at: petX, width: petSize)
+    }
+
+    func dockWalkRange(allowFallZone: Bool = false) -> ClosedRange<CGFloat> {
+        guard let dockBar = currentDockBarRect() else {
+            return safeRange(20, screenW - petSize - 20)
+        }
+
+        let edgeOverflow = allowFallZone ? petSize * 0.35 : 12
+        let lo = max(10, dockBar.minX - edgeOverflow)
+        let hi = min(screenW - petSize - 10, dockBar.maxX - petSize + edgeOverflow)
+        return safeRange(lo, hi)
+    }
+
+    func nearbyEventX(offset: CGFloat, width: CGFloat) -> CGFloat {
+        let baseX = petX + offset
+
+        if groundYForPet() > floorY, let dockBar = currentDockBarRect() {
+            let lo = max(10, dockBar.minX + 8)
+            let hi = min(screenW - width - 10, dockBar.maxX - width - 8)
+            return min(max(baseX, lo), hi)
+        }
+
+        return min(max(baseX, 10), screenW - width - 10)
     }
     var velocityY: CGFloat = 0
     var isOnGround = true
@@ -2054,14 +3975,21 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         websiteItem.target = self
         menu.addItem(websiteItem)
 
+        let updateItem = NSMenuItem(title: "\u{1F504} Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "u")
+        updateItem.target = self
+        menu.addItem(updateItem)
+
         let aboutItem = NSMenuItem(title: "About Murchi", action: nil, keyEquivalent: "")
         aboutItem.attributedTitle = NSAttributedString(
-            string: "Murchi v2.0 \u{00A9} 2026 murchi.pet",
+            string: "Murchi v\(currentVersion) \u{00A9} 2026 murchi.pet",
             attributes: [.font: NSFont.systemFont(ofSize: 11), .foregroundColor: NSColor.secondaryLabelColor]
         )
         menu.addItem(aboutItem)
 
         menu.addItem(NSMenuItem.separator())
+
+        let petTypeItem = NSMenuItem(title: petType == "cat" ? "\u{1F43B} Switch to Bear" : "\u{1F431} Switch to Cat", action: #selector(switchPetType), keyEquivalent: "")
+        menu.addItem(petTypeItem)
 
         let soundItem = NSMenuItem(title: soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds", action: #selector(toggleSound), keyEquivalent: "")
         menu.addItem(soundItem)
@@ -2192,7 +4120,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         accessoryWindow.ignoresMouseEvents = true
 
         accessoryImageView = NSImageView(frame: NSRect(x: 0, y: 0, width: petSize, height: petSize))
-        accessoryImageView.imageScaling = .scaleProportionallyUpOrDown
+        accessoryImageView.imageScaling = .scaleAxesIndependently
         accessoryWindow.contentView = accessoryImageView
         accessoryWindow.orderOut(nil)
     }
@@ -2263,15 +4191,118 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         }
         let key = acc.name
         if accessoryCache[key] == nil {
-            accessoryCache[key] = Sprites.render(acc.sprite)
+            if acc.vectorDraw != nil {
+                accessoryCache[key] = KawaiiItems.renderAccessory(acc, size: petSize)
+            } else {
+                accessoryCache[key] = Sprites.render(acc.sprite)
+            }
         }
         accessoryImageView.image = accessoryCache[key]
-        accessoryWindow.setFrameOrigin(NSPoint(x: petX, y: petY))
+        accessoryWindow.setFrameOrigin(currentDisplayOrigin())
         accessoryWindow.orderFront(nil)
+    }
+
+    func dismissLaserDotIfNeeded() {
+        guard currentToy?.type == .laserDot else { return }
+        removeToy()
+        if behavior == .chasingToy {
+            startBehavior(.idle, duration: 0.4)
+        }
+    }
+
+    func currentDisplayOrigin() -> NSPoint {
+        var displayX = petX
+        let displayY = petY + breathOffset
+
+        if behavior == .beingPet {
+            displayX += CGFloat(sin(Double(frameCounter) * 0.5) * 2)
+        }
+        if isGentleDropping {
+            displayX += CGFloat(sin(Double(gentleDropPhase)) * 3)
+        }
+
+        return NSPoint(x: displayX.rounded(), y: displayY.rounded())
     }
 
     @objc func openWebsite() {
         NSWorkspace.shared.open(URL(string: "https://murchi.pet")!)
+    }
+
+    @objc func checkForUpdates() {
+        let urlString = "https://api.github.com/repos/egorfedorov/murchi/releases/latest"
+        guard let url = URL(string: urlString) else { return }
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 15
+        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if let error = error {
+                    let alert = NSAlert()
+                    alert.messageText = "Update Check Failed"
+                    alert.informativeText = "Could not connect to GitHub: \(error.localizedDescription)"
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                    return
+                }
+                guard let data = data,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let tagName = json["tag_name"] as? String else {
+                    let alert = NSAlert()
+                    alert.messageText = "Update Check Failed"
+                    alert.informativeText = "Could not parse the update information."
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                    return
+                }
+                let remoteVersion = tagName.hasPrefix("v") ? String(tagName.dropFirst()) : tagName
+                if self.isVersion(remoteVersion, newerThan: self.currentVersion) {
+                    let alert = NSAlert()
+                    alert.messageText = "Update Available!"
+                    alert.informativeText = "Version \(remoteVersion) is available. You are running v\(self.currentVersion). Would you like to download it?"
+                    alert.alertStyle = .informational
+                    alert.addButton(withTitle: "Download")
+                    alert.addButton(withTitle: "Later")
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        if let assets = json["assets"] as? [[String: Any]] {
+                            for asset in assets {
+                                if let name = asset["name"] as? String, name.hasSuffix(".dmg"),
+                                   let downloadUrl = asset["browser_download_url"] as? String,
+                                   let dlURL = URL(string: downloadUrl) {
+                                    NSWorkspace.shared.open(dlURL)
+                                    return
+                                }
+                            }
+                        }
+                        if let htmlUrl = json["html_url"] as? String, let pageURL = URL(string: htmlUrl) {
+                            NSWorkspace.shared.open(pageURL)
+                        }
+                    }
+                } else {
+                    let alert = NSAlert()
+                    alert.messageText = "You're up to date!"
+                    alert.informativeText = "Murchi v\(self.currentVersion) is the latest version."
+                    alert.alertStyle = .informational
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                }
+            }
+        }.resume()
+    }
+
+    private func isVersion(_ a: String, newerThan b: String) -> Bool {
+        let partsA = a.split(separator: ".").compactMap { Int($0) }
+        let partsB = b.split(separator: ".").compactMap { Int($0) }
+        let count = max(partsA.count, partsB.count)
+        for i in 0..<count {
+            let va = i < partsA.count ? partsA[i] : 0
+            let vb = i < partsB.count ? partsB[i] : 0
+            if va > vb { return true }
+            if va < vb { return false }
+        }
+        return false
     }
 
     @objc func summonPet() {
@@ -2326,38 +4357,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             toyWindow!.contentView = toyImageView
         }
 
-        // Draw toy
-        let toyImg = NSImage(size: NSSize(width: toySize, height: toySize))
-        toyImg.lockFocus()
+        // Draw toy using vector kawaii items
+        let toyImg: NSImage
         switch type {
         case .mouseToy:
-            NSColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1).set()
-            NSBezierPath(ovalIn: NSRect(x: 5, y: 8, width: 20, height: 14)).fill()
-            NSColor(red: 0.7, green: 0.4, blue: 0.4, alpha: 1).set()
-            NSBezierPath(ovalIn: NSRect(x: 18, y: 16, width: 8, height: 8)).fill()
-            NSBezierPath(ovalIn: NSRect(x: 18, y: 8, width: 8, height: 8)).fill()
-            NSColor(red: 0.8, green: 0.5, blue: 0.5, alpha: 1).set()
-            let tail = NSBezierPath()
-            tail.move(to: NSPoint(x: 5, y: 15))
-            tail.curve(to: NSPoint(x: 0, y: 25), controlPoint1: NSPoint(x: 2, y: 18), controlPoint2: NSPoint(x: -2, y: 22))
-            tail.lineWidth = 2
-            tail.stroke()
+            toyImg = KawaiiItems.mouseToy()
         case .yarnBall:
-            NSColor(red: 0.9, green: 0.3, blue: 0.3, alpha: 1).set()
-            NSBezierPath(ovalIn: NSRect(x: 3, y: 3, width: 24, height: 24)).fill()
-            NSColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 1).set()
-            let yarn = NSBezierPath()
-            yarn.move(to: NSPoint(x: 8, y: 15))
-            yarn.curve(to: NSPoint(x: 22, y: 15), controlPoint1: NSPoint(x: 12, y: 25), controlPoint2: NSPoint(x: 18, y: 5))
-            yarn.lineWidth = 1.5
-            yarn.stroke()
+            toyImg = KawaiiItems.yarnBall()
         case .laserDot:
-            NSColor(red: 1, green: 0, blue: 0, alpha: 0.9).set()
-            NSBezierPath(ovalIn: NSRect(x: 10, y: 10, width: 10, height: 10)).fill()
-            NSColor(red: 1, green: 0.3, blue: 0.3, alpha: 0.4).set()
-            NSBezierPath(ovalIn: NSRect(x: 5, y: 5, width: 20, height: 20)).fill()
+            toyImg = KawaiiItems.laserDot()
         }
-        toyImg.unlockFocus()
         toyImageView?.image = toyImg
 
         toyWindow!.setFrameOrigin(NSPoint(x: tx, y: ty))
@@ -2445,71 +4454,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Sprites
 
     func getSprite(for behavior: PetBehavior, frame: Int, right: Bool) -> NSImage {
-        let key = "\(behavior.rawValue)_\(frame % 16)_\(right)"
-        if behavior != .lookingAtCursor, let cached = spriteCache[key] { return cached }
-
-        let spriteData: [[UInt32]]
-        switch behavior {
-        case .walking:
-            spriteData = frame % 2 == 0 ? Sprites.walk1 : Sprites.walk2
-        case .running, .chasingCursor, .chasingToy, .zoomies:
-            spriteData = frame % 2 == 0 ? Sprites.run1 : Sprites.run2
-        case .sitting:
-            spriteData = Sprites.sit
-        case .sleeping:
-            spriteData = frame % 2 == 0 ? Sprites.sleep1 : Sprites.sleep2
-        case .eating:
-            spriteData = Sprites.eating
-        case .beingPet, .greeting:
-            spriteData = Sprites.love
-        case .playing:
-            spriteData = frame % 3 == 0 ? Sprites.happy : (frame % 3 == 1 ? Sprites.jump : Sprites.happy)
-        case .jumping:
-            spriteData = Sprites.jump
-        case .stretching:
-            spriteData = Sprites.stretch
-        case .tripping:
-            spriteData = Sprites.trip
-        case .grooming:
-            spriteData = Sprites.lickPaw
-        case .scratching:
-            spriteData = frame % 2 == 0 ? Sprites.stretch : Sprites.lickPaw
-        case .edgeWalking:
-            spriteData = frame % 2 == 0 ? Sprites.walk1 : Sprites.walk2
-        case .pooping:
-            spriteData = Sprites.sit  // sitting while pooping
-        case .sick:
-            spriteData = Sprites.sick
-        case .bathing:
-            spriteData = Sprites.bath
-        case .promenade:
-            spriteData = frame % 2 == 0 ? Sprites.walkLeash : Sprites.walk2
-        case .chasingButterfly:
-            spriteData = frame % 2 == 0 ? Sprites.run1 : Sprites.run2
-        case .watchingBird:
-            spriteData = Sprites.sit  // sitting and watching
-        case .knockingGlass:
-            spriteData = frame % 2 == 0 ? Sprites.walk1 : Sprites.walk2
-        case .openingGift:
-            spriteData = frame % 3 == 0 ? Sprites.happy : Sprites.jump
-        case .lookingAtCursor:
-            let mousePos = NSEvent.mouseLocation
-            if mousePos.x > petX + petSize / 2 {
-                return Sprites.render(Sprites.lookRight)
-            } else {
-                return Sprites.render(Sprites.lookLeft)
-            }
-        case .idle:
-            if frame % 12 == 0 {
-                spriteData = Sprites.blink
-            } else {
-                spriteData = Sprites.walk1
-            }
+        if petType == "bear" {
+            return BearRenderer.shared.getSprite(for: behavior, frame: frame, right: right)
         }
-
-        let img = right ? Sprites.render(spriteData) : Sprites.renderMirrored(spriteData)
-        spriteCache[key] = img
-        return img
+        return CatRenderer.shared.getSprite(for: behavior, frame: frame, right: right)
     }
 
     // MARK: - Timers
@@ -2609,7 +4557,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let delay = TimeInterval.random(in: 4...12)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self = self else { return }
-            if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy {
+            if self.followingCursor { /* skip random behavior while following */ }
+            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy {
                 self.pickRandomBehavior()
             }
             self.scheduleRandomBehavior()
@@ -2701,14 +4650,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         switch b {
         case .walking:
-            let lo = max(50, cachedDockBarLeft - 10)
-            let hi = min(screenW - 50, cachedDockBarRight - petSize + 10)
-            walkTargetX = CGFloat.random(in: safeRange(lo, hi))
+            walkTargetX = CGFloat.random(in: dockWalkRange(allowFallZone: groundYForPet() > floorY))
             facingRight = (walkTargetX ?? petX) > petX
         case .running:
-            let lo = max(50, cachedDockBarLeft - 10)
-            let hi = min(screenW - 50, cachedDockBarRight - petSize + 10)
-            walkTargetX = CGFloat.random(in: safeRange(lo, hi))
+            walkTargetX = CGFloat.random(in: dockWalkRange(allowFallZone: groundYForPet() > floorY))
             facingRight = (walkTargetX ?? petX) > petX
         case .chasingCursor:
             facingRight = NSEvent.mouseLocation.x > petX
@@ -2765,7 +4710,9 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Behavior timeout
         let elapsed = Date().timeIntervalSince(behaviorStartTime)
-        if elapsed > behaviorDuration && !isDragging && behavior != .idle {
+        if followingCursor && behavior == .chasingCursor {
+            // Keep following — don't timeout
+        } else if elapsed > behaviorDuration && !isDragging && behavior != .idle {
             // Clean up event windows on behavior timeout
             if behavior == .openingGift, let gw = giftWindow, gw.isVisible {
                 gw.orderOut(nil)
@@ -2790,12 +4737,19 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Physics — gravity with Dock as platform
         let currentGround = groundYForPet()
-        if !isDragging && behavior != .sleeping && behavior != .jumping {
-            // Safety clamp: cat should never be above 250px naturally
-            if petY > 250 {
-                petY = currentGround
-                velocityY = 0
-                isOnGround = true
+        if !isDragging && behavior != .sleeping && behavior != .jumping && behavior != .edgeWalking {
+            if isGentleDropping && petY > currentGround + 2 {
+                gentleDropPhase += 0.35
+                let distance = petY - currentGround
+                let descent = min(3.0, max(1.2, distance * 0.045))
+                petY -= descent
+                if petY <= currentGround {
+                    petY = currentGround
+                    velocityY = 0
+                    isOnGround = true
+                    isGentleDropping = false
+                    gentleDropPhase = 0
+                }
             } else if petY > currentGround + 2 {
                 // Falling
                 velocityY -= 0.8
@@ -2804,6 +4758,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                     petY = currentGround
                     velocityY = 0
                     isOnGround = true
+                    isGentleDropping = false
+                    gentleDropPhase = 0
                 }
             } else if petY < currentGround - 2 && isOnGround {
                 // Ground rose (e.g. walked onto Dock) — snap up smoothly
@@ -2814,6 +4770,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                     petY = currentGround
                     velocityY = 0
                     isOnGround = true
+                    isGentleDropping = false
+                    gentleDropPhase = 0
                 }
             }
         }
@@ -2972,41 +4930,59 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 )
             }
         case .openingGift:
-            // Gift falls down
             if let gw = giftWindow, gw.isVisible {
-                giftPos.y -= 8
-                gw.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
-                // Cat runs to gift
-                let dx = giftPos.x - petX
-                if abs(dx) > 20 {
-                    petX += dx > 0 ? 2 : -2
-                    facingRight = dx > 0
-                }
-                // Gift landed — open it!
-                if giftPos.y <= groundYForPet() + 10 {
-                    gw.orderOut(nil)
-                    showBubble("A PRESENT!! Yay!!")
-                    SoundEngine.shared.pop()
-                    particleCanvas.particleSystem.emit(
-                        at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
-                        type: .star, count: 15
-                    )
-                    particleCanvas.particleSystem.emit(
-                        at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
-                        type: .heart, count: 8
-                    )
-                    // Random reward
-                    let rewards = ["XP boost", "full tummy", "happiness", "sparkles"]
-                    let reward = rewards.randomElement()!
-                    switch reward {
-                    case "XP boost": stats.addXP(8)
-                    case "full tummy": stats.hunger = min(100, stats.hunger + 30)
-                    case "happiness": stats.happiness = min(100, stats.happiness + 25)
-                    default: break
+                switch giftPhase {
+                case 0:
+                    // Phase 0: Gift falling from sky
+                    giftPos.y -= 6
+                    gw.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
+                    // Gift landed on ground
+                    let giftLandingY = groundY(at: giftPos.x, width: gw.frame.width) + 10
+                    if giftPos.y <= giftLandingY {
+                        giftPos.y = giftLandingY
+                        gw.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
+                        giftPhase = 1
+                        showBubble("A present!!")
                     }
-                    stats.addMilestone("Opened a gift: \(reward)!")
-                    stats.save()
-                    behavior = .idle
+                case 1:
+                    // Phase 1: Cat walks to the gift
+                    let dx = giftPos.x - petX
+                    facingRight = dx > 0
+                    if abs(dx) > 20 {
+                        petX += dx > 0 ? 3 : -3
+                    } else {
+                        // Cat reached the gift — open it!
+                        giftPhase = 2
+                        showBubble("A PRESENT!! Yay!!")
+                        SoundEngine.shared.pop()
+                        particleCanvas.particleSystem.emit(
+                            at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                            type: .star, count: 15
+                        )
+                        particleCanvas.particleSystem.emit(
+                            at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                            type: .heart, count: 8
+                        )
+                        // Random reward
+                        let rewards = ["XP boost", "full tummy", "happiness", "sparkles"]
+                        let reward = rewards.randomElement()!
+                        switch reward {
+                        case "XP boost": stats.addXP(8)
+                        case "full tummy": stats.hunger = min(100, stats.hunger + 30)
+                        case "happiness": stats.happiness = min(100, stats.happiness + 25)
+                        default: break
+                        }
+                        stats.addMilestone("Opened a gift: \(reward)!")
+                        stats.save()
+                    }
+                default:
+                    // Phase 2: Gift opened — fade out smoothly
+                    gw.alphaValue -= 0.05
+                    if gw.alphaValue <= 0 {
+                        gw.orderOut(nil)
+                        gw.alphaValue = 1.0  // reset for next time
+                        behavior = .idle
+                    }
                 }
             }
         case .scratching:
@@ -3022,20 +4998,17 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         petX = max(0, min(petX, screenW - petSize))
         petY = max(floorY, min(petY, screenH - petSize - 50))
 
-        // Update windows
-        petWindow.setFrameOrigin(NSPoint(x: petX, y: petY))
-
-        // Wobble for purring when being pet
-        if behavior == .beingPet {
-            let wobble = sin(Double(frameCounter) * 0.5) * 2
-            petWindow.setFrameOrigin(NSPoint(x: petX + CGFloat(wobble), y: petY))
-        }
-
         // Idle breathing animation — subtle vertical bob
-        if behavior == .idle || behavior == .sitting || behavior == .lookingAtCursor {
+        if isOnGround && !isGentleDropping && (behavior == .idle || behavior == .sitting || behavior == .lookingAtCursor) {
             breathOffset = CGFloat(sin(Double(frameCounter) * 0.08)) * 1.5
-            petWindow.setFrameOrigin(NSPoint(x: petX, y: petY + breathOffset))
+        } else {
+            breathOffset = 0
         }
+
+        let displayOrigin = currentDisplayOrigin()
+
+        // Update windows
+        petWindow.setFrameOrigin(displayOrigin)
 
         updateBubblePosition()
         updateParticleWindow()
@@ -3043,7 +5016,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Update accessory position
         if currentAccessory != nil {
-            accessoryWindow.setFrameOrigin(NSPoint(x: petX, y: petY + breathOffset))
+            accessoryWindow.setFrameOrigin(displayOrigin)
         }
 
         // Night glow follows pet
@@ -3121,6 +5094,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateSprite() {
+        if isGentleDropping {
+            petImageView.image = getSprite(for: .jumping, frame: animFrame, right: facingRight)
+            return
+        }
         petImageView.image = getSprite(for: behavior, frame: animFrame, right: facingRight)
     }
 
@@ -3180,7 +5157,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             butterflyWindow!.ignoresMouseEvents = true
             let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: size, height: size))
             iv.imageScaling = .scaleProportionallyUpOrDown
-            iv.image = Sprites.render(Sprites.butterfly1, scale: 3)
+            iv.image = KawaiiItems.butterfly(frame: 0)
             butterflyWindow!.contentView = iv
         }
 
@@ -3202,8 +5179,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Update sprite (wing flap)
         if butterflyFrame % 6 == 0 {
-            let sprite = butterflyFrame % 12 < 6 ? Sprites.butterfly1 : Sprites.butterfly2
-            (bw.contentView as? NSImageView)?.image = Sprites.render(sprite, scale: 3)
+            let wingFrame = butterflyFrame % 12 < 6 ? 0 : 1
+            (bw.contentView as? NSImageView)?.image = KawaiiItems.butterfly(frame: wingFrame)
         }
 
         bw.setFrameOrigin(NSPoint(x: butterflyPos.x, y: butterflyPos.y))
@@ -3243,7 +5220,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnBird() {
         let size: CGFloat = 30
-        birdPos = NSPoint(x: petX + (facingRight ? 200 : -200), y: groundYForPet())
+        let birdX = nearbyEventX(offset: facingRight ? 150 : -150, width: size)
+        birdPos = NSPoint(x: birdX, y: groundY(at: birdX, width: size))
         let frame = NSRect(x: birdPos.x, y: birdPos.y, width: size, height: size)
 
         if birdWindow == nil {
@@ -3257,12 +5235,14 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             birdWindow!.ignoresMouseEvents = true
             let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: size, height: size))
             iv.imageScaling = .scaleProportionallyUpOrDown
-            iv.image = Sprites.render(Sprites.bird, scale: 3)
+            iv.image = KawaiiItems.bird()
             birdWindow!.contentView = iv
         }
 
         birdWindow!.setFrameOrigin(NSPoint(x: birdPos.x, y: birdPos.y))
         birdWindow!.orderFront(nil)
+        birdFlyAwaySpeed = 0
+        birdFlyAwayFrame = 0
 
         showBubble("*stares at bird*")
         startBehavior(.watchingBird, duration: 6.0)
@@ -3271,14 +5251,15 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     func updateBird() {
         guard let bw = birdWindow, bw.isVisible else { return }
 
-        // Bird hops slightly
-        if frameCounter % 30 == 0 {
-            birdPos.x += CGFloat.random(in: -5...5)
-            bw.setFrameOrigin(NSPoint(x: birdPos.x, y: birdPos.y))
-        }
-
-        // Cat watches intently
+        // Cat watches intently while behavior is active
         if behavior == .watchingBird {
+            // Bird hops slightly on the ground
+            if frameCounter % 30 == 0 {
+                birdPos.x += CGFloat.random(in: -5...5)
+                birdPos.x = nearbyEventX(offset: birdPos.x - petX, width: bw.frame.width)
+                birdPos.y = groundY(at: birdPos.x, width: bw.frame.width)
+                bw.setFrameOrigin(NSPoint(x: birdPos.x, y: birdPos.y))
+            }
             facingRight = birdPos.x > petX
             // Butt wiggle (getting ready to pounce)
             if frameCounter % 4 == 0 {
@@ -3286,13 +5267,35 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // Bird flies away when behavior ends
+        // Bird flies away smoothly when behavior ends
         if behavior != .watchingBird && bw.isVisible {
-            // Fly away animation
-            birdPos.y += 4
-            birdPos.x += 3
+            birdFlyAwayFrame += 1
+            // Accelerate upward and to the side over ~2 seconds (~120 frames at 60fps)
+            birdFlyAwaySpeed += 0.15  // gradual acceleration
+            let sideDir: CGFloat = birdPos.x > petX ? 1 : -1
+            birdPos.y += birdFlyAwaySpeed
+            birdPos.x += sideDir * (1.0 + birdFlyAwaySpeed * 0.3)
+
+            // Wing flap animation during fly-away
+            if birdFlyAwayFrame % 4 == 0 {
+                // Create a flapping bird image by re-rendering with slight vertical offset
+                let flapOffset: CGFloat = birdFlyAwayFrame % 8 < 4 ? 2 : -2
+                let birdSize: CGFloat = 30
+                let flapImg = NSImage(size: NSSize(width: birdSize, height: birdSize))
+                flapImg.lockFocus()
+                if let ctx = NSGraphicsContext.current?.cgContext {
+                    // Translate for flap effect
+                    ctx.translateBy(x: 0, y: flapOffset)
+                    let baseImg = KawaiiItems.bird()
+                    baseImg.draw(in: NSRect(x: 0, y: 0, width: birdSize, height: birdSize))
+                }
+                flapImg.unlockFocus()
+                (bw.contentView as? NSImageView)?.image = flapImg
+            }
+
             bw.setFrameOrigin(NSPoint(x: birdPos.x, y: birdPos.y))
-            if birdPos.y > screenH {
+
+            if birdPos.y > screenH + 50 {
                 bw.orderOut(nil)
                 showBubble("*chirp chirp* Bye birdie!")
             }
@@ -3301,7 +5304,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnGift() {
         let size: CGFloat = 40
-        let gx = max(20, min(screenW - 60, petX + CGFloat.random(in: -100...100)))
+        let gx = nearbyEventX(offset: CGFloat.random(in: -100...100), width: size)
         giftPos = NSPoint(x: gx, y: screenH)
         let frame = NSRect(x: giftPos.x, y: giftPos.y, width: size, height: size)
 
@@ -3316,21 +5319,21 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             giftWindow!.ignoresMouseEvents = true
             let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: size, height: size))
             iv.imageScaling = .scaleProportionallyUpOrDown
-            iv.image = Sprites.render(Sprites.gift, scale: 4)
+            iv.image = KawaiiItems.gift()
             giftWindow!.contentView = iv
         }
 
         giftWindow!.setFrameOrigin(NSPoint(x: giftPos.x, y: giftPos.y))
         giftWindow!.orderFront(nil)
+        giftPhase = 0  // start with falling phase
 
         startBehavior(.openingGift, duration: 12.0)
     }
 
     func startKnockingGlass() {
         let size: CGFloat = 30
-        // Glass at screen edge
-        let glassX = facingRight ? screenW - size - 10 : 10.0
-        let glassY = groundYForPet()
+        let glassX = nearbyEventX(offset: facingRight ? 110 : -110, width: size)
+        let glassY = groundY(at: glassX, width: size)
         let frame = NSRect(x: glassX, y: glassY, width: size, height: size)
 
         if glassWindow == nil {
@@ -3344,7 +5347,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             glassWindow!.ignoresMouseEvents = true
             let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: size, height: size))
             iv.imageScaling = .scaleProportionallyUpOrDown
-            iv.image = Sprites.render(Sprites.glass, scale: 3)
+            iv.image = KawaiiItems.glass()
             glassWindow!.contentView = iv
         }
 
@@ -3353,7 +5356,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         glassVelocityY = 0
 
         showBubble("*eyes glass*")
-        walkTargetX = glassX - (facingRight ? 30 : -30)
+        facingRight = glassX > petX
+        walkTargetX = min(max(glassX + (facingRight ? -30 : 30), 0), screenW - petSize)
         startBehavior(.knockingGlass, duration: 6.0)
     }
 
@@ -3556,6 +5560,31 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                     item.title = soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds"
                 }
             }
+        }
+    }
+
+    @objc func switchPetType() {
+        petType = petType == "cat" ? "bear" : "cat"
+        // Update menu item title
+        if let menu = statusBarItem.menu {
+            for item in menu.items {
+                if item.title.contains("Switch to") {
+                    item.title = petType == "cat" ? "🐻 Switch to Bear" : "🐱 Switch to Cat"
+                }
+            }
+        }
+        // Re-render current sprite
+        updateSprite()
+    }
+
+    @objc func toggleFollowCursor() {
+        followingCursor.toggle()
+        if followingCursor {
+            startBehavior(.chasingCursor, duration: 999999)
+            showBubble("I'll follow you! 🐾")
+        } else {
+            startBehavior(.idle, duration: 2.0)
+            showBubble("Ok, I'll chill~")
         }
     }
 
@@ -3770,6 +5799,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func petTapped() {
+        dismissLaserDotIfNeeded()
+
         // Multi-click detection
         let now = Date()
         if now.timeIntervalSince(lastClickTime) < 0.4 {
@@ -3886,19 +5917,33 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Mouse handling
 
     func handleMouseDown(_ event: NSEvent) {
+        dismissLaserDotIfNeeded()
         isDragging = true
+        didDragPet = false
+        isGentleDropping = false
+        gentleDropPhase = 0
+        breathOffset = 0
         dragOffset = NSPoint(
             x: event.locationInWindow.x,
             y: event.locationInWindow.y
         )
+        dragStartScreenPoint = NSEvent.mouseLocation
     }
 
     func handleMouseDragged(_ event: NSEvent) {
         guard isDragging else { return }
         let screenPoint = NSEvent.mouseLocation
+        let moved = abs(screenPoint.x - dragStartScreenPoint.x) + abs(screenPoint.y - dragStartScreenPoint.y)
+        if moved > 4 {
+            didDragPet = true
+        }
         petX = screenPoint.x - dragOffset.x
         petY = screenPoint.y - dragOffset.y
-        petWindow.setFrameOrigin(NSPoint(x: petX, y: petY))
+        let dragOrigin = NSPoint(x: petX.rounded(), y: petY.rounded())
+        petWindow.setFrameOrigin(dragOrigin)
+        if currentAccessory != nil {
+            accessoryWindow.setFrameOrigin(dragOrigin)
+        }
         updateBubblePosition()
         updateParticleWindow()
 
@@ -3911,8 +5956,9 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     func handleMouseUp(_ event: NSEvent) {
         if isDragging {
             isDragging = false
-            let moved = abs(event.locationInWindow.x - dragOffset.x) + abs(event.locationInWindow.y - dragOffset.y)
-            if moved < 5 {
+            let screenPoint = NSEvent.mouseLocation
+            let moved = abs(screenPoint.x - dragStartScreenPoint.x) + abs(screenPoint.y - dragStartScreenPoint.y)
+            if !didDragPet || moved < 5 {
                 petTapped()
             } else {
                 showBubble("Wheee!")
@@ -3920,6 +5966,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 if petY > groundYForPet() + 5 {
                     velocityY = 0
                     isOnGround = false
+                    isGentleDropping = true
+                    gentleDropPhase = 0
                 }
             }
         }
@@ -4010,6 +6058,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        let followItem = NSMenuItem(title: followingCursor ? "🛑 Stop Following" : "🐾 Follow Cursor", action: #selector(toggleFollowCursor), keyEquivalent: "")
+        followItem.target = self
+        menu.addItem(followItem)
+
         let cameraItem = NSMenuItem(title: "\u{1F4F7} Screenshot", action: #selector(screenshotPet), keyEquivalent: "")
         cameraItem.target = self
         menu.addItem(cameraItem)
@@ -4021,6 +6073,12 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let statsItem = NSMenuItem(title: "\u{1F4CA} Stats", action: #selector(showStats), keyEquivalent: "")
         statsItem.target = self
         menu.addItem(statsItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let updateItem = NSMenuItem(title: "\u{1F504} Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
 
         NSMenu.popUpContextMenu(menu, with: event, for: petImageView)
     }
