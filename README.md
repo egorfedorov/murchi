@@ -12,42 +12,30 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-CC_BY--NC--ND_4.0-64748b?style=for-the-badge" alt="License"></a>
 </p>
 
+<p align="center">
+  <sub>A pixel-art Tamagotchi cat that lives on your macOS desktop. One Swift file. Zero dependencies.</sub>
+</p>
+
 <br>
 
-<table>
-<tr>
-<td width="60%" valign="top">
+<p align="center">
+  <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg">
+    <img src="https://img.shields.io/badge/DOWNLOAD_MURCHI.DMG-34d399?style=for-the-badge&logo=apple&logoColor=white&labelColor=0a0a1a" alt="Download DMG" height="48">
+  </a>
+</p>
+<p align="center">
+  <sub>Open DMG &rarr; drag to Applications &rarr; done. macOS 12+ required.</sub>
+</p>
 
-## What is Murchi?
-
-A **single-file Swift app** that puts a pixel-art Tamagotchi cat on your macOS desktop. No Xcode, no dependencies — one `.swift` file, compiled with `swiftc`.
-
-The cat walks around, sleeps, plays, gets hungry, chases butterflies, knocks glasses off tables, writes a diary, and lives on top of your Dock.
-
-**Think classic Tamagotchi, but on your Mac.**
-
-</td>
-<td width="40%" align="center">
-
-```
-    ╱╲╱╲
-   ╱ ◉◉ ╲
-   │ ▼▼  │    ← Murchi
-   ╰┬──┬─╯
-    │▓▓│  ♥ ♥
-   ╱╰──╯╲
-  ╱ ╱  ╲ ╲
-```
-
-</td>
-</tr>
-</table>
+<br>
 
 ---
 
 <br>
 
-<h2 align="center">Features</h2>
+<h2 align="center">What can Murchi do?</h2>
+
+<p align="center"><sub>Your cat has a full life on your desktop</sub></p>
 
 <br>
 
@@ -120,34 +108,132 @@ The cat walks around, sleeps, plays, gets hungry, chases butterflies, knocks gla
 
 <br>
 
-## Download
+<h2 align="center">How it works</h2>
 
-[**Download Murchi.dmg**](https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg) — open, drag to Applications, done. Requires **macOS 12+**.
+<p align="center"><sub>Everything lives in <strong>one file</strong> &mdash; Murchi.swift (~4000 lines)</sub></p>
 
 <br>
 
-## Architecture
-
-Everything lives in **one file**: `Murchi.swift` (~4000 lines)
+<table>
+<tr>
+<td width="50%">
 
 ```
 Murchi.swift            the entire app
 generate-icon.swift     pixel-art icon generator
 build-app.sh            .app bundle + .dmg builder
 run.sh                  compile & launch
-docs/                   murchi.pet website (GitHub Pages)
+docs/                   murchi.pet website
 ```
+
+</td>
+<td width="50%">
 
 | Layer | Tech |
 |-------|------|
-| Rendering | Pixel art as `[[UInt32]]` → `NSImage` |
-| Window | `NSPanel` borderless, above Dock level |
-| Physics | Custom gravity + platform detection |
-| Particles | Hearts, stars, sparkles system |
-| Persistence | `Codable` JSON → `~/.murchi/stats.json` |
-| Hotkey | Carbon `EventHotKeyID` (Cmd+Shift+M) |
-| Diary | `NSAttributedString` styled window |
-| Website | Single HTML + vanilla JS, 10 languages |
+| Rendering | Pixel art `[[UInt32]]` &rarr; `NSImage` |
+| Window | `NSPanel` borderless, above Dock |
+| Physics | Custom gravity + dock detection |
+| Particles | Hearts, stars, sparkles, paws |
+| Persistence | `Codable` JSON &rarr; `~/.murchi/` |
+| Hotkey | `Cmd+Shift+M` global shortcut |
+
+</td>
+</tr>
+</table>
+
+<br>
+
+---
+
+<br>
+
+<h2 align="center">Roadmap</h2>
+
+<p align="center"><sub>Murchi is just getting started</sub></p>
+
+<br>
+
+<table>
+<tr>
+<td align="center" width="33%">
+<br>
+<img width="30" src="https://em-content.zobj.net/source/apple/391/rocket_1f680.png"><br>
+<strong>v2.1 &mdash; Soon</strong><br><br>
+<sub>15+ new accessories<br>New food types<br>Mini-games<br>Seasonal events</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="30" src="https://em-content.zobj.net/source/apple/391/globe-showing-americas_1f30e.png"><br>
+<strong>v2.2 &mdash; Next</strong><br><br>
+<sub>Visit friends' cats<br>Room decorations<br>Cat furniture<br>Photo sharing</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<img width="30" src="https://em-content.zobj.net/source/apple/391/crystal-ball_1f52e.png"><br>
+<strong>v3.0 &mdash; Future</strong><br><br>
+<sub>Dogs, hamsters, birds<br>Worlds &amp; biomes<br>Multiplayer<br>App Store release</sub><br><br>
+</td>
+</tr>
+</table>
+
+<p align="center">
+  <a href="https://github.com/egorfedorov/murchi/issues"><img src="https://img.shields.io/badge/VIEW_FULL_ROADMAP-issues-a78bfa?style=for-the-badge" alt="Roadmap"></a>
+</p>
+
+<br>
+
+---
+
+<br>
+
+<h2 align="center">Fun facts</h2>
+
+<br>
+
+<p align="center">
+  <code>4000+</code> lines of Swift &nbsp;&bull;&nbsp;
+  <code>25+</code> behaviors &nbsp;&bull;&nbsp;
+  <code>6</code> stats &nbsp;&bull;&nbsp;
+  <code>5</code> evolution stages &nbsp;&bull;&nbsp;
+  <code>0</code> dependencies
+</p>
+
+<p align="center">
+  <sub>
+    Murchi remembers everything between launches &nbsp;&#x1f4be;<br>
+    Murchi writes a personal diary about its day &nbsp;&#x1f4d6;<br>
+    Murchi celebrates its birthday with confetti &nbsp;&#x1f389;<br>
+    Murchi knocks your glass off the table if bored &nbsp;&#x1f610;<br>
+    Murchi poops if you forget to feed it &nbsp;&#x1f4a9;
+  </sub>
+</p>
+
+<br>
+
+---
+
+<br>
+
+<h2 align="center">Star history</h2>
+
+<p align="center">
+  <sub>If you enjoy Murchi, give it a star &mdash; it helps a lot!</sub>
+</p>
+
+<p align="center">
+  <a href="https://github.com/egorfedorov/murchi/stargazers">
+    <img src="https://img.shields.io/github/stars/egorfedorov/murchi?style=for-the-badge&color=fbbf24&logo=github&label=stars" alt="Stars">
+  </a>
+  &nbsp;
+  <a href="https://github.com/egorfedorov/murchi/network/members">
+    <img src="https://img.shields.io/github/forks/egorfedorov/murchi?style=for-the-badge&color=64748b&logo=github&label=forks" alt="Forks">
+  </a>
+</p>
+
+<br>
+
+---
 
 <br>
 
