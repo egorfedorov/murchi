@@ -31,7 +31,7 @@ class CatRenderer {
         cacheKeys.append(key)
     }
 
-    enum CatPose { case sitting, walking, eating, sleeping, held, angry, jumping, playing, clinging, bathing, sick, dead, celebrating, crying, lonelySitting, standing, climbing }
+    enum CatPose { case sitting, walking, eating, sleeping, held, angry, jumping, playing, clinging, bathing, sick, dead, celebrating, crying, lonelySitting, standing, climbing, musicHappy, musicAngry, hiding, squatting }
 
     // Pet screen position for cursor tracking (updated by PetEngine)
     var petScreenCenter: NSPoint = NSPoint(x: 400, y: 100)
@@ -62,6 +62,13 @@ class CatRenderer {
     private var standingFrames: [NSImage] = []
     private var climbingFramesOpen: [NSImage] = []
     private var climbingFramesClosed: [NSImage] = []
+    private var musicHappyFramesOpen: [NSImage] = []
+    private var musicHappyFramesClosed: [NSImage] = []
+    private var musicAngryFramesOpen: [NSImage] = []
+    private var musicAngryFramesClosed: [NSImage] = []
+    private var hidingFramesOpen: [NSImage] = []
+    private var hidingFramesClosed: [NSImage] = []
+    private var squattingFrames: [NSImage] = []
 
     init() {
         buildSittingFrames()
@@ -80,6 +87,10 @@ class CatRenderer {
         buildLonelySittingFrames()
         buildStandingFrames()
         buildClimbingFrames()
+        buildMusicHappyFrames()
+        buildMusicAngryFrames()
+        buildHidingFrames()
+        buildSquattingFrames()
     }
 
     // MARK: - SVG rendering
@@ -205,7 +216,7 @@ class CatRenderer {
     private func buildCryingFrames() {
         for i in 0..<16 {
             let phase = Double(i) / 16.0 * .pi * 2.0
-            cryingFrames.append(renderSVG(CatRenderer.makeCryingFrame(phase: phase)))
+            cryingFrames.append(renderSVG(CatRenderer.makeCryingFrame(phase: phase, frameIndex: i)))
         }
     }
 
@@ -228,6 +239,37 @@ class CatRenderer {
             let phase = Double(i) / 16.0 * .pi * 2.0
             climbingFramesOpen.append(renderSVG(CatRenderer.makeClimbingFrame(phase: phase, eyesClosed: false)))
             climbingFramesClosed.append(renderSVG(CatRenderer.makeClimbingFrame(phase: phase, eyesClosed: true)))
+        }
+    }
+
+    private func buildMusicHappyFrames() {
+        for i in 0..<16 {
+            let phase = Double(i) / 16.0 * .pi * 2.0
+            musicHappyFramesOpen.append(renderSVG(CatRenderer.makeMusicHappyFrame(phase: phase, eyesClosed: false)))
+            musicHappyFramesClosed.append(renderSVG(CatRenderer.makeMusicHappyFrame(phase: phase, eyesClosed: true)))
+        }
+    }
+
+    private func buildMusicAngryFrames() {
+        for i in 0..<16 {
+            let phase = Double(i) / 16.0 * .pi * 2.0
+            musicAngryFramesOpen.append(renderSVG(CatRenderer.makeMusicAngryFrame(phase: phase, eyesClosed: false)))
+            musicAngryFramesClosed.append(renderSVG(CatRenderer.makeMusicAngryFrame(phase: phase, eyesClosed: true)))
+        }
+    }
+
+    private func buildHidingFrames() {
+        for i in 0..<16 {
+            let phase = Double(i) / 16.0 * .pi * 2.0
+            hidingFramesOpen.append(renderSVG(CatRenderer.makeHidingFrame(phase: phase, eyesClosed: false)))
+            hidingFramesClosed.append(renderSVG(CatRenderer.makeHidingFrame(phase: phase, eyesClosed: true)))
+        }
+    }
+
+    private func buildSquattingFrames() {
+        for i in 0..<16 {
+            let phase = Double(i) / 16.0 * .pi * 2.0
+            squattingFrames.append(renderSVG(CatRenderer.makeSquattingFrame(phase: phase)))
         }
     }
 
@@ -577,13 +619,16 @@ class CatRenderer {
     }
 
     // Crying frame: gentle sobbing bob
-    private static func makeCryingFrame(phase: Double) -> String {
-        let sobY = sin(phase * 2) * 1.5  // sobbing rhythm
-        let tilt = sin(phase) * 1.0  // head tilt
+    private static func makeCryingFrame(phase: Double, frameIndex: Int) -> String {
+        // Rhythmic sobbing: quick hitches up, slow sink down
+        let sobCycle = sin(phase * 2.0)
+        let sobY = sobCycle > 0 ? sobCycle * 2.5 : sobCycle * 1.0
+        let tilt = sin(phase * 1.3) * 1.5
+        let tremble = sin(phase * 8) * 0.3
         var svg = cryingSVG
         svg = svg.replacingOccurrences(
             of: "(https://quiver.ai) -->",
-            with: "(https://quiver.ai) -->\n<g transform=\"translate(0, \(f(sobY))) rotate(\(f(tilt)), 100, 100)\">"
+            with: "(https://quiver.ai) -->\n<g transform=\"translate(\(f(tremble)), \(f(sobY))) rotate(\(f(tilt)), 100, 100)\">"
         )
         svg = svg.replacingOccurrences(of: "</svg>", with: "</g>\n</svg>")
         return svg
@@ -649,9 +694,11 @@ class CatRenderer {
 
     private func poseFor(_ behavior: PetBehavior) -> CatPose {
         switch behavior {
-        case .idle, .sitting, .lookingAtCursor, .grooming, .pooping,
+        case .idle, .sitting, .lookingAtCursor, .grooming,
              .openingGift, .knockingGlass:
             return .sitting
+        case .pooping:
+            return .squatting
         case .greeting, .watchingBird:
             return .standing
         case .lonelySitting:
@@ -683,6 +730,14 @@ class CatRenderer {
             return .celebrating
         case .crying:
             return .crying
+        case .dancing:
+            return .musicHappy
+        case .hatingMusic:
+            return .musicAngry
+        case .hiding:
+            return .hiding
+        case .cornerTimeout:
+            return .lonelySitting
         }
     }
 
@@ -765,6 +820,18 @@ class CatRenderer {
         case .standing:
             let standPhase = frame % 16
             base = standingFrames[standPhase]
+        case .musicHappy:
+            let p = frame % 16
+            base = blink ? musicHappyFramesClosed[p] : musicHappyFramesOpen[p]
+        case .musicAngry:
+            let p = frame % 16
+            base = blink ? musicAngryFramesClosed[p] : musicAngryFramesOpen[p]
+        case .hiding:
+            let p = frame % 16
+            base = blink ? hidingFramesClosed[p] : hidingFramesOpen[p]
+        case .squatting:
+            let p = frame % 16
+            base = squattingFrames[p]
         }
 
         let img = applyTransforms(base: base, behavior: behavior, pose: pose, frame: frame, right: right)
@@ -849,7 +916,21 @@ class CatRenderer {
                 tilt = CGFloat(sin(Double(frame) * 0.5)) * 0.04
             }
         case .playing:
-            break  // bounce + tilt are now SVG-level
+            break  // SVG-level animation
+        case .musicHappy:
+            // Extra dancing animation on top of SVG-level animation
+            let t = Double(frame) * 0.5
+            bounce = CGFloat(abs(sin(t * 1.5))) * 8  // energetic bounce
+            tilt = CGFloat(sin(t)) * 0.08             // groovy sway
+            let beat = CGFloat(sin(t * 3.0))
+            squashX = 1.0 + beat * 0.04
+            squashY = 1.0 - beat * 0.03
+        case .musicAngry:
+            break  // tremble is SVG-level
+        case .hiding:
+            break  // tremble is SVG-level
+        case .squatting:
+            break  // strain pulsing is SVG-level
         case .bathing:
             break  // bob + wobble are now SVG-level
         case .sick:
@@ -867,17 +948,18 @@ class CatRenderer {
         case .clinging, .climbing:
             // Cat climbing up edge — rotate 90° with scramble animation (SVG-level)
             let t = Double(frame) * 0.6
-            let swing = CGFloat(sin(t)) * 0.06       // subtle wobble
+            let swing = CGFloat(sin(t)) * 0.04       // subtle wobble
             let scramble = CGFloat(sin(t * 2.5)) * 1.5 // quick paw scramble offset
 
             let cx = size / 2, cy = size / 2
             ctx.translateBy(x: cx, y: cy)
-            // On right edge: cat faces right, rotate so head points up
-            // On left edge: cat faces left, rotate so head points up
+            // CG rotation is counterclockwise positive
+            // Right edge (facingRight=true, already flipped): rotate -90° so head points up
+            // Left edge (facingRight=false): rotate +90° so head points up
             if right {
-                ctx.rotate(by: .pi / 2 + swing)
-            } else {
                 ctx.rotate(by: -.pi / 2 + swing)
+            } else {
+                ctx.rotate(by: .pi / 2 + swing)
             }
             ctx.translateBy(x: -cx, y: -cy + scramble)
 
@@ -946,6 +1028,208 @@ class CatRenderer {
       <path d="M150,108 Q170,90 190,108" stroke="#2D2D2D" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M58,108 Q80,90 100,108" stroke="#2D2D2D" stroke-width="4" fill="none" stroke-linecap="round"/>
     """
+
+    // Sitting mouth path (for replacement in squatting/angry)
+    private static let sittingMouthPath = ##"  <path d="m107.1 133.8c-1.66 0.49-1.66 2.31-1.03 3.86 2.68 5.56 10.44 7.58 15.46 5.56 1.3-0.56 2.33-1.31 3.09-2.31 1.69 2.55 4.53 3.28 7.57 2.96 5.78-0.65 10.66-4.91 11.15-7.76 0.21-1.37-0.78-2.65-2.23-2.45-1.75 0.28-1.89 2.03-3.02 3.3-1.89 2.16-4.29 2.61-6.72 2.16-3.33-0.69-3.75-3.01-3.75-6.41h-4.85c0 2.67-0.14 5.41-3.11 6.41-3.04 1.06-6.93-0.14-9.1-3.46-0.83-1.38-1.82-2.34-3.46-1.86z" fill="url(#paint10_linear_2043_11400)"/>"##
+
+    // Headphones SVG overlay
+    private static let headphonesSVG = """
+    <path d="M50 80 C50 35 82 10 124 10 C166 10 198 35 198 80" fill="none" stroke="#2D2D2D" stroke-width="7" stroke-linecap="round"/>
+    <ellipse cx="50" cy="86" rx="13" ry="17" fill="#3A3A3A" stroke="#1A1A1A" stroke-width="1.5"/>
+    <ellipse cx="48" cy="86" rx="7" ry="11" fill="#555"/>
+    <ellipse cx="198" cy="86" rx="13" ry="17" fill="#3A3A3A" stroke="#1A1A1A" stroke-width="1.5"/>
+    <ellipse cx="200" cy="86" rx="7" ry="11" fill="#555"/>
+    """
+
+    // Half-closed eyelid overlays (body-colored to cover top of eyes)
+    private static let eyelidOverlays = ##"""
+    <path d="m171.8 82.11c-14.8 0-25.47 14.8-25.47 28.21 0 2 0.3 3.9 0.8 5.7 5-6.5 14-10.7 24.12-10.7 10 0 18.8 4 23.8 10.2 0.5-1.7 0.8-3.4 0.8-5.2 0-13.89-11-26.69-25.05-26.69z" fill="#FFC8A2"/>
+    <path d="m76.41 82.11c14.53-0.9 26.3 12.66 26.3 26.69 0 2-0.3 3.9-0.8 5.7-5-6.5-14-10.7-24.4-10.7-10 0-18.8 4-23.46 10.2-0.5-1.7-0.8-3.4-0.8-5.2 0-13.41 9.86-26.9 24.36-26.9z" fill="#FFC8A2"/>
+    """##
+
+    // Angry eyebrows
+    private static let angryEyebrowsSVG = ##"""
+    <path d="M62 80 L98 92" stroke="#2D2D2D" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M188 80 L152 92" stroke="#2D2D2D" stroke-width="4.5" stroke-linecap="round"/>
+    """##
+
+    // Angry/frown mouth replacement
+    private static let angryMouthSVG = ##"""
+    <path d="M108 140 Q118 133 125 134 Q132 133 142 140" fill="none" stroke="#8B4513" stroke-width="2.8" stroke-linecap="round"/>
+    """##
+
+    // Worried eyebrows (curved up)
+    private static let worriedEyebrowsSVG = ##"""
+    <path d="M65 78 Q80 72 98 80" fill="none" stroke="#C08050" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M185 78 Q170 72 152 80" fill="none" stroke="#C08050" stroke-width="2.5" stroke-linecap="round"/>
+    """##
+
+    // Paw overlays (hiding pose - paws held up in front)
+    private static let pawOverlaysSVG = ##"""
+    <ellipse cx="95" cy="150" rx="22" ry="16" fill="#FFC8A2" stroke="#E08858" stroke-width="1.2" transform="rotate(-10 95 150)"/>
+    <ellipse cx="155" cy="150" rx="22" ry="16" fill="#FFC8A2" stroke="#E08858" stroke-width="1.2" transform="rotate(10 155 150)"/>
+    <ellipse cx="88" cy="148" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    <ellipse cx="95" cy="145" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    <ellipse cx="102" cy="148" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    <ellipse cx="148" cy="148" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    <ellipse cx="155" cy="145" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    <ellipse cx="162" cy="148" rx="4" ry="3" fill="#FFB6C1" opacity="0.6"/>
+    """##
+
+    // Squatting eyes (^_^)
+    private static let squattingEyesSVG = ##"""
+    <path d="M65 95 Q80 82 100 95" fill="none" stroke="#2D2D2D" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M150 95 Q168 82 185 95" fill="none" stroke="#2D2D2D" stroke-width="3.5" stroke-linecap="round"/>
+    """##
+
+    // Squatting wavy mouth
+    private static let squattingMouthSVG = ##"""
+    <path d="M110 138 Q117 142 124 136 Q131 142 138 138" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round"/>
+    """##
+
+    // Blush overlays (pink)
+    private static let blushOverlaysSVG = ##"""
+    <ellipse cx="66" cy="108" rx="15" ry="8" fill="#FF6B6B" opacity="0.35"/>
+    <ellipse cx="184" cy="108" rx="15" ry="8" fill="#FF6B6B" opacity="0.35"/>
+    """##
+
+    // Sweat drop
+    private static let sweatDropSVG = ##"""
+    <path d="M80 50 Q84 38 80 30 Q76 38 80 50z" fill="#88CDEF" stroke="#5AA8CB" stroke-width="0.8"/>
+    """##
+
+    // Strain lines (for squatting)
+    private static let strainLinesSVG = ##"""
+    <g stroke="#E08858" stroke-width="1.8" stroke-linecap="round" opacity="0.7">
+    <line x1="48" y1="88" x2="40" y2="84"/><line x1="48" y1="95" x2="38" y2="95"/><line x1="48" y1="102" x2="40" y2="106"/>
+    <line x1="200" y1="88" x2="208" y2="84"/><line x1="200" y1="95" x2="210" y2="95"/><line x1="200" y1="102" x2="208" y2="106"/>
+    </g>
+    """##
+
+    // MARK: - Music Happy frame (sitting + half-closed eyes + headphones, vibing)
+    private static func makeMusicHappyFrame(phase: Double, eyesClosed: Bool) -> String {
+        let bobY = sin(phase) * 2.0
+        let swayX = sin(phase * 0.7) * 3.0
+        let tailAngle = sin(phase + .pi / 3.0) * 12.0
+
+        var svg = sittingSVG
+
+        if eyesClosed {
+            svg = makeBlink(svg: svg, eyePaths: sittingEyePaths, closedEyes: sittingClosedEyes)
+        } else {
+            // Add eyelid overlays for half-closed look
+            svg = svg.replacingOccurrences(of: "  <defs>", with: "\(eyelidOverlays)\n  <defs>")
+        }
+
+        // Tail wag
+        let tailD = "m175.1 198.6c16.19-2.24 23.89-17.58 34.9-24.3"
+        if let range = svg.range(of: tailD) {
+            let before = svg[svg.startIndex..<range.lowerBound]
+            if let pStart = before.range(of: "<path", options: .backwards) {
+                let after = svg[range.upperBound...]
+                if let pEnd = after.range(of: "/>") {
+                    let pathStr = String(svg[pStart.lowerBound..<pEnd.upperBound])
+                    svg = svg.replacingOccurrences(of: pathStr, with: "<g transform=\"rotate(\(f(tailAngle)), 175, 199)\">\(pathStr)</g>")
+                }
+            }
+        }
+
+        // Wrap in breathing + sway + headphones
+        svg = svg.replacingOccurrences(
+            of: "(https://quiver.ai) -->",
+            with: "(https://quiver.ai) -->\n<g transform=\"translate(\(f(swayX)), \(f(bobY)))\">"
+        )
+        svg = svg.replacingOccurrences(of: "</svg>", with: "\(headphonesSVG)\n</g>\n</svg>")
+
+        return svg
+    }
+
+    // MARK: - Music Angry frame (sitting + angry eyebrows + frown + headphones)
+    private static func makeMusicAngryFrame(phase: Double, eyesClosed: Bool) -> String {
+        let bobY = sin(phase) * 0.8  // minimal bob
+        let trembleX = sin(phase * 3.0) * 1.0  // slight tremble
+
+        var svg = sittingSVG
+
+        if eyesClosed {
+            svg = makeBlink(svg: svg, eyePaths: sittingEyePaths, closedEyes: sittingClosedEyes)
+        }
+
+        // Replace happy mouth with frown
+        svg = svg.replacingOccurrences(of: sittingMouthPath, with: angryMouthSVG)
+
+        // Tail wag (stiff)
+        let tailD = "m175.1 198.6c16.19-2.24 23.89-17.58 34.9-24.3"
+        if let range = svg.range(of: tailD) {
+            let before = svg[svg.startIndex..<range.lowerBound]
+            if let pStart = before.range(of: "<path", options: .backwards) {
+                let after = svg[range.upperBound...]
+                if let pEnd = after.range(of: "/>") {
+                    let pathStr = String(svg[pStart.lowerBound..<pEnd.upperBound])
+                    svg = svg.replacingOccurrences(of: pathStr, with: "<g transform=\"rotate(-5, 175, 199)\">\(pathStr)</g>")
+                }
+            }
+        }
+
+        // Wrap in tremble + eyebrows + headphones
+        svg = svg.replacingOccurrences(
+            of: "(https://quiver.ai) -->",
+            with: "(https://quiver.ai) -->\n<g transform=\"translate(\(f(trembleX)), \(f(bobY)))\">"
+        )
+        svg = svg.replacingOccurrences(of: "</svg>", with: "\(angryEyebrowsSVG)\n\(headphonesSVG)\n</g>\n</svg>")
+
+        return svg
+    }
+
+    // MARK: - Hiding frame (sitting + paws up + worried brows + blush + sweat)
+    private static func makeHidingFrame(phase: Double, eyesClosed: Bool) -> String {
+        let bobY = sin(phase) * 1.0
+        let trembleX = sin(phase * 4.0) * 0.5  // tiny tremble
+
+        var svg = sittingSVG
+
+        if eyesClosed {
+            svg = makeBlink(svg: svg, eyePaths: sittingEyePaths, closedEyes: sittingClosedEyes)
+        }
+
+        // Replace mouth with small worried mouth
+        svg = svg.replacingOccurrences(of: sittingMouthPath,
+            with: ##"  <path d="M118 137 Q124 133 130 137" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round"/>"##)
+
+        // Wrap in tremble + add overlays
+        svg = svg.replacingOccurrences(
+            of: "(https://quiver.ai) -->",
+            with: "(https://quiver.ai) -->\n<g transform=\"translate(\(f(trembleX)), \(f(bobY)))\">"
+        )
+        svg = svg.replacingOccurrences(of: "</svg>",
+            with: "\(worriedEyebrowsSVG)\n\(pawOverlaysSVG)\n\(sweatDropSVG)\n</g>\n</svg>")
+
+        return svg
+    }
+
+    // MARK: - Squatting frame (sitting + ^_^ eyes + blush + sweat + strain)
+    private static func makeSquattingFrame(phase: Double) -> String {
+        let pulseY = sin(phase * 2.0) * 1.5  // strain pulsing
+
+        var svg = sittingSVG
+
+        // Remove open eyes
+        for ep in sittingEyePaths {
+            svg = svg.replacingOccurrences(of: ep, with: "")
+        }
+        // Remove happy mouth
+        svg = svg.replacingOccurrences(of: sittingMouthPath, with: "")
+
+        // Add ^_^ eyes + wavy mouth + blush + sweat + strain
+        svg = svg.replacingOccurrences(
+            of: "(https://quiver.ai) -->",
+            with: "(https://quiver.ai) -->\n<g transform=\"translate(0, \(f(pulseY)))\">"
+        )
+        svg = svg.replacingOccurrences(of: "</svg>",
+            with: "\(squattingEyesSVG)\n\(squattingMouthSVG)\n\(blushOverlaysSVG)\n\(sweatDropSVG)\n\(strainLinesSVG)\n</g>\n</svg>")
+
+        return svg
+    }
 
     // Eating SVG: eye paths
     private static let eatingEyePaths = [
@@ -1450,6 +1734,7 @@ class CatRenderer {
 
     static let bathingSVG = """
     <svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" fill="none" viewBox="0 0 250 250">
+    <!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
       <path d="m139.7 31.19c-5.88-1.18-9.96-1.37-14.98-1.37-12.01 0-21.42 1.64-30.03 6.05-7.48-7.45-24.67-19.1-38.82-19.7-11.5-0.5-11.7 22-10.1 38.75 0.9 9.86 3 17.81 4.9 23.83-3.5 7.35-4.2 16-4 23.85 0.7 19.26 8.5 33.01 26.3 41.76 10.2 5.12 23.1 8.33 41.9 8.33l10.9-0.3c23.5-1.2 35.4-5.42 46.9-11.64 15.1-8.45 25-19.8 26.9-36.15 1.6-12.75-1.7-24.5-6.3-36.56 3.6-13.92 1.5-42.03-6.4-57.28-2.3-4.31-6.3-4.31-9.8-3.21-10.9 3.51-23 14.46-33.3 24.71l-4.07-1.07z" fill="#FFC8A2" stroke="#FFC8A2" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/>
       <path d="m157.9 37.07c8.5 3.81 17.1 9.72 24.1 16.85 1.4 1.4 2.1 0.2 2.6-3.11 1.3-7.93 0.3-21.69-4.2-28.1-2.2-3.31-7.9-1-11.3 2.2-4.8 3.61-8.3 6.82-10.8 10.76-0.7 0.7-1.2 1-0.4 1.4z" fill="#FFE4CC"/>
       <path d="m59.11 63.23c-4.2-9.15-4.9-18.6-3.1-28.06 1.2-5.01 4.3-5.01 7.9-3.91 6.1 2.11 12.2 6.11 16.3 10.32 0.9 0.9 1.2 1.9-0.5 3.1-9.5 5.91-14.5 10.94-19.7 18.85-0.2 0.4-0.7 0.4-0.9-0.3z" fill="#FFE4CC"/>
@@ -1911,7 +2196,7 @@ struct Particle {
     var type: ParticleType
 
     enum ParticleType {
-        case heart, star, sparkle, note, poof, tear, confetti, zzz, dream, firefly
+        case heart, star, sparkle, note, poof, tear, confetti, zzz, dream, firefly, bubble
     }
 }
 
@@ -1935,8 +2220,15 @@ class ParticleSystem {
                 color = NSColor(red: CGFloat.random(in: 0.8...1), green: CGFloat.random(in: 0.8...1), blue: 1, alpha: 1)
                 size = CGFloat.random(in: 3...7)
             case .note:
-                color = NSColor(red: 0.6, green: 0.8, blue: 1, alpha: 1)
-                size = CGFloat.random(in: 5...9)
+                let noteColors: [NSColor] = [
+                    NSColor(red: 1, green: 0.4, blue: 0.6, alpha: 1),   // pink
+                    NSColor(red: 0.4, green: 0.7, blue: 1, alpha: 1),   // blue
+                    NSColor(red: 1, green: 0.8, blue: 0.2, alpha: 1),   // gold
+                    NSColor(red: 0.6, green: 1, blue: 0.5, alpha: 1),   // green
+                    NSColor(red: 0.8, green: 0.5, blue: 1, alpha: 1),   // purple
+                ]
+                color = noteColors.randomElement()!
+                size = CGFloat.random(in: 10...16)
             case .poof:
                 color = NSColor(white: 0.8, alpha: 0.7)
                 size = CGFloat.random(in: 4...8)
@@ -1956,6 +2248,9 @@ class ParticleSystem {
             case .firefly:
                 color = NSColor(red: 1, green: 0.95, blue: CGFloat.random(in: 0.3...0.6), alpha: 0.9)
                 size = CGFloat.random(in: 2...4)
+            case .bubble:
+                color = NSColor(red: 0.7, green: 0.9, blue: 1, alpha: 0.7)
+                size = CGFloat.random(in: 3...8)
             }
             let vx: CGFloat
             let vy: CGFloat
@@ -1975,6 +2270,12 @@ class ParticleSystem {
             case .firefly:
                 vx = CGFloat.random(in: -0.8...0.8)
                 vy = CGFloat.random(in: -0.3...0.5)  // wander
+            case .note:
+                vx = CGFloat.random(in: -1.0...1.0)
+                vy = CGFloat.random(in: 1.5...3.0)  // drift up
+            case .bubble:
+                vx = CGFloat.random(in: -0.8...0.8)
+                vy = CGFloat.random(in: 1.0...2.5)  // float up
             default:
                 vx = cos(angle) * speed
                 vy = sin(angle) * speed + 2  // upward bias
@@ -2073,11 +2374,48 @@ class ParticleSystem {
                 // Bright core
                 p.color.withAlphaComponent(alpha).set()
                 NSBezierPath(ovalIn: NSRect(x: p.x - s / 2, y: p.y - s / 2, width: s, height: s)).fill()
-            default:
-                let rect = NSRect(x: p.x - p.size * alpha / 2, y: p.y - p.size * alpha / 2,
-                                 width: p.size * alpha, height: p.size * alpha)
-                let path = NSBezierPath(ovalIn: rect)
+            case .note:
+                let s = p.size * alpha
+                let notes = ["♪", "♫", "♩", "♬"]
+                let noteIdx = abs(Int(p.x * 3 + p.y * 7)) % notes.count
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: NSFont.systemFont(ofSize: s),
+                    .foregroundColor: p.color.withAlphaComponent(alpha)
+                ]
+                notes[noteIdx].draw(at: NSPoint(x: p.x - s * 0.3, y: p.y - s * 0.3), withAttributes: attrs)
+            case .bubble:
+                let s = p.size * alpha
+                // Outer bubble ring
+                let ringColor = p.color.withAlphaComponent(alpha * 0.6)
+                ringColor.set()
+                let bubblePath = NSBezierPath(ovalIn: NSRect(x: p.x - s, y: p.y - s, width: s * 2, height: s * 2))
+                bubblePath.lineWidth = 0.8
+                bubblePath.stroke()
+                // Inner highlight
+                let hlColor = NSColor.white.withAlphaComponent(alpha * 0.4)
+                hlColor.set()
+                NSBezierPath(ovalIn: NSRect(x: p.x - s * 0.3, y: p.y + s * 0.1, width: s * 0.5, height: s * 0.4)).fill()
+            case .sparkle:
+                let s = p.size * alpha
+                // 4-point sparkle star
+                let path = NSBezierPath()
+                path.move(to: NSPoint(x: p.x, y: p.y + s))
+                path.line(to: NSPoint(x: p.x - s * 0.2, y: p.y + s * 0.2))
+                path.line(to: NSPoint(x: p.x - s, y: p.y))
+                path.line(to: NSPoint(x: p.x - s * 0.2, y: p.y - s * 0.2))
+                path.line(to: NSPoint(x: p.x, y: p.y - s))
+                path.line(to: NSPoint(x: p.x + s * 0.2, y: p.y - s * 0.2))
+                path.line(to: NSPoint(x: p.x + s, y: p.y))
+                path.line(to: NSPoint(x: p.x + s * 0.2, y: p.y + s * 0.2))
+                path.close()
                 path.fill()
+            case .poof:
+                let s = p.size * alpha
+                // Soft cloud poof
+                let poofColor = p.color.withAlphaComponent(alpha * 0.5)
+                poofColor.set()
+                NSBezierPath(ovalIn: NSRect(x: p.x - s, y: p.y - s * 0.7, width: s * 2, height: s * 1.4)).fill()
+                NSBezierPath(ovalIn: NSRect(x: p.x - s * 0.7, y: p.y - s * 0.3, width: s * 1.8, height: s * 1.2)).fill()
             }
         }
     }
@@ -2354,6 +2692,8 @@ enum PetBehavior: String {
     case chasingButterfly, watchingBird, knockingGlass, openingGift
     case flying, clingingEdge
     case dead, celebrating, crying, lonelySitting
+    case dancing, cornerTimeout
+    case hatingMusic, hiding
 }
 
 // MARK: - Speech Bubbles
@@ -4903,6 +5243,242 @@ class KawaiiItems {
         img.unlockFocus()
         return img
     }
+
+    // MARK: - Kawaii Food & Items
+
+    static func kawaiifish() -> NSImage {
+        let s: CGFloat = 40
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2, cy = s / 2
+        // Body
+        ctx.setFillColor(NSColor(red: 1, green: 0.55, blue: 0.35, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 12, y: cy - 7, width: 24, height: 14))
+        ctx.fillPath()
+        // Tail
+        ctx.move(to: CGPoint(x: cx - 12, y: cy))
+        ctx.addLine(to: CGPoint(x: cx - 19, y: cy + 7))
+        ctx.addLine(to: CGPoint(x: cx - 19, y: cy - 7))
+        ctx.closePath()
+        ctx.fillPath()
+        // Belly stripe
+        ctx.setFillColor(NSColor(red: 1, green: 0.75, blue: 0.6, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy - 5, width: 18, height: 8))
+        ctx.fillPath()
+        // Eye
+        ctx.setFillColor(NSColor.white.cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + 5, y: cy + 1, width: 5, height: 5))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor(red: 0.2, green: 0.2, blue: 0.3, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + 6.5, y: cy + 2.5, width: 2.5, height: 2.5))
+        ctx.fillPath()
+        // Fin
+        ctx.setFillColor(NSColor(red: 1, green: 0.4, blue: 0.25, alpha: 0.8).cgColor)
+        ctx.move(to: CGPoint(x: cx - 2, y: cy + 7))
+        ctx.addLine(to: CGPoint(x: cx + 2, y: cy + 12))
+        ctx.addLine(to: CGPoint(x: cx + 6, y: cy + 7))
+        ctx.closePath()
+        ctx.fillPath()
+        // Outline
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.25, blue: 0.15, alpha: 0.7).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.addEllipse(in: CGRect(x: cx - 12, y: cy - 7, width: 24, height: 14))
+        ctx.strokePath()
+        // Mouth smile
+        ctx.setStrokeColor(NSColor(red: 0.5, green: 0.2, blue: 0.1, alpha: 0.6).cgColor)
+        ctx.setLineWidth(0.8)
+        ctx.move(to: CGPoint(x: cx + 8, y: cy))
+        ctx.addQuadCurve(to: CGPoint(x: cx + 12, y: cy + 1), control: CGPoint(x: cx + 10, y: cy - 1.5))
+        ctx.strokePath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func kawaiimilk() -> NSImage {
+        let s: CGFloat = 40
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2
+        // Carton body
+        let body = CGRect(x: cx - 8, y: 4, width: 16, height: 22)
+        ctx.setFillColor(NSColor(red: 1, green: 0.98, blue: 0.92, alpha: 1).cgColor)
+        ctx.fill(body)
+        // Stripe
+        ctx.setFillColor(NSColor(red: 0.55, green: 0.78, blue: 1, alpha: 1).cgColor)
+        ctx.fill(CGRect(x: cx - 8, y: 4, width: 16, height: 8))
+        // Roof triangle
+        ctx.setFillColor(NSColor(red: 1, green: 0.98, blue: 0.92, alpha: 1).cgColor)
+        ctx.move(to: CGPoint(x: cx - 8, y: 26))
+        ctx.addLine(to: CGPoint(x: cx, y: 33))
+        ctx.addLine(to: CGPoint(x: cx + 8, y: 26))
+        ctx.closePath()
+        ctx.fillPath()
+        // Outline
+        ctx.setStrokeColor(NSColor(red: 0.45, green: 0.55, blue: 0.7, alpha: 0.8).cgColor)
+        ctx.setLineWidth(1.3)
+        ctx.stroke(body)
+        ctx.move(to: CGPoint(x: cx - 8, y: 26))
+        ctx.addLine(to: CGPoint(x: cx, y: 33))
+        ctx.addLine(to: CGPoint(x: cx + 8, y: 26))
+        ctx.strokePath()
+        // Cow spot
+        ctx.setFillColor(NSColor(red: 0.2, green: 0.2, blue: 0.3, alpha: 0.15).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 4, y: 14, width: 6, height: 5))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 1, y: 17, width: 4, height: 4))
+        ctx.fillPath()
+        // Label text "MILK"
+        let font = NSFont.boldSystemFont(ofSize: 4)
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: NSColor.white]
+        ("MILK" as NSString).draw(at: NSPoint(x: cx - 6, y: 5), withAttributes: attrs)
+        img.unlockFocus()
+        return img
+    }
+
+    static func kawaitreat() -> NSImage {
+        let s: CGFloat = 40
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2, cy = s / 2
+        // Cookie body
+        ctx.setFillColor(NSColor(red: 0.82, green: 0.62, blue: 0.35, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 10, y: cy - 10, width: 20, height: 20))
+        ctx.fillPath()
+        // Light baked edge
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.72, blue: 0.45, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy - 8, width: 16, height: 16))
+        ctx.fillPath()
+        // Chocolate chips
+        ctx.setFillColor(NSColor(red: 0.3, green: 0.18, blue: 0.1, alpha: 1).cgColor)
+        for (dx, dy) in [(-3.0, 3.0), (4.0, 2.0), (-1.0, -3.0), (3.0, -4.0), (-5.0, -1.0)] as [(CGFloat, CGFloat)] {
+            ctx.addEllipse(in: CGRect(x: cx + dx - 1.3, y: cy + dy - 1.3, width: 2.6, height: 2.6))
+            ctx.fillPath()
+        }
+        // Outline
+        ctx.setStrokeColor(NSColor(red: 0.55, green: 0.35, blue: 0.15, alpha: 0.7).cgColor)
+        ctx.setLineWidth(1.2)
+        ctx.addEllipse(in: CGRect(x: cx - 10, y: cy - 10, width: 20, height: 20))
+        ctx.strokePath()
+        // Highlight
+        ctx.setFillColor(NSColor(white: 1, alpha: 0.2).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 5, y: cy + 3, width: 6, height: 4))
+        ctx.fillPath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func kawaimedicine() -> NSImage {
+        let s: CGFloat = 40
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2, cy = s / 2
+        // Capsule body - left half (red)
+        ctx.setFillColor(NSColor(red: 1, green: 0.35, blue: 0.35, alpha: 1).cgColor)
+        let capsule = CGRect(x: cx - 12, y: cy - 6, width: 24, height: 12)
+        let path = CGPath(roundedRect: capsule, cornerWidth: 6, cornerHeight: 6, transform: nil)
+        ctx.addPath(path)
+        ctx.fillPath()
+        // Right half (white)
+        ctx.setFillColor(NSColor(red: 0.97, green: 0.97, blue: 1, alpha: 1).cgColor)
+        ctx.addRect(CGRect(x: cx, y: cy - 6, width: 12, height: 12))
+        ctx.clip()
+        ctx.addPath(path)
+        ctx.fillPath()
+        ctx.resetClip()
+        // Outline
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.25, blue: 0.25, alpha: 0.6).cgColor)
+        ctx.setLineWidth(1.3)
+        ctx.addPath(path)
+        ctx.strokePath()
+        // Divider line
+        ctx.setStrokeColor(NSColor(red: 0.5, green: 0.3, blue: 0.3, alpha: 0.3).cgColor)
+        ctx.setLineWidth(0.8)
+        ctx.move(to: CGPoint(x: cx, y: cy - 5.5))
+        ctx.addLine(to: CGPoint(x: cx, y: cy + 5.5))
+        ctx.strokePath()
+        // Shine
+        ctx.setFillColor(NSColor(white: 1, alpha: 0.35).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 8, y: cy + 1, width: 7, height: 3))
+        ctx.fillPath()
+        // Cross on red half
+        ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.8).cgColor)
+        ctx.setLineWidth(1.5)
+        ctx.move(to: CGPoint(x: cx - 7, y: cy - 2.5))
+        ctx.addLine(to: CGPoint(x: cx - 7, y: cy + 2.5))
+        ctx.strokePath()
+        ctx.move(to: CGPoint(x: cx - 9.5, y: cy))
+        ctx.addLine(to: CGPoint(x: cx - 4.5, y: cy))
+        ctx.strokePath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func kawaiipoop() -> NSImage {
+        let s: CGFloat = 24
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2
+        // Shadow
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 7, y: 0, width: 14, height: 4))
+        ctx.fillPath()
+        // Base layer
+        ctx.setFillColor(NSColor(red: 0.45, green: 0.3, blue: 0.18, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 7, y: 2, width: 14, height: 8))
+        ctx.fillPath()
+        // Middle layer
+        ctx.setFillColor(NSColor(red: 0.5, green: 0.33, blue: 0.2, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 5.5, y: 7, width: 11, height: 7))
+        ctx.fillPath()
+        // Top swirl
+        ctx.setFillColor(NSColor(red: 0.55, green: 0.36, blue: 0.22, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 3.5, y: 12, width: 7, height: 6))
+        ctx.fillPath()
+        // Highlight
+        ctx.setFillColor(NSColor(white: 1, alpha: 0.2).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 2, y: 14, width: 3, height: 2.5))
+        ctx.fillPath()
+        // Eyes (kawaii face)
+        ctx.setFillColor(NSColor(red: 0.2, green: 0.15, blue: 0.1, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 3, y: 8.5, width: 2, height: 2))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 1, y: 8.5, width: 2, height: 2))
+        ctx.fillPath()
+        // Blush
+        ctx.setFillColor(NSColor(red: 0.8, green: 0.4, blue: 0.35, alpha: 0.35).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 5, y: 7, width: 3, height: 2))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 2, y: 7, width: 3, height: 2))
+        ctx.fillPath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func kawaiipaw() -> NSImage {
+        let s: CGFloat = 12
+        let img = NSImage(size: NSSize(width: s, height: s))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        let cx = s / 2
+        // Main pad
+        ctx.setFillColor(NSColor(red: 1, green: 0.78, blue: 0.63, alpha: 0.6).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - 3, y: 1, width: 6, height: 5))
+        ctx.fillPath()
+        // Toe beans
+        ctx.addEllipse(in: CGRect(x: cx - 4.5, y: 6, width: 3, height: 2.5))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx - 1, y: 7, width: 2.5, height: 2.5))
+        ctx.fillPath()
+        ctx.addEllipse(in: CGRect(x: cx + 2, y: 6, width: 3, height: 2.5))
+        ctx.fillPath()
+        img.unlockFocus()
+        return img
+    }
 }
 
 // MARK: - Sound Engine
@@ -5171,6 +5747,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var bubbleWindow: NSPanel!
     var particleWindow: NSPanel!
     var statsWindow: NSPanel!
+    var diaryWindow: NSWindow?
     var poopWindows: [NSPanel] = []
     var foodWindow: NSPanel?
     var toyWindow: NSPanel?
@@ -5236,6 +5813,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     // Accessory
     var currentAccessory: Accessory? = nil
     var accessoryCache: [String: NSImage] = [:]
+
+    // Corner timeout
+    var cornerTimeoutStart: Date?
+    var cornerCryingStarted = false
+    var cornerPending = false  // walking to corner, not yet sitting
+
+    // Music detection
+    var isMusicPlaying = false
+    var lastMusicCheck = Date.distantPast
+    var musicDanceNotified = false  // already showed bubble for this session
 
     // Night glow
     var isNightMode = false
@@ -5536,6 +6123,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let walkItem = NSMenuItem(title: "\u{1F6B6} Walk", action: #selector(takeForWalk), keyEquivalent: "w")
         walkItem.target = self
         menu.addItem(walkItem)
+
+        let cornerTitle1 = behavior == .cornerTimeout ? "\u{1F49A} Forgive" : "\u{1F6D1} Sit in Corner"
+        let cornerItem = NSMenuItem(title: cornerTitle1, action: #selector(sendToCorner), keyEquivalent: "")
+        cornerItem.target = self
+        menu.addItem(cornerItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -6052,7 +6644,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         poopWin.collectionBehavior = [.canJoinAllSpaces, .stationary]
         poopWin.ignoresMouseEvents = true
 
-        let img = Sprites.render(Sprites.poop, scale: 3)
+        let img = KawaiiItems.kawaiipoop()
         let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: poopSize, height: poopSize))
         iv.image = img
         iv.imageScaling = .scaleProportionallyUpOrDown
@@ -6190,7 +6782,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             guard let self = self else { return }
             if self.stats.isDead { /* dead pet doesn't pick new behaviors */ }
             else if self.followingCursor { /* skip random behavior while following */ }
-            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy {
+            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy && self.behavior != .dancing && self.behavior != .hatingMusic {
                 self.pickRandomBehavior()
             }
             self.scheduleRandomBehavior()
@@ -6198,6 +6790,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func pickRandomBehavior() {
+        // While music is playing, keep dancing — don't pick random behaviors
+        if isMusicPlaying { return }
         // Dead pet stays dead
         if stats.isDead {
             if behavior != .dead {
@@ -6239,19 +6833,19 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             }
         case .neutral:
             options = [
-                (.walking, 18), (.sitting, 22), (.idle, 18),
+                (.walking, 18), (.sitting, 20), (.idle, 16),
                 (.lookingAtCursor, 12), (.stretching, 10),
                 (.sleeping, 5), (.grooming, 8), (.tripping, 4), (.running, 3),
-                (.lonelySitting, 8),
+                (.lonelySitting, 8), (.hiding, 5),
             ]
             if petType == "bird" {
                 options.append((.flying, 6))
             }
         case .sad:
             options = [
-                (.sitting, 20), (.idle, 15), (.sleeping, 18),
+                (.sitting, 18), (.idle, 13), (.sleeping, 18),
                 (.walking, 8), (.lookingAtCursor, 8), (.tripping, 5), (.grooming, 3), (.crying, 8),
-                (.lonelySitting, 25),
+                (.lonelySitting, 23), (.hiding, 7),
             ]
         case .sleepy:
             options = [
@@ -6276,7 +6870,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 case .running, .chasingCursor: dur = .random(in: 2...5)
                 case .zoomies: dur = .random(in: 2...4)
                 case .scratching: dur = .random(in: 2...4)
-                case .sitting, .idle: dur = .random(in: 4...12)
+                case .sitting, .idle, .hiding: dur = .random(in: 4...12)
                 case .sleeping: dur = .random(in: 8...25)
                 case .jumping: dur = 2.5
                 case .flying: dur = .random(in: 3...7)
@@ -6346,6 +6940,9 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             petY = screenH - petSize - 25  // menu bar area
             walkTargetX = CGFloat.random(in: safeRange(100, screenW - 100))
             facingRight = (walkTargetX ?? petX) > petX
+        case .hiding:
+            let hideBubbles = ["Don't look...", "So shy...", "Eep!", "Hide!", "..."]
+            showBubble(hideBubbles.randomElement()!)
         default:
             break
         }
@@ -6447,8 +7044,26 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 )
                 return  // skip the idle reset below
             }
+            // Corner timeout — never expires on its own, only via "Forgive" menu
+            if behavior == .cornerTimeout {
+                // Stay in corner indefinitely
+                behavior = .cornerTimeout
+                behaviorStartTime = Date()
+                behaviorDuration = 999999
+                return
+            }
             behavior = .idle
             animFrame = 0
+        }
+
+        // Music detection — check periodically and dance
+        checkMusicPlaying()
+        if isMusicPlaying && (behavior == .idle || behavior == .sitting) {
+            maybeStartDancing()
+        }
+        // Re-start dancing if music is still playing and dance expired
+        if isMusicPlaying && behavior == .idle && musicDanceNotified {
+            maybeStartDancing()
         }
 
         // Animate every 2nd frame (15fps sprite animation at 30fps loop = 2x smoother than before)
@@ -6463,8 +7078,17 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             let topY = petSize + 5
             switch behavior {
             case .crying:
-                particleCanvas.particleSystem.emit(at: NSPoint(x: midX - 15, y: topY - 20), type: .tear, count: 1)
-                particleCanvas.particleSystem.emit(at: NSPoint(x: midX + 15, y: topY - 20), type: .tear, count: 1)
+                // Tears from each eye — offset 40 for particle window padding
+                // Eyes in SVG: left ~x=120/256, right ~x=170/256, y ~100/256
+                let padX: CGFloat = 40  // particle window starts 40px left of pet
+                let padY: CGFloat = 20  // particle window starts 20px below pet
+                let eyeY = padY + petSize * 0.60  // eye vertical position
+                let leftEyeX = padX + petSize * 0.47
+                let rightEyeX = padX + petSize * 0.66
+                let lx = facingRight ? (padX + petSize - (petSize * 0.47)) : leftEyeX
+                let rx = facingRight ? (padX + petSize - (petSize * 0.66)) : rightEyeX
+                particleCanvas.particleSystem.emit(at: NSPoint(x: lx, y: eyeY), type: .tear, count: 1)
+                particleCanvas.particleSystem.emit(at: NSPoint(x: rx, y: eyeY), type: .tear, count: 1)
             case .sleeping:
                 particleCanvas.particleSystem.emit(at: NSPoint(x: midX + 25, y: topY + 5), type: .zzz, count: 1)
                 if frameCounter % 30 == 0 {
@@ -6476,16 +7100,36 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 if frameCounter % 30 == 0 {
                     particleCanvas.particleSystem.emit(at: NSPoint(x: midX, y: topY), type: .poof, count: 2)
                 }
+            case .dancing:
+                particleCanvas.particleSystem.emit(
+                    at: NSPoint(x: midX + CGFloat.random(in: -20...40), y: topY + CGFloat.random(in: 0...15)),
+                    type: .note, count: 1
+                )
+            case .hatingMusic:
+                // Angry sparks
+                if frameCounter % 20 == 0 {
+                    particleCanvas.particleSystem.emit(
+                        at: NSPoint(x: midX + CGFloat.random(in: -10...30), y: topY + CGFloat.random(in: 5...15)),
+                        type: .sparkle, count: 2
+                    )
+                }
+            case .bathing, .grooming:
+                // Soap bubbles floating up
+                particleCanvas.particleSystem.emit(
+                    at: NSPoint(x: midX + CGFloat.random(in: -15...35), y: topY * 0.5 + CGFloat.random(in: -5...10)),
+                    type: .bubble, count: 1
+                )
+                if frameCounter % 20 == 0 {
+                    particleCanvas.particleSystem.emit(
+                        at: NSPoint(x: midX + CGFloat.random(in: -20...40), y: topY + 5),
+                        type: .sparkle, count: 1
+                    )
+                }
             default: break
             }
         }
 
-        // Ambient fireflies at night
-        if isNightMode && frameCounter % 20 == 0 {
-            let fx = CGFloat.random(in: 0...petSize + 60)
-            let fy = CGFloat.random(in: 0...petSize + 40)
-            particleCanvas.particleSystem.emit(at: NSPoint(x: fx, y: fy), type: .firefly, count: 1)
-        }
+        // (fireflies removed)
 
         // Physics — gravity with Dock as platform (skip when stable on ground)
         let currentGround = groundYForPet()
@@ -6546,7 +7190,18 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 if abs(petX - target) < speed * 2 {
                     petX = target
                     walkTargetX = nil
-                    behavior = .idle
+                    if cornerPending {
+                        // Arrived at corner — sit facing cursor
+                        cornerPending = false
+                        cornerTimeoutStart = Date()
+                        behavior = .cornerTimeout
+                        behaviorStartTime = Date()
+                        behaviorDuration = 999999  // indefinite — until forgiven
+                        facingRight = false  // face left to watch the screen
+                        showBubble("...")
+                    } else {
+                        behavior = .idle
+                    }
                 } else {
                     petX += (target > petX) ? speed : -speed
                     facingRight = target > petX
@@ -6856,13 +7511,39 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             if frameCounter % 3 == 0 {
                 petX += CGFloat.random(in: -1...1)
             }
+        case .cornerTimeout:
+            // Cat sits in corner facing left (watching the room)
+            facingRight = false
+
+            if let start = cornerTimeoutStart {
+                let cornerElapsed = Date().timeIntervalSince(start)
+                if cornerElapsed > 10 && !cornerCryingStarted {
+                    cornerCryingStarted = true
+                    showBubble("I'm sorry... *sniff*")
+                }
+                // Emit tears from eyes (facingRight is always false in corner)
+                if cornerCryingStarted && frameCounter % 15 == 0 {
+                    let padX: CGFloat = 40
+                    let padY: CGFloat = 20
+                    let eyeY = padY + petSize * 0.60
+                    let lx = padX + petSize * 0.47
+                    let rx = padX + petSize * 0.66
+                    particleCanvas.particleSystem.emit(at: NSPoint(x: lx, y: eyeY), type: .tear, count: 1)
+                    particleCanvas.particleSystem.emit(at: NSPoint(x: rx, y: eyeY), type: .tear, count: 1)
+                }
+                // Sad bubbles from time to time
+                if frameCounter % 200 == 0 {
+                    let sadBubbles = ["*sniff*", "I'll be good...", "Sorry...", "*whimper*", "Please forgive me...", "Don't be mad...", "*sobs quietly*"]
+                    showBubble(sadBubbles.randomElement()!)
+                }
+            }
         default:
             break
         }
 
-        // Edge cling detection: when walking/running and hitting the screen edge (only on floor, not Dock)
+        // Edge cling detection: when walking/running and hitting the screen edge
         if (behavior == .walking || behavior == .running || behavior == .promenade) &&
-           !isDragging && isOnGround && groundYForPet() <= floorY + 5 {
+           !isDragging && isOnGround {
             let atLeftEdge = petX <= 2
             let atRightEdge = petX >= screenW - petSize - 2
             if atLeftEdge || atRightEdge {
@@ -7039,6 +7720,9 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let sprite: NSImage
         if isDragging || isGentleDropping {
             sprite = getSprite(for: .beingPet, frame: animFrame, right: facingRight)
+        } else if behavior == .cornerTimeout && cornerCryingStarted && walkTargetX == nil {
+            // In corner and crying — use crying pose
+            sprite = getSprite(for: .crying, frame: animFrame, right: facingRight)
         } else {
             sprite = getSprite(for: behavior, frame: animFrame, right: facingRight)
         }
@@ -7126,7 +7810,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnPawPrint(at point: NSPoint) {
         let size: CGFloat = 12
-        let img = Sprites.render(Sprites.pawPrint, scale: 2)
+        let img = KawaiiItems.kawaiipaw()
         let win = NSPanel(contentRect: NSRect(x: point.x, y: point.y, width: size, height: size),
                           styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         win.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.mainMenuWindow)) + 1)
@@ -7496,7 +8180,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.feed()
         if stats.totalFeedings == 1 { stats.addMilestone("Had my first meal ever! Yummy fish!") }
         if stats.totalFeedings % 50 == 0 { stats.addMilestone("Eaten \(stats.totalFeedings) meals! I'm a foodie \u{1F41F}") }
-        startBehavior(.eating, duration: 3.0)
+        startBehavior(.eating, duration: 5.0)
         showBubble(SpeechBubbles.eating(petType).randomElement()!)
         SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
@@ -7506,7 +8190,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.save()
 
         // Drop a fish sprite briefly
-        showFoodAnimation()
+        showFoodAnimation(image: KawaiiItems.kawaiifish())
     }
 
     @objc func playWithPet() {
@@ -7547,27 +8231,27 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     @objc func feedMilkAction() {
         stats.feedMilk()
-        startBehavior(.eating, duration: 3.0)
+        startBehavior(.eating, duration: 5.0)
         showBubble(SpeechBubbles.milkBubbles(petType).randomElement()!)
         SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 5
         )
-        showFoodAnimation(sprite: Sprites.milk)
+        showFoodAnimation(image: KawaiiItems.kawaiimilk())
         stats.save()
     }
 
     @objc func feedTreatAction() {
         stats.feedTreat()
-        startBehavior(.eating, duration: 2.0)
+        startBehavior(.eating, duration: 4.0)
         showBubble(SpeechBubbles.treatBubbles.randomElement()!)
         SoundEngine.shared.eat()
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .star, count: 6
         )
-        showFoodAnimation(sprite: Sprites.treat)
+        showFoodAnimation(image: KawaiiItems.kawaitreat())
         stats.save()
     }
 
@@ -7624,7 +8308,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 12
         )
-        showFoodAnimation(sprite: Sprites.medicine)
+        showFoodAnimation(image: KawaiiItems.kawaimedicine())
         stats.addMilestone("Recovered from sickness!")
         stats.save()
     }
@@ -7637,6 +8321,37 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         walkTargetX = facingRight ? screenW - petSize - 20 : 20
         stats.addMilestone("Went for a walk!")
         stats.save()
+    }
+
+    @objc func sendToCorner() {
+        if behavior == .cornerTimeout {
+            // Forgive — release from corner
+            forgiveFromCorner()
+            return
+        }
+        // Cat walks to right edge of screen, then sits watching cursor
+        showBubble("But I didn't do anything!...")
+        cornerCryingStarted = false
+        cornerTimeoutStart = nil  // set when cat arrives at corner
+        // Walk to the right side of screen
+        startBehavior(.walking, duration: 30.0)
+        walkTargetX = screenW - petSize - 15
+        facingRight = true
+        cornerPending = true  // flag: switch to cornerTimeout on arrival
+        stats.happiness = max(0, stats.happiness - 5)
+    }
+
+    func forgiveFromCorner() {
+        cornerTimeoutStart = nil
+        cornerCryingStarted = false
+        cornerPending = false
+        showBubble("I'll be good now! *purr*")
+        particleCanvas.particleSystem.emit(
+            at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+            type: .heart, count: 5
+        )
+        stats.happiness = min(100, stats.happiness + 3)
+        startBehavior(.idle, duration: 2.0)
     }
 
     @objc func screenshotPet() {
@@ -7676,8 +8391,9 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             defer: false
         )
         diaryWin.title = "\u{1F4D3} Murchi's Diary"
-        diaryWin.isReleasedWhenClosed = true
+        diaryWin.isReleasedWhenClosed = false
         diaryWin.level = .floating
+        self.diaryWindow = diaryWin
 
         let scroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: w, height: h))
         scroll.hasVerticalScroller = true
@@ -7825,6 +8541,21 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     func petTapped() {
         dismissLaserDotIfNeeded()
 
+        // Forgive from corner timeout on click
+        if behavior == .cornerTimeout {
+            behavior = .idle
+            cornerTimeoutStart = nil
+            cornerCryingStarted = false
+            cornerPending = false
+            showBubble("Thank you! I'll be good!")
+            particleCanvas.particleSystem.emit(
+                at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                type: .heart, count: 8
+            )
+            stats.happiness = min(100, stats.happiness + 5)
+            return
+        }
+
         // Multi-click detection
         let now = Date()
         if now.timeIntervalSince(lastClickTime) < 0.4 {
@@ -7849,23 +8580,29 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             )
             stats.happiness = min(100, stats.happiness + 10)
             stats.addXP(2)
+            clickCount = 0  // reset so next clicks don't keep triple-triggering
         } else {
-            startBehavior(.beingPet, duration: 2.5)
+            // Don't restart if already being pet
+            if behavior != .beingPet {
+                startBehavior(.beingPet, duration: 2.5)
+            } else {
+                // Extend petting duration
+                behaviorStartTime = Date()
+            }
             showBubble(SpeechBubbles.petted(petType).randomElement()!)
             SoundEngine.shared.chirp()
             particleCanvas.particleSystem.emit(
                 at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
-                type: .heart, count: 5
+                type: .heart, count: 3
             )
         }
         stats.save()
 
-        // Play system sound
-        NSSound(named: "Pop")?.play()
+        // (system sound removed to avoid stacking on rapid clicks)
     }
 
-    func showFoodAnimation(sprite: [[UInt32]] = Sprites.fish) {
-        let fishImg = Sprites.render(sprite, scale: 4)
+    func showFoodAnimation(image: NSImage? = nil) {
+        let fishImg = image ?? KawaiiItems.kawaiifish()
         let foodSize: CGFloat = 40
         let fx = petX + petSize / 2 - foodSize / 2
         let fy = petY + petSize + 20
@@ -7886,10 +8623,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             foodWindow!.ignoresMouseEvents = true
 
             let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: foodSize, height: foodSize))
-            iv.image = fishImg
             iv.imageScaling = .scaleProportionallyUpOrDown
             foodWindow!.contentView = iv
         }
+        // Always update the image for the current food type
+        (foodWindow!.contentView as? NSImageView)?.image = fishImg
 
         foodWindow!.setFrameOrigin(NSPoint(x: fx, y: fy))
         foodWindow!.orderFront(nil)
@@ -7938,6 +8676,83 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
     }
 
+    // MARK: - Music Detection
+
+    func checkMusicPlaying() {
+        // Only check every 5 seconds to avoid overhead
+        guard Date().timeIntervalSince(lastMusicCheck) > 5 else { return }
+        lastMusicCheck = Date()
+
+        // Use AppleScript to check Music.app / Spotify player state
+        // This works reliably without bundle/entitlement requirements
+        let script = """
+        set isPlaying to false
+        try
+            if application "Music" is running then
+                tell application "Music" to if player state is playing then set isPlaying to true
+            end if
+        end try
+        try
+            if application "Spotify" is running then
+                tell application "Spotify" to if player state is playing then set isPlaying to true
+            end if
+        end try
+        return isPlaying
+        """
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self = self else { return }
+            let appleScript = NSAppleScript(source: script)
+            var error: NSDictionary?
+            let result = appleScript?.executeAndReturnError(&error)
+            let playing = result?.booleanValue ?? false
+
+            DispatchQueue.main.async {
+                let wasPlaying = self.isMusicPlaying
+                self.isMusicPlaying = playing
+
+                if self.isMusicPlaying && !wasPlaying {
+                    self.musicDanceNotified = false
+                }
+                if !self.isMusicPlaying && wasPlaying {
+                    if self.behavior == .dancing || self.behavior == .hatingMusic {
+                        self.startBehavior(.idle, duration: 2.0)
+                    }
+                }
+            }
+        }
+    }
+
+    func maybeStartDancing() {
+        guard isMusicPlaying,
+              !isDragging,
+              behavior == .idle || behavior == .sitting || behavior == .lookingAtCursor else { return }
+
+        // 25% chance cat hates the music
+        let hatesIt = Int.random(in: 0..<4) == 0
+
+        if !musicDanceNotified {
+            musicDanceNotified = true
+            if hatesIt {
+                let hateBubbles = ["Ugh...", "Not this...", "My ears!", "Turn it off!", "Terrible..."]
+                showBubble(hateBubbles.randomElement()!)
+            } else {
+                let danceBubbles = ["Music!", "Vibes~", "My jam!", "Dance time!", "Bop bop!"]
+                showBubble(danceBubbles.randomElement()!)
+                particleCanvas.particleSystem.emit(
+                    at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                    type: .note, count: 5
+                )
+            }
+        }
+
+        if hatesIt {
+            startBehavior(.hatingMusic, duration: 6.0)
+        } else {
+            startBehavior(.dancing, duration: 8.0)
+        }
+    }
+
     // MARK: - Mouse handling
 
     let heldWindowHeight: CGFloat = 120  // taller window when held (= heldHeight/2 for retina)
@@ -7956,9 +8771,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             y: event.locationInWindow.y
         )
         dragStartScreenPoint = NSEvent.mouseLocation
-        // Grab reaction
-        let grabBubbles = ["Mew?!", "*grabbed!*", "Hey!", "Wah!", "Eep!"]
-        showBubble(grabBubbles.randomElement()!)
+        // Don't show grab bubble yet — wait for drag to confirm it's not just a tap
 
         // Resize window to tall held format (body hangs below cursor)
         let newFrame = NSRect(x: petWindow.frame.origin.x, y: petWindow.frame.origin.y,
@@ -7973,6 +8786,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let screenPoint = NSEvent.mouseLocation
         let moved = abs(screenPoint.x - dragStartScreenPoint.x) + abs(screenPoint.y - dragStartScreenPoint.y)
         if moved > 4 {
+            if !didDragPet {
+                // First drag frame — show grab reaction
+                let grabBubbles = ["Mew?!", "*grabbed!*", "Hey!", "Wah!", "Eep!"]
+                showBubble(grabBubbles.randomElement()!)
+            }
             didDragPet = true
         }
         // Position: cursor is at the scruff (top), body hangs below
@@ -8110,7 +8928,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     func handleRightClick(_ event: NSEvent) {
         let menu = NSMenu()
 
-        // Feed submenu
+        // -- Core actions --
         let feedMenu = NSMenu()
         let f1 = NSMenuItem(title: "\u{1F41F} Fish", action: #selector(feedPet), keyEquivalent: "")
         f1.target = self; feedMenu.addItem(f1)
@@ -8150,9 +8968,14 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(cleanItem)
         }
 
+        let cornerTitle2 = behavior == .cornerTimeout ? "\u{1F49A} Forgive" : "\u{1F6D1} Sit in Corner"
+        let cornerItem = NSMenuItem(title: cornerTitle2, action: #selector(sendToCorner), keyEquivalent: "")
+        cornerItem.target = self
+        menu.addItem(cornerItem)
+
         menu.addItem(NSMenuItem.separator())
 
-        // Toys
+        // -- Toys & Accessories --
         let toyMenu = NSMenu()
         let m1 = NSMenuItem(title: "\u{1F401} Mouse Toy", action: #selector(spawnMouseToy), keyEquivalent: "")
         m1.target = self; toyMenu.addItem(m1)
@@ -8164,7 +8987,6 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         toyItem.submenu = toyMenu
         menu.addItem(toyItem)
 
-        // Accessories
         let accMenu = NSMenu()
         let noneAcc = NSMenuItem(title: "None", action: #selector(removeAccessory), keyEquivalent: "")
         noneAcc.target = self; accMenu.addItem(noneAcc)
@@ -8179,7 +9001,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let followItem = NSMenuItem(title: followingCursor ? "🛑 Stop Following" : "🐾 Follow Cursor", action: #selector(toggleFollowCursor), keyEquivalent: "")
+        // -- Extra --
+        let followItem = NSMenuItem(title: followingCursor ? "\u{1F6D1} Stop Following" : "\u{1F43E} Follow Cursor", action: #selector(toggleFollowCursor), keyEquivalent: "")
         followItem.target = self
         menu.addItem(followItem)
 
@@ -8190,16 +9013,6 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let diaryItem = NSMenuItem(title: "\u{1F4D3} Diary", action: #selector(showDiary), keyEquivalent: "")
         diaryItem.target = self
         menu.addItem(diaryItem)
-
-        let statsItem = NSMenuItem(title: "\u{1F4CA} Stats", action: #selector(showStats), keyEquivalent: "")
-        statsItem.target = self
-        menu.addItem(statsItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let updateItem = NSMenuItem(title: "\u{1F504} Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
-        updateItem.target = self
-        menu.addItem(updateItem)
 
         NSMenu.popUpContextMenu(menu, with: event, for: petImageView)
     }

@@ -1,8 +1,10 @@
 # Build artifacts
+Murchi
 Murchi.app/
 Murchi.dmg
 murchi
 gen-icon
+generate-icon
 .dmg-staging/
 AppIcon.iconset/
 
@@ -21,3 +23,13 @@ DerivedData/
 .build/
 .swiftpm/
 Package.resolved
+Package.swift
+
+# Temp / preview files
+*.html
+svg/
+*.icns
+
+# Rive experiments
+build-rive-app.sh
+run-rive.sh

@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://murchi.pet">
-    <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/banner.svg" alt="Murchi & Kuma — Kawaii Desktop Pets for macOS" width="800">
+    <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/banner.svg" alt="Murchi — Kawaii Desktop Pet for macOS" width="800">
   </a>
 </p>
 
@@ -13,14 +13,14 @@
 </p>
 
 <p align="center">
-  <sub>Two kawaii vector pets that live on your macOS desktop. One Swift file. Zero dependencies.</sub>
+  <sub>A kawaii vector cat that lives on your macOS desktop. One Swift file. Zero dependencies. 9000+ lines of love.</sub>
 </p>
 
 <br>
 
 <p align="center">
   <a href="https://murchi.pet">
-    <img src="https://img.shields.io/badge/%F0%9F%90%B1_GET_MURCHI_&_KUMA-34d399?style=for-the-badge&logoColor=white&labelColor=0a0a1a" alt="Get Murchi & Kuma" height="52">
+    <img src="https://img.shields.io/badge/%F0%9F%90%B1_GET_MURCHI-34d399?style=for-the-badge&logoColor=white&labelColor=0a0a1a" alt="Get Murchi" height="52">
   </a>
 </p>
 <p align="center">
@@ -34,42 +34,15 @@
 
 <br>
 
-<h2 align="center">Meet the Friends</h2>
+<h2 align="center">What is Murchi?</h2>
 
-<p align="center"><sub>Two characters, two personalities, one desktop</sub></p>
-
-<br>
-
-<table>
-<tr>
-<td align="center" width="50%">
-<br>
-
-### Murchi
-
-**The Curious Cat**
-
-<sub>Playful &bull; Curious &bull; Loves Fish</sub>
-
-<sub>Gray-blue fur, green eyes, yellow collar with a blue bell. Chases butterflies, knocks glasses off tables, writes diary entries about birds.</sub>
+<p align="center"><sub>A desktop tamagotchi cat with full SVG vector art, physics, emotions, and a life of its own</sub></p>
 
 <br>
-</td>
-<td align="center" width="50%">
-<br>
 
-### Kuma
+Murchi is a kawaii cat that lives on your macOS screen. It walks on your Dock, climbs screen edges, chases your cursor, reacts to music, writes diary entries, and has real emotions. Everything is rendered as smooth SVG vector art with 16-frame animations for every pose.
 
-**The Gentle Bear**
-
-<sub>Calm &bull; Cuddly &bull; Loves Honey</sub>
-
-<sub>Warm brown fur, rosy cheeks, cute red bow tie. Gentle and cozy, loves napping and being pet. Dreams about honey.</sub>
-
-<br>
-</td>
-</tr>
-</table>
+The entire app is a **single Swift file** — no Xcode project, no dependencies, no storyboards. Just compile and run.
 
 <br>
 
@@ -77,19 +50,7 @@
 
 <br>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/demo.svg" alt="Murchi & Kuma Demo — pets on desktop with speech bubble, hearts, stats" width="700">
-</p>
-
-<br>
-
----
-
-<br>
-
-<h2 align="center">What can they do?</h2>
-
-<p align="center"><sub>Your pets have a full life on your desktop</sub></p>
+<h2 align="center">Features</h2>
 
 <br>
 
@@ -97,55 +58,87 @@
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>25+ Behaviors</h3>
-<sub>Walk, sleep, zoomies, groom, chase butterflies, watch birds, knock glasses off tables, follow your cursor</sub><br><br>
+<h3>30+ Behaviors</h3>
+<sub>Walk, run, sleep, zoomies, climb edges, chase butterflies, watch birds, knock glasses, follow cursor, hide, poop, dance to music</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Feed & Care</h3>
-<sub>Fish, milk, treats, honey. 6 stats: hunger, happiness, energy, social, hygiene, health</sub><br><br>
+<h3>Music Detection</h3>
+<sub>Detects when you play music in Apple Music or Spotify. Cat puts on headphones and vibes — or gets angry if it hates the song</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Toys & Accessories</h3>
-<sub>Mouse, yarn, laser. Hats, bow ties, crowns, glasses, flowers</sub><br><br>
+<h3>Dock Physics</h3>
+<sub>Walks on macOS Dock as a physical platform. Real gravity, edge climbing, jumping off walls</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>Pet Diary</h3>
-<sub>Personal blog about meals, play, sickness, butterflies, birthdays</sub><br><br>
+<h3>SVG Vector Art</h3>
+<sub>Every pose is hand-crafted SVG with smooth 16-frame animation cycles. Breathing, tail wag, blinking, trembling, strain</sub><br><br>
+</td>
+<td align="center" width="33%">
+<br>
+<h3>Emotions & Stats</h3>
+<sub>6 stats: hunger, happiness, energy, social, hygiene, health. 4 moods. Gets sick, sad, or ecstatic based on care</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
 <h3>Particle Effects</h3>
-<sub>Hearts, stars, sparkles, paw prints, sleep Z particles, confetti</sub><br><br>
-</td>
-<td align="center" width="33%">
-<br>
-<h3>Lives on Your Dock</h3>
-<sub>Walks on macOS Dock as a physical platform with gravity</sub><br><br>
+<sub>Music notes, hearts, stars, sparkles, tears, confetti, sleep Zs, dream bubbles, soap bubbles</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>Level Up</h3>
-<sub>XP system, 5 evolution stages: Baby to Cosmic</sub><br><br>
+<h3>Toys & Accessories</h3>
+<sub>Mouse toy, yarn ball, laser dot. Party hat, bow tie, crown, sunglasses, flower, halo — unlock with XP</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Speech Bubbles</h3>
-<sub>Your pet talks, reacts to petting, greets you when you return</sub><br><br>
+<h3>Pet Diary</h3>
+<sub>Cat writes a personal journal about its day. Meals, play, butterflies, sickness, milestones</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Auto-Update</h3>
-<sub>One-click update check from menu. Always the latest version</sub><br><br>
+<h3>Sit in Corner</h3>
+<sub>Send the cat to the corner as punishment. It walks to the edge, sits facing the room, and cries until you forgive it</sub><br><br>
 </td>
 </tr>
 </table>
+
+<br>
+
+---
+
+<br>
+
+<h2 align="center">All Poses</h2>
+
+<p align="center"><sub>15 unique SVG poses, each with 16-frame animation</sub></p>
+
+<br>
+
+| Pose | Animation | Trigger |
+|------|-----------|---------|
+| **Sitting** | Breathing bob, tail wag, blinking | Idle, grooming, looking at cursor |
+| **Walking** | 4-frame walk cycle, bounce | Walking, running, chasing |
+| **Sleeping** | Slow breathing, Zzz particles | Low energy / nighttime |
+| **Eating** | Chomping animation | Feed from menu |
+| **Held** | Dangling by scruff, sway | Click and drag |
+| **Angry** | Trembling, arched back | Scratching furniture |
+| **Jumping** | Squash & stretch | Random jump, stretch |
+| **Playing** | Bouncy, energetic | Toys, play behavior |
+| **Climbing** | Rotated 90°, paw scramble | Reaches screen edge |
+| **Bathing** | Wobble, soap bubbles | Bath from menu |
+| **Music Happy** | Headphones, half-closed eyes, sway | Music playing (75% chance) |
+| **Music Angry** | Headphones, angry brows, tremble | Music playing (25% chance) |
+| **Hiding** | Paw overlay, worried brows, sweat | Random shy behavior |
+| **Squatting** | ^_^ eyes, strain lines, blush | Pooping |
+| **Crying** | Sobbing bob, tilt, tears | Sad mood, corner punishment |
+
+Plus: standing, lonely sitting, sick, dead, celebrating poses.
 
 <br>
 
@@ -155,7 +148,7 @@
 
 <h2 align="center">How it works</h2>
 
-<p align="center"><sub>Everything lives in <strong>one file</strong> — Murchi.swift (~5000 lines)</sub></p>
+<p align="center"><sub>Everything lives in <strong>one file</strong> — Murchi.swift (9000+ lines)</sub></p>
 
 <br>
 
@@ -165,10 +158,9 @@
 
 ```
 Murchi.swift            the entire app
-generate-icon.swift     pixel-art icon generator
+generate-icon.swift     icon generator
 build-app.sh            .app bundle + .dmg builder
 run.sh                  compile & launch
-docs/                   murchi.pet website
 ```
 
 </td>
@@ -176,11 +168,11 @@ docs/                   murchi.pet website
 
 | Layer | Tech |
 |-------|------|
-| Rendering | Kawaii vector `CGContext` &rarr; `NSImage` |
-| Characters | CatRenderer + BearRenderer |
+| Rendering | SVG &rarr; `NSImage` (16-frame cycles) |
 | Window | `NSPanel` borderless, above Dock |
-| Physics | Custom gravity + dock detection |
-| Particles | Hearts, stars, sparkles, paws |
+| Physics | Custom gravity + Dock platform detection |
+| Particles | 10 types, custom drawing per type |
+| Music | AppleScript &rarr; Music.app / Spotify |
 | Persistence | `Codable` JSON &rarr; `~/.murchi/` |
 | Hotkey | `Cmd+Shift+M` global shortcut |
 
@@ -195,6 +187,12 @@ docs/                   murchi.pet website
 ```bash
 # Quick run (compile + launch)
 ./run.sh
+
+# Or compile manually
+swiftc -O -whole-module-optimization -o Murchi Murchi.swift \
+  -framework AppKit -framework Foundation -framework AVFoundation \
+  -framework Carbon -framework UserNotifications
+./Murchi
 
 # Build .app + .dmg
 ./build-app.sh
@@ -216,7 +214,7 @@ Requires Xcode command-line tools (`xcode-select --install`).
 
 <h2 align="center">Pay What You Want</h2>
 
-<p align="center"><sub>Murchi & Kuma are free forever. If you'd like to support development and help real animals — name your price.</sub></p>
+<p align="center"><sub>Murchi is free forever. If you'd like to support development and help real animals — name your price.</sub></p>
 
 <br>
 
@@ -232,97 +230,21 @@ Requires Xcode command-line tools (`xcode-select --install`).
 
 <br>
 
-### Crypto Payments
-
-We accept crypto — send any amount to these addresses:
-
-| Network | Address |
-|---------|---------|
-| **BTC** (Bitcoin) | `bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh` |
-| **ERC-20** (ETH, USDT, USDC & tokens) | `0x71C7656EC7ab88b098defB751B7401B5f6d8976F` |
-| **Solana** (SOL, SPL tokens) | `DRpbCBMxVnDK7maPMoGQfFaCRJNen4STmkF7Rexz1UV6` |
-
-<br>
-
-### Where Your Money Goes
-
-50% of all payments go directly to these organizations:
-
-| Organization | Mission |
-|-------------|---------|
-| [**Best Friends Animal Society**](https://bestfriends.org) | Leading the no-kill movement for cats and dogs across the USA |
-| [**ASPCA**](https://aspca.org) | Fighting animal cruelty since 1866. Rescue, adoption, veterinary care |
-| [**Alley Cat Allies**](https://alleycat.org) | Protecting cats through TNR (Trap-Neuter-Return) programs worldwide |
-| [**IFAW**](https://ifaw.org) | International Fund for Animal Welfare. Rescuing animals in crisis globally |
-| [**World Animal Protection**](https://worldanimalprotection.org) | Ending animal suffering. Better laws and disaster response |
-| [**Feline Friends**](https://felinefriends.org.uk) | Finding loving homes for stray and abandoned cats through foster care |
-
-<br>
-
 ---
 
 <br>
 
-<h2 align="center">Roadmap</h2>
-
-<p align="center"><sub>Murchi & Kuma are just getting started</sub></p>
-
-<br>
-
-<table>
-<tr>
-<td align="center" width="33%">
-<br>
-<h3>v2.2 — Soon</h3>
-<sub>15+ new accessories<br>New food types<br>Mini-games<br>Seasonal events</sub><br><br>
-</td>
-<td align="center" width="33%">
-<br>
-<h3>v2.3 — Next</h3>
-<sub>Visit friends' pets<br>Room decorations<br>Pet furniture<br>Photo sharing</sub><br><br>
-</td>
-<td align="center" width="33%">
-<br>
-<h3>v3.0 — Future</h3>
-<sub>Dogs, hamsters, birds<br>Worlds &amp; biomes<br>Multiplayer<br>App Store release</sub><br><br>
-</td>
-</tr>
-</table>
-
 <p align="center">
-  <a href="https://github.com/egorfedorov/murchi/issues"><img src="https://img.shields.io/badge/VIEW_FULL_ROADMAP-issues-a78bfa?style=for-the-badge" alt="Roadmap"></a>
-</p>
-
-<br>
-
----
-
-<br>
-
-<h2 align="center">Fun facts</h2>
-
-<br>
-
-<p align="center">
-  <code>5000+</code> lines of Swift &nbsp;&bull;&nbsp;
-  <code>25+</code> behaviors &nbsp;&bull;&nbsp;
+  <code>9000+</code> lines of Swift &nbsp;&bull;&nbsp;
+  <code>30+</code> behaviors &nbsp;&bull;&nbsp;
+  <code>15+</code> animated poses &nbsp;&bull;&nbsp;
+  <code>10</code> particle types &nbsp;&bull;&nbsp;
   <code>6</code> stats &nbsp;&bull;&nbsp;
   <code>5</code> evolution stages &nbsp;&bull;&nbsp;
-  <code>2</code> characters &nbsp;&bull;&nbsp;
+  <code>1</code> file &nbsp;&bull;&nbsp;
   <code>0</code> dependencies
 </p>
 
-<p align="center">
-  <sub>
-    Murchi remembers everything between launches<br>
-    Murchi writes a personal diary about its day<br>
-    Murchi celebrates its birthday with confetti<br>
-    Murchi knocks your glass off the table if bored<br>
-    Kuma dreams about honey when sleeping<br>
-    Switch between cat and bear anytime
-  </sub>
-</p>
-
 <br>
 
 ---
@@ -330,16 +252,12 @@ We accept crypto — send any amount to these addresses:
 <br>
 
 <p align="center">
-  <sub>If you enjoy Murchi & Kuma, give it a star — it helps a lot!</sub>
+  <sub>If you enjoy Murchi, give it a star!</sub>
 </p>
 
 <p align="center">
   <a href="https://github.com/egorfedorov/murchi/stargazers">
     <img src="https://img.shields.io/github/stars/egorfedorov/murchi?style=for-the-badge&color=fbbf24&logo=github&label=stars" alt="Stars">
-  </a>
-  &nbsp;
-  <a href="https://github.com/egorfedorov/murchi/network/members">
-    <img src="https://img.shields.io/github/forks/egorfedorov/murchi?style=for-the-badge&color=64748b&logo=github&label=forks" alt="Forks">
   </a>
 </p>
 
