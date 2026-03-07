@@ -3,1753 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Murchi — Desktop Tamagotchi Cat for macOS</title>
-    <meta name="description" content="Murchi is a pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
-    <meta name="keywords" content="tamagotchi, desktop pet, virtual pet, pixel cat, macOS pet, desktop tamagotchi, murchi, digital pet, virtual cat">
-
-    <!-- Open Graph -->
+    <title>Murchi — Desktop Tamagotchi for macOS</title>
+    <meta name="description" content="Murchi is a Tamagotchi pet living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://murchi.pet">
-    <meta property="og:title" content="Murchi — Desktop Tamagotchi Cat for macOS">
-    <meta property="og:description" content="A pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
+    <meta property="og:title" content="Murchi — Desktop Tamagotchi for macOS">
+    <meta property="og:description" content="A Tamagotchi pet living on your macOS desktop. Feed, play, level up. Free with 25+ behaviors.">
     <meta property="og:image" content="https://murchi.pet/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Murchi">
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Murchi — Desktop Tamagotchi Cat for macOS">
-    <meta name="twitter:description" content="A pixel-art Tamagotchi cat living on your macOS desktop. Feed, play, level up, read its diary. Free desktop pet with 25+ behaviors.">
+    <meta name="twitter:title" content="Murchi — Desktop Tamagotchi for macOS">
     <meta name="twitter:image" content="https://murchi.pet/og.png">
-
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#0c0c16;--surface:rgba(255,255,255,0.035);--border:rgba(255,255,255,0.07);
+            --accent:#e08858;--accent2:#d46b8f;--green:#4aba7a;--blue:#5b8def;
+            --text:#e8e4e0;--dim:#6a6670;--heading:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:var(--body);background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased;position:relative}
+        body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:
+            radial-gradient(ellipse 40% 30% at 15% 20%,rgba(224,136,88,0.04),transparent 70%),
+            radial-gradient(ellipse 35% 25% at 85% 60%,rgba(180,100,200,0.03),transparent 70%),
+            radial-gradient(ellipse 50% 35% at 50% 90%,rgba(90,140,230,0.03),transparent 70%),
+            radial-gradient(ellipse 30% 20% at 70% 10%,rgba(255,200,160,0.03),transparent 60%)
+        }
+        body>*{position:relative;z-index:1}
 
-        :root {
-            --bg-deep: #08081a;
-            --bg-card: #111128;
-            --purple: #7c5cbf;
-            --purple-light: #a78bfa;
-            --blue: #3b82f6;
-            --pink: #f472b6;
-            --green: #34d399;
-            --yellow: #fbbf24;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --border: rgba(255,255,255,0.06);
-        }
+        .pet-img{}
 
-        html { scroll-behavior: smooth; }
+        /* ── NAV ── */
+        .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,16,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:50px;gap:10px}
+        .nav-logo{font-family:var(--heading);font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+        .nav-langs{flex:1;display:flex;justify-content:center;gap:2px;flex-wrap:wrap}
+        .lang-btn{background:none;border:none;color:var(--dim);font-size:11px;padding:3px 7px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:var(--body)}
+        .lang-btn:hover{color:var(--text)}
+        .lang-btn.active{color:var(--accent);background:rgba(224,136,88,0.1)}
+        .nav-gh{display:flex;align-items:center;gap:5px;color:var(--dim);text-decoration:none;font-size:12px;font-weight:500;padding:5px 10px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+        .nav-gh:hover{color:var(--text);border-color:rgba(255,255,255,0.12)}
+        .nav-gh svg{width:14px;height:14px;fill:currentColor}
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-deep);
-            color: var(--text);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
+        /* ── HERO ── */
+        .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden}
+        .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 35%,rgba(224,136,88,0.08),transparent 70%),radial-gradient(ellipse 40% 30% at 30% 70%,rgba(180,120,220,0.04),transparent 60%),radial-gradient(ellipse 35% 25% at 80% 20%,rgba(255,200,150,0.04),transparent 60%);pointer-events:none}
+        .hero-char{width:220px;height:220px;animation:heroFloat 5s ease-in-out infinite;position:relative;z-index:1}
+        @keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+        .hero h1{font-family:var(--heading);font-size:clamp(72px,12vw,120px);font-weight:700;letter-spacing:-4px;color:#fff;line-height:0.9;margin:20px 0 16px;position:relative;z-index:1}
+        .hero-tagline{font-size:clamp(18px,2.5vw,24px);color:var(--dim);max-width:480px;line-height:1.4;position:relative;z-index:1}
+        .hero-actions{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+        .btn-dl{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;text-decoration:none;font-family:var(--heading);font-size:15px;font-weight:600;padding:12px 28px;border-radius:12px;transition:all .25s;border:none;cursor:pointer}
+        .btn-dl:hover{background:#c8764a;transform:translateY(-2px);box-shadow:0 8px 30px rgba(224,136,88,0.3)}
+        .btn-dl svg{width:18px;height:18px}
+        .btn-gh{display:inline-flex;align-items:center;gap:6px;padding:12px 22px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--text);font-family:var(--heading);font-size:14px;font-weight:500;text-decoration:none;transition:all .25s}
+        .btn-gh:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-2px)}
+        .btn-gh svg{width:16px;height:16px;fill:currentColor}
+        .hero-scroll{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:var(--dim);font-size:12px;animation:scrollBounce 2s ease-in-out infinite}
+        @keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
-        /* Ambient background */
-        .ambient {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .ambient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.12;
-            animation: orbFloat 20s ease-in-out infinite;
-        }
-        .ambient-orb:nth-child(1) {
-            width: 600px; height: 600px;
-            background: #7c5cbf;
-            top: -200px; left: -100px;
-        }
-        .ambient-orb:nth-child(2) {
-            width: 500px; height: 500px;
-            background: #3b82f6;
-            bottom: -150px; right: -100px;
-            animation-delay: -7s;
-        }
-        .ambient-orb:nth-child(3) {
-            width: 400px; height: 400px;
-            background: #f472b6;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -14s;
-        }
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -40px) scale(1.05); }
-            66% { transform: translate(-20px, 30px) scale(0.95); }
-        }
+        /* ── STORY SECTIONS ── */
+        .story{padding:100px 24px;max-width:1000px;margin:0 auto;position:relative}
+        .story-full{padding:120px 24px;position:relative;overflow:hidden}
+        .story-center{text-align:center}
+        .story h2{font-family:var(--heading);font-size:clamp(42px,7vw,72px);font-weight:700;letter-spacing:-2px;line-height:1;color:#fff;margin-bottom:20px}
+        .story h3{font-family:var(--heading);font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-1px;line-height:1.1;color:#fff;margin-bottom:16px}
+        .story-text{font-size:clamp(16px,2vw,20px);color:var(--dim);max-width:600px;line-height:1.6}
+        .story-center .story-text{margin:0 auto}
+        .story-accent{color:var(--accent)}
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
+        /* ── MEET SECTION ── */
+        .meet{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+        .meet-chars{display:flex;gap:-20px;justify-content:center;position:relative}
+        .meet-chars img{width:180px;height:180px;position:relative}
+        .meet-chars img:nth-child(2){margin-left:-30px;margin-top:20px}
 
-        /* Language switcher */
-        .lang-bar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-            background: rgba(8, 8, 26, 0.8);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid var(--border);
-            padding: 8px 0;
-        }
-        .lang-bar .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .lang-btn {
-            background: none;
-            border: 1px solid transparent;
-            color: var(--text-dim);
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .lang-btn:hover { color: var(--text); border-color: var(--border); }
-        .lang-btn.active {
-            color: white;
-            background: rgba(124, 92, 191, 0.3);
-            border-color: var(--purple);
-        }
+        /* ── DEMO ── */
+        .demo-wrap{max-width:900px;margin:40px auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 30px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.05)}
+        .demo-bar{background:#1a1a26;height:32px;display:flex;align-items:center;padding:0 12px;gap:7px}
+        .dot{width:11px;height:11px;border-radius:50%}
+        .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+        .demo-bar-text{flex:1;text-align:center;font-size:11px;color:rgba(255,255,255,0.25);margin-right:45px}
+        .demo-screen{position:relative;height:440px;background:linear-gradient(180deg,#0f1022 0%,#0a0b18 100%);cursor:pointer;overflow:hidden;user-select:none}
+        .demo-ground{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(180deg,transparent,rgba(224,136,88,0.03))}
+        .demo-stars{position:absolute;inset:0;overflow:hidden}
+        .demo-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+        @keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:0.6}}
+        #pet-sprite{position:absolute;width:140px;height:140px;transition:transform .15s ease-out;z-index:5;cursor:pointer}
+        .demo-bubble{position:absolute;background:rgba(255,255,255,0.92);color:#111;font-size:13px;font-weight:600;padding:6px 14px;border-radius:14px;pointer-events:none;animation:bubblePop 2.5s ease-out forwards;z-index:10;font-family:var(--heading)}
+        .demo-bubble::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid rgba(255,255,255,0.92)}
+        @keyframes bubblePop{0%{opacity:0;transform:translateY(5px) scale(.8)}10%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+        .demo-particle{position:absolute;pointer-events:none;font-size:16px;animation:particleUp 1.2s ease-out forwards;z-index:10}
+        @keyframes particleUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(.4)}}
+        .demo-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:12px;color:rgba(255,255,255,0.2);z-index:5;animation:hintPulse 2s ease-in-out infinite}
+        @keyframes hintPulse{0%,100%{opacity:.2}50%{opacity:.5}}
+        .demo-dock{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.06);backdrop-filter:blur(16px);border-radius:14px;border:1px solid rgba(255,255,255,0.08);padding:6px 14px;display:flex;gap:8px;z-index:3}
+        .dock-i{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .15s}
+        .dock-i:hover{transform:scale(1.25) translateY(-5px)}
+        .dock-i.a{background:linear-gradient(135deg,#35a8f0,#1d7dd9)}
+        .dock-i.b{background:linear-gradient(135deg,#54b5f0,#2d8fd9)}
+        .dock-i.c{background:linear-gradient(135deg,#fa5c5c,#d93b3b)}
+        .dock-i.d{background:#222233}
+        .dock-i.e{background:linear-gradient(135deg,#fdd835,#e6b800)}
 
-        /* Hero */
-        .hero {
-            text-align: center;
-            padding: 100px 0 40px;
-        }
-        .hero h1 {
-            font-size: 72px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--purple-light), var(--pink), var(--yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: -3px;
-        }
-        .hero .tagline {
-            font-size: 22px;
-            color: var(--text-dim);
-            font-weight: 300;
-            max-width: 520px;
-            margin: 0 auto 36px;
-        }
+        /* ── FEATURES ── */
+        .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:50px}
+        .feat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 22px;transition:all .3s;position:relative;overflow:hidden}
+        .feat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(224,136,88,0.04),transparent 60%);pointer-events:none;opacity:0;transition:opacity .3s}
+        .feat-card:hover{border-color:rgba(224,136,88,0.15);transform:translateY(-3px)}.feat-card:hover::before{opacity:1}
+        .feat-card.w{grid-column:span 2}
+        .feat-icon{font-size:28px;margin-bottom:12px}
+        .feat-card h4{font-family:var(--heading);font-size:16px;font-weight:600;margin-bottom:4px}
+        .feat-card p{font-size:13px;color:var(--dim);line-height:1.5}
 
-        /* Download button */
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, var(--purple), var(--blue));
-            color: white;
-            text-decoration: none;
-            font-size: 19px;
-            font-weight: 600;
-            padding: 16px 36px;
-            border-radius: 16px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 30px rgba(124, 92, 191, 0.4);
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 40px rgba(124, 92, 191, 0.6);
-        }
-        .download-btn svg { width: 22px; height: 22px; }
-        .download-sub {
-            display: block;
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--text-dim);
-        }
-        .cta-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .github-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            background: rgba(255,255,255,0.04);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .github-btn:hover {
-            border-color: var(--yellow);
-            background: rgba(251,191,36,0.08);
-            transform: translateY(-2px);
-        }
-        .github-btn svg { width: 20px; height: 20px; fill: currentColor; }
-        .github-btn .star-icon { color: var(--yellow); font-size: 16px; }
-        .github-sub {
-            display: block;
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-dim);
-            margin-top: 2px;
-        }
+        /* ── EMOTION SECTION ── */
+        .emotion{background:radial-gradient(ellipse 80% 50% at 50% 50%,rgba(100,50,120,0.06),transparent);text-align:center}
+        .emotion-chars{display:flex;justify-content:center;gap:20px;margin:40px 0;flex-wrap:wrap}
+        .emotion-chars img{width:100px;height:100px;transition:all .5s}
+        .emotion-chars img:hover{transform:scale(1.1)}
+        .tear{display:inline-block;animation:tearDrop 2s ease-in infinite;opacity:0.6}
+        @keyframes tearDrop{0%{transform:translateY(0);opacity:0}30%{opacity:0.6}100%{transform:translateY(16px);opacity:0}}
 
-        /* ── Interactive Demo ── */
-        .demo-section {
-            padding: 40px 0 60px;
-        }
-        .demo-label {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-dim);
-            margin-bottom: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        .desktop-frame {
-            position: relative;
-            max-width: 820px;
-            margin: 0 auto;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.08),
-                0 20px 80px rgba(0, 0, 0, 0.6),
-                0 0 120px rgba(124, 92, 191, 0.08);
-        }
-        /* Titlebar */
-        .desktop-titlebar {
-            background: linear-gradient(180deg, #3a3a4a, #2a2a3a);
-            height: 32px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            gap: 7px;
-        }
-        .tb-dot {
-            width: 12px; height: 12px;
-            border-radius: 50%;
-        }
-        .tb-dot.r { background: #ff5f57; }
-        .tb-dot.y { background: #febc2e; }
-        .tb-dot.g { background: #28c840; }
-        .desktop-titlebar-text {
-            flex: 1;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            font-weight: 500;
-            margin-right: 50px;
-        }
-        /* Canvas area */
-        .desktop-screen {
-            position: relative;
-            background: linear-gradient(180deg, #1a1a3e 0%, #0e0e2a 60%, #16162e 100%);
-            height: 420px;
-            cursor: pointer;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        /* Wallpaper decorations */
-        .wallpaper-grid {
-            position: absolute;
-            inset: 0;
-            background-image:
-                radial-gradient(circle at 20% 30%, rgba(124, 92, 191, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
-        }
-        .wallpaper-dots {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        /* Fake dock */
-        .fake-dock {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 14px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .dock-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            transition: transform 0.15s;
-        }
-        .dock-icon:hover { transform: scale(1.3) translateY(-6px); }
-        .dock-icon.finder { background: linear-gradient(135deg, #35a8f0, #1d7dd9); }
-        .dock-icon.safari { background: linear-gradient(135deg, #54b5f0, #2d8fd9); }
-        .dock-icon.music { background: linear-gradient(135deg, #fa5c5c, #d93b3b); }
-        .dock-icon.terminal { background: linear-gradient(135deg, #2d2d3f, #1a1a2e); }
-        .dock-icon.notes { background: linear-gradient(135deg, #fdd835, #e6b800); }
+        /* ── ROADMAP ── */
+        .road-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
+        .road-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;transition:all .3s}
+        .road-card:hover{border-color:rgba(255,255,255,0.1);transform:translateY(-2px)}
+        .road-tag{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:8px;margin-bottom:10px;font-family:var(--heading)}
+        .road-card.s .road-tag{background:rgba(74,186,122,0.1);color:var(--green)}
+        .road-card.n .road-tag{background:rgba(91,141,239,0.1);color:var(--blue)}
+        .road-card.f .road-tag{background:rgba(212,107,143,0.1);color:var(--accent2)}
+        .road-card h4{font-family:var(--heading);font-size:15px;font-weight:600;margin-bottom:8px}
+        .road-list{list-style:none;padding:0}
+        .road-list li{font-size:12px;color:var(--dim);padding:3px 0 3px 16px;position:relative}
+        .road-list li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;border:1.5px solid var(--dim)}
+        .road-card.s .road-list li.d::before{background:var(--green);border-color:var(--green)}
 
-        /* Cat canvas */
-        #demo-canvas {
-            position: absolute;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            pointer-events: none;
-        }
-        /* Particles */
-        .demo-particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 14px;
-            animation: particleUp 1s ease-out forwards;
-            z-index: 10;
-        }
-        @keyframes particleUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
-        }
-        /* Speech bubble */
-        .demo-bubble {
-            position: absolute;
-            background: rgba(255,255,255,0.95);
-            color: #1a1a2e;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 12px;
-            white-space: nowrap;
-            pointer-events: none;
-            animation: bubblePop 2.5s ease-out forwards;
-            z-index: 10;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-        .demo-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid rgba(255,255,255,0.95);
-        }
-        @keyframes bubblePop {
-            0% { opacity: 0; transform: translateY(4px) scale(0.8); }
-            10% { opacity: 1; transform: translateY(0) scale(1); }
-            80% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-6px); }
-        }
-        /* Stat bars overlay */
-        .demo-stats {
-            position: absolute;
-            pointer-events: none;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .demo-stats.visible { opacity: 1; }
-        .demo-stat-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-        }
-        .demo-stat-icon { width: 14px; text-align: center; }
-        .demo-stat-bar {
-            width: 60px; height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .demo-stat-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.5s ease;
-        }
-        .demo-stat-pct {
-            font-size: 9px;
-            color: rgba(255,255,255,0.6);
-            font-family: 'SF Mono', monospace;
-            min-width: 24px;
-        }
-        /* Click hint */
-        .click-hint {
-            position: absolute;
-            bottom: 76px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            animation: hintPulse 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 5;
-        }
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
+        /* ── INSTALL ── */
+        .steps{display:grid;gap:10px;max-width:560px;margin:40px auto 0}
+        .step{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;transition:all .2s}
+        .step:hover{border-color:rgba(255,255,255,0.1)}
+        .step-n{width:32px;height:32px;min-width:32px;border-radius:10px;background:rgba(224,136,88,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-weight:700;font-size:13px}
+        .step-t{font-size:14px;color:var(--dim)}.step-t strong{color:var(--text)}
 
-        /* Sections */
-        .section {
-            padding: 70px 0;
-        }
-        .section-title {
-            font-size: 36px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, var(--text), var(--purple-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 16px;
-            margin-bottom: 40px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        /* ── DONATE ── */
+        .donate-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 28px;max-width:560px;margin:40px auto 0;text-align:center}
+        .badge{display:inline-block;background:rgba(74,186,122,0.08);border:1px solid rgba(74,186,122,0.15);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--green);font-weight:500;margin-bottom:16px}
+        .donate-card h3{font-family:var(--heading);font-size:22px;font-weight:700;margin-bottom:6px;color:#fff}
+        .donate-card .sub{color:var(--dim);font-size:13px;margin-bottom:22px}
+        .crypto-grid{display:grid;gap:8px}
+        .crypto-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s}
+        .crypto-row:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1)}
+        .crypto-ic{width:30px;height:30px;border-radius:50%;min-width:30px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px}
+        .crypto-ic.btc{background:#f7931a}.crypto-ic.eth{background:#627eea}.crypto-ic.sol{background:linear-gradient(135deg,#9945ff,#14f195)}
+        .crypto-info{flex:1;text-align:left}.crypto-label{font-size:12px;font-weight:600}
+        .crypto-addr{font-size:9px;color:var(--dim);font-family:monospace;word-break:break-all}
+        .copy-btn{background:rgba(255,255,255,0.06);border:none;color:var(--dim);font-size:10px;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--body);transition:all .2s}
+        .copy-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+        .copy-btn.copied{background:rgba(74,186,122,0.15);color:var(--green)}
+        .charity-note{margin-top:14px;padding:10px;background:rgba(74,186,122,0.04);border:1px solid rgba(74,186,122,0.1);border-radius:8px;font-size:11px;color:var(--green)}
 
-        /* Feature cards — bento grid */
-        .bento {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-        }
-        .bento-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 28px 24px;
-            transition: border-color 0.3s, transform 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .bento-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(124, 92, 191, 0.06), transparent 70%);
-            pointer-events: none;
-        }
-        .bento-card:hover {
-            border-color: rgba(124, 92, 191, 0.25);
-            transform: translateY(-2px);
-        }
-        .bento-card.wide { grid-column: span 2; }
-        .bento-icon {
-            font-size: 32px;
-            margin-bottom: 14px;
-        }
-        .bento-card h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-        .bento-card p {
-            font-size: 13px;
-            color: var(--text-dim);
-            line-height: 1.5;
-        }
+        /* ── FOOTER ── */
+        footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);color:var(--dim);font-size:11px}
+        footer a{color:var(--accent);text-decoration:none}
 
-        /* Install steps */
-        .steps {
-            display: grid;
-            gap: 12px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px 22px;
-            transition: border-color 0.3s;
-        }
-        .step:hover { border-color: rgba(124, 92, 191, 0.2); }
-        .step-num {
-            width: 36px; height: 36px; min-width: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--purple), var(--blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-        }
-        .step-text {
-            font-size: 14px;
-            color: var(--text-dim);
-        }
-        .step-text strong { color: var(--text); }
+        /* ── REVEALS ── */
+        .rv{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+        .rv.vis{opacity:1;transform:translateY(0)}
+        .rv-delay-1{transition-delay:.1s}.rv-delay-2{transition-delay:.2s}.rv-delay-3{transition-delay:.3s}
 
-        /* Pay what you want */
-        .pay-section { text-align: center; padding: 60px 0; }
-        .pay-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 44px 32px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .charity-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(251, 191, 36, 0.12));
-            border: 1px solid rgba(52, 211, 153, 0.25);
-            border-radius: 24px;
-            padding: 7px 18px;
-            font-size: 13px;
-            color: var(--green);
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        .pay-card h2 { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
-        .pay-card .subtitle {
-            color: var(--text-dim);
-            font-size: 14px;
-            margin-bottom: 28px;
-        }
-        .crypto-grid { display: grid; gap: 10px; margin-top: 20px; }
-        .crypto-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .crypto-row:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
-        }
-        .crypto-icon {
-            width: 34px; height: 34px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px; min-width: 34px;
-        }
-        .crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #e68a00); }
-        .crypto-icon.eth { background: linear-gradient(135deg, #627eea, #4c64c8); }
-        .crypto-icon.sol { background: linear-gradient(135deg, #9945ff, #14f195); }
-        .crypto-info { flex: 1; text-align: left; }
-        .crypto-label { font-size: 13px; font-weight: 600; }
-        .crypto-addr {
-            font-size: 10px;
-            color: var(--text-dim);
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            word-break: break-all;
-        }
-        .copy-btn {
-            background: rgba(255,255,255,0.07);
-            border: none;
-            color: var(--text-dim);
-            font-size: 11px;
-            padding: 5px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .copy-btn:hover { background: rgba(255,255,255,0.14); color: var(--text); }
-        .copy-btn.copied { background: rgba(52, 211, 153, 0.2); color: var(--green); }
-        .charity-note {
-            margin-top: 20px;
-            padding: 14px;
-            background: rgba(52, 211, 153, 0.04);
-            border: 1px solid rgba(52, 211, 153, 0.12);
-            border-radius: 12px;
-            font-size: 13px;
-            color: var(--green);
-        }
-
-        /* Donation wall */
-        .donations-section { padding: 40px 0; text-align: center; }
-        .donations-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .empty-donations {
-            color: var(--text-dim);
-            font-size: 14px;
-            padding: 20px 0;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
-            color: var(--text-dim);
-            font-size: 12px;
-        }
-        footer a { color: var(--purple-light); text-decoration: none; }
-
-        /* Roadmap */
-        .roadmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px;
-        }
-        .roadmap-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s;
-        }
-        .roadmap-card:hover { border-color: rgba(124, 92, 191, 0.25); }
-        .roadmap-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 16px 16px 0 0;
-        }
-        .roadmap-card.soon::before { background: linear-gradient(90deg, var(--green), #2dd4bf); }
-        .roadmap-card.next::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
-        .roadmap-card.future::before { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
-        .roadmap-phase {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-        }
-        .roadmap-card.soon .roadmap-phase {
-            background: rgba(52, 211, 153, 0.12);
-            color: var(--green);
-        }
-        .roadmap-card.next .roadmap-phase {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--blue);
-        }
-        .roadmap-card.future .roadmap-phase {
-            background: rgba(244, 114, 182, 0.12);
-            color: var(--pink);
-        }
-        .roadmap-card h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .roadmap-list {
-            list-style: none;
-            padding: 0;
-        }
-        .roadmap-list li {
-            font-size: 13px;
-            color: var(--text-dim);
-            padding: 4px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-        .roadmap-list li::before {
-            content: '';
-            position: absolute;
-            left: 2px;
-            top: 10px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            border: 1.5px solid var(--text-dim);
-        }
-        .roadmap-card.soon .roadmap-list li.done::before {
-            background: var(--green);
-            border-color: var(--green);
-        }
-
-        /* Scroll reveal */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 48px; letter-spacing: -2px; }
-            .hero .tagline { font-size: 17px; }
-            .desktop-screen { height: 320px; }
-            .bento { grid-template-columns: 1fr; }
-            .bento-card.wide { grid-column: span 1; }
-            .download-btn { font-size: 16px; padding: 14px 28px; }
-            .fake-dock { gap: 6px; padding: 5px 10px; }
-            .dock-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
-        }
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 38px; }
-            .desktop-screen { height: 260px; }
+        /* ── RESPONSIVE ── */
+        @media(max-width:768px){
+            .meet{grid-template-columns:1fr;text-align:center;gap:30px}
+            .meet .story-text{margin:0 auto}
+            .feat-grid{grid-template-columns:1fr}.feat-card.w{grid-column:span 1}
+            .road-grid{grid-template-columns:1fr}
+            .hero-char{width:160px;height:160px}
+            .emotion-chars img{width:70px;height:70px}
         }
     </style>
 </head>
 <body>
 
-<!-- Ambient bg -->
-<div class="ambient">
-    <div class="ambient-orb"></div>
-    <div class="ambient-orb"></div>
-    <div class="ambient-orb"></div>
-</div>
-
-<!-- Language bar -->
-<div class="lang-bar">
-    <div class="container">
-        <button class="lang-btn active" data-lang="en">English</button>
-        <button class="lang-btn" data-lang="ru">Русский</button>
-        <button class="lang-btn" data-lang="es">Espanol</button>
-        <button class="lang-btn" data-lang="zh">中文</button>
-        <button class="lang-btn" data-lang="ja">日本語</button>
-        <button class="lang-btn" data-lang="ko">한국어</button>
-        <button class="lang-btn" data-lang="de">Deutsch</button>
-        <button class="lang-btn" data-lang="fr">Francais</button>
-        <button class="lang-btn" data-lang="pt">Portugues</button>
-        <button class="lang-btn" data-lang="tr">Turkce</button>
-    </div>
-</div>
-
-<!-- Hero -->
-<section class="hero">
-    <h1>Murchi</h1>
-    <p class="tagline" data-i18n="tagline">Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.</p>
-    <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="download-btn" id="download-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>
-            <span data-i18n="download">Download for macOS</span>
-            <span class="download-sub">v2.0 &middot; DMG &middot; macOS 12+</span>
-        </span>
-    </a>
-    <div class="cta-row">
-        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="github-btn">
+<nav class="nav">
+    <div class="nav-inner">
+        <div class="nav-logo">Murchi</div>
+        <div class="nav-langs">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ru">RU</button>
+            <button class="lang-btn" data-lang="es">ES</button>
+            <button class="lang-btn" data-lang="zh">ZH</button>
+            <button class="lang-btn" data-lang="ja">JA</button>
+            <button class="lang-btn" data-lang="ko">KO</button>
+            <button class="lang-btn" data-lang="de">DE</button>
+            <button class="lang-btn" data-lang="fr">FR</button>
+            <button class="lang-btn" data-lang="pt">PT</button>
+            <button class="lang-btn" data-lang="tr">TR</button>
+        </div>
+        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="nav-gh">
             <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            <span>
-                <span data-i18n="github_star">Star on GitHub</span>
-                <span class="github-sub" data-i18n="github_sub">Help Murchi grow!</span>
-            </span>
-            <span class="star-icon">&#9733;</span>
+            Star
         </a>
     </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <img src="pet1.svg" alt="Murchi" class="hero-char pet-img">
+    <h1>Murchi</h1>
+    <p class="hero-tagline" data-i18n="tagline">Your desktop companion.<br>Lives on your Mac. Needs your love.</p>
+    <div class="hero-actions">
+        <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="btn-dl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-i18n="download">Download for macOS</span>
+        </a>
+        <a href="https://github.com/egorfedorov/murchi" target="_blank" class="btn-gh">
+            <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <span data-i18n="github_star">Star on GitHub</span>
+        </a>
+    </div>
+    <div class="hero-scroll">scroll</div>
 </section>
 
-<!-- Interactive Demo -->
-<section class="demo-section">
-    <div class="container">
-        <p class="demo-label" data-i18n="demo_label">Live Preview — click the cat!</p>
-        <div class="desktop-frame">
-            <div class="desktop-titlebar">
-                <div class="tb-dot r"></div>
-                <div class="tb-dot y"></div>
-                <div class="tb-dot g"></div>
-                <div class="desktop-titlebar-text">macOS Desktop</div>
+<!-- ═══ MEET ═══ -->
+<section class="story">
+    <div class="meet rv">
+        <div>
+            <h2 data-i18n="meet_title">Hey!<br>I'm <span class="story-accent">Murchi</span>.</h2>
+            <p class="story-text" data-i18n="meet_text">I'm your desktop pet. I live right here, on your macOS screen. I walk around, chase butterflies, knock things off your desk, and make your day better.</p>
+        </div>
+        <div class="meet-chars">
+            <img src="pet2.svg" alt="" class="pet-img">
+            <img src="pet5.svg" alt="" class="pet-img">
+        </div>
+    </div>
+</section>
+
+<!-- ═══ DEMO ═══ -->
+<section class="story-full story-center">
+    <div style="max-width:1000px;margin:0 auto;padding:0 24px">
+        <h2 class="rv" data-i18n="demo_title">Watch Me<br><span class="story-accent">Live</span></h2>
+        <p class="story-text rv rv-delay-1" style="margin:0 auto 30px" data-i18n="demo_text">I roam your desktop, sit on the Dock, and react when you pet me. Try it!</p>
+        <div class="demo-wrap rv rv-delay-2">
+            <div class="demo-bar">
+                <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+                <div class="demo-bar-text">macOS Desktop</div>
             </div>
-            <div class="desktop-screen" id="desktop-screen">
-                <div class="wallpaper-grid"></div>
-                <div class="wallpaper-dots"></div>
-                <canvas id="demo-canvas" width="64" height="64"></canvas>
-                <div class="demo-stats" id="demo-stats"></div>
-                <div class="click-hint" id="click-hint" data-i18n="click_hint">Click the cat to pet it</div>
-                <div class="fake-dock">
-                    <div class="dock-icon finder">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="10" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="white" stroke="none"/><path d="M9 15c1.5 1.5 4.5 1.5 6 0"/></svg>
-                    </div>
-                    <div class="dock-icon safari">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M16 8l-6 2.5L8 16l6-2.5z" fill="rgba(255,255,255,0.3)"/></svg>
-                    </div>
-                    <div class="dock-icon music">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    </div>
-                    <div class="dock-icon terminal">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                    </div>
-                    <div class="dock-icon notes">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
-                    </div>
+            <div class="demo-screen" id="demo-screen">
+                <div class="demo-stars" id="demo-stars"></div>
+                <div class="demo-ground"></div>
+                <img id="pet-sprite" src="pet11.svg" alt="" class="pet-img">
+                <div class="demo-hint" id="demo-hint" data-i18n="click_hint">Click me!</div>
+                <div class="demo-dock">
+                    <div class="dock-i a"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="10" r="1.5" fill="#fff" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="#fff" stroke="none"/><path d="M9 15c1.5 1.5 4.5 1.5 6 0"/></svg></div>
+                    <div class="dock-i b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M16 8l-6 2.5L8 16l6-2.5z" fill="rgba(255,255,255,.3)"/></svg></div>
+                    <div class="dock-i c"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                    <div class="dock-i d"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+                    <div class="dock-i e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features -->
-<section class="section reveal">
-    <div class="container">
-        <h2 class="section-title" data-i18n="features_title">Everything a Cat Needs</h2>
-        <p class="section-subtitle" data-i18n="features_subtitle">A full Tamagotchi experience right on your desktop</p>
-        <div class="bento">
-            <div class="bento-card wide">
-                <div class="bento-icon">🎮</div>
-                <h3 data-i18n="f1_title">25+ Behaviors</h3>
-                <p data-i18n="f1_desc">Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.</p>
-            </div>
-            <div class="bento-card">
-                <div class="bento-icon">🐟</div>
-                <h3 data-i18n="f2_title">Feed & Care</h3>
-                <p data-i18n="f2_desc">Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.</p>
-            </div>
-            <div class="bento-card">
-                <div class="bento-icon">🧶</div>
-                <h3 data-i18n="f3_title">Toys & Accessories</h3>
-                <p data-i18n="f3_desc">Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.</p>
-            </div>
-            <div class="bento-card wide">
-                <div class="bento-icon">📖</div>
-                <h3 data-i18n="f7_title">Cat Diary</h3>
-                <p data-i18n="f7_desc">Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.</p>
-            </div>
-            <div class="bento-card">
-                <div class="bento-icon">⬆️</div>
-                <h3 data-i18n="f4_title">Level Up & Evolve</h3>
-                <p data-i18n="f4_desc">Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.</p>
-            </div>
-            <div class="bento-card">
-                <div class="bento-icon">✨</div>
-                <h3 data-i18n="f5_title">Particle Magic</h3>
-                <p data-i18n="f5_desc">Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.</p>
-            </div>
-            <div class="bento-card">
-                <div class="bento-icon">🖥️</div>
-                <h3 data-i18n="f8_title">Lives on Your Dock</h3>
-                <p data-i18n="f8_desc">Walks on the macOS Dock as a physical platform. Falls off the edges!</p>
-            </div>
+<!-- ═══ WHAT I DO ═══ -->
+<section class="story story-center">
+    <h2 class="rv" data-i18n="feat_title">I eat. I sleep.<br>I <span class="story-accent">play</span>.</h2>
+    <p class="story-text rv rv-delay-1" style="margin:0 auto" data-i18n="feat_text">25+ unique behaviors. A full life, right on your desktop.</p>
+    <div class="feat-grid">
+        <div class="feat-card w rv"><div class="feat-icon">🎮</div><h4 data-i18n="f1_title">25+ Behaviors</h4><p data-i18n="f1_desc">Walking, sleeping, zoomies, grooming, bathing, chasing butterflies, watching birds, knocking glasses off tables. I have a life of my own.</p></div>
+        <div class="feat-card rv rv-delay-1"><div class="feat-icon">🐟</div><h4 data-i18n="f2_title">Feed & Care</h4><p data-i18n="f2_desc">Fish, milk, treats. Keep my hunger, happiness, energy, and health in check.</p></div>
+        <div class="feat-card rv rv-delay-1"><div class="feat-icon">🧶</div><h4 data-i18n="f3_title">Toys & Stuff</h4><p data-i18n="f3_desc">Yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.</p></div>
+        <div class="feat-card w rv rv-delay-2"><div class="feat-icon">📖</div><h4 data-i18n="f7_title">My Diary</h4><p data-i18n="f7_desc">I keep a personal blog about my day. When I got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real journal.</p></div>
+        <div class="feat-card rv rv-delay-2"><div class="feat-icon">⬆️</div><h4 data-i18n="f4_title">Level Up</h4><p data-i18n="f4_desc">Earn XP from caring. Evolve from Baby to Cosmic across 5 stages.</p></div>
+        <div class="feat-card rv rv-delay-3"><div class="feat-icon">✨</div><h4 data-i18n="f5_title">Particles</h4><p data-i18n="f5_desc">Hearts, stars, sparkles, poof clouds, paw prints, sleep Z's.</p></div>
+        <div class="feat-card rv rv-delay-3"><div class="feat-icon">🖥️</div><h4 data-i18n="f8_title">Dock Life</h4><p data-i18n="f8_desc">I walk on the macOS Dock. Sometimes I fall off the edges!</p></div>
+    </div>
+</section>
+
+<!-- ═══ EMOTIONS ═══ -->
+<section class="story-full emotion">
+    <div style="max-width:800px;margin:0 auto;padding:0 24px;text-align:center">
+        <h2 class="rv" data-i18n="emo_title">Sometimes...<br>I feel <span class="story-accent">alone</span> <span class="tear">💧</span></h2>
+        <p class="story-text rv rv-delay-1" style="margin:16px auto 0" data-i18n="emo_text">I sit by myself and watch the cursor move around... Where are my friends? I dream about dogs running next to me, hamsters in their wheels, parrots sitting on my head...</p>
+        <div class="emotion-chars rv rv-delay-2">
+            <img src="pet6.svg" alt="" class="pet-img">
+            <img src="pet9.svg" alt="" class="pet-img">
+            <img src="pet10.svg" alt="" class="pet-img">
+            <img src="pet14.svg" alt="" class="pet-img">
+        </div>
+        <h3 class="rv rv-delay-2" data-i18n="emo_but" style="margin-top:40px">But then you <span class="story-accent">pet me</span>,<br>and everything is okay.</h3>
+        <p class="story-text rv rv-delay-3" style="margin:12px auto 0" data-i18n="emo_ok">Hearts float around me. I purr. I'm the happiest pet alive. And I know — one day, my friends will come too.</p>
+    </div>
+</section>
+
+<!-- ═══ DREAMS / ROADMAP ═══ -->
+<section class="story story-center">
+    <h2 class="rv" data-i18n="road_title">My <span class="story-accent">Dreams</span></h2>
+    <p class="story-text rv rv-delay-1" style="margin:0 auto" data-i18n="road_text">Things I'm wishing for. Some are almost here...</p>
+    <div class="road-grid">
+        <div class="road-card s rv">
+            <div class="road-tag" data-i18n="roadmap_v21">v2.1 — Soon</div>
+            <h4 data-i18n="roadmap_v21_title">More Items & Games</h4>
+            <ul class="road-list">
+                <li class="d" data-i18n="r1_1">25+ behaviors</li>
+                <li class="d" data-i18n="r1_2">My diary</li>
+                <li class="d" data-i18n="r1_3">5 accessories</li>
+                <li data-i18n="r1_4">15+ new accessories</li>
+                <li data-i18n="r1_5">Sushi, cake, pizza</li>
+                <li data-i18n="r1_6">Mini-games</li>
+                <li data-i18n="r1_7">Seasonal events</li>
+            </ul>
+        </div>
+        <div class="road-card n rv rv-delay-1">
+            <div class="road-tag" data-i18n="roadmap_v22">v2.2 — Next</div>
+            <h4 data-i18n="roadmap_v22_title">Friends & Social</h4>
+            <ul class="road-list">
+                <li data-i18n="r2_1">Visit friends' pets</li>
+                <li data-i18n="r2_2">Mood music</li>
+                <li data-i18n="r2_3">Desktop widgets</li>
+                <li data-i18n="r2_4">iCloud sync</li>
+                <li data-i18n="r2_5">Custom skins</li>
+                <li data-i18n="r2_6">Photo mode</li>
+            </ul>
+        </div>
+        <div class="road-card f rv rv-delay-2">
+            <div class="road-tag" data-i18n="roadmap_v3">v3.0 — One Day</div>
+            <h4 data-i18n="roadmap_v3_title">New Friends!</h4>
+            <ul class="road-list">
+                <li data-i18n="r3_1">Dogs, hamsters, parrots</li>
+                <li data-i18n="r3_2">Pet houses</li>
+                <li data-i18n="r3_3">Multi-pet life</li>
+                <li data-i18n="r3_4">iOS app</li>
+                <li data-i18n="r3_5">AI personality</li>
+                <li data-i18n="r3_6">Community marketplace</li>
+            </ul>
         </div>
     </div>
 </section>
 
-<!-- Roadmap -->
-<section class="section reveal">
-    <div class="container">
-        <h2 class="section-title" data-i18n="roadmap_title">Roadmap</h2>
-        <p class="section-subtitle" data-i18n="roadmap_subtitle">What's coming next for Murchi</p>
-        <div class="roadmap-grid">
-            <div class="roadmap-card soon">
-                <div class="roadmap-phase" data-i18n="roadmap_v21">v2.1 — Coming Soon</div>
-                <h3 data-i18n="roadmap_v21_title">More Items & Mini-Games</h3>
-                <ul class="roadmap-list">
-                    <li class="done" data-i18n="r1_1">25+ cat behaviors</li>
-                    <li class="done" data-i18n="r1_2">Cat diary with blog entries</li>
-                    <li class="done" data-i18n="r1_3">5 accessories (hat, bow tie, crown, glasses, flower)</li>
-                    <li data-i18n="r1_4">15+ new accessories (scarves, sunglasses, bandanas...)</li>
-                    <li data-i18n="r1_5">New foods: sushi, cake, pizza, ice cream</li>
-                    <li data-i18n="r1_6">Mini-games: catch the fish, dodge the vacuum</li>
-                    <li data-i18n="r1_7">Seasonal events (Halloween, Christmas, New Year)</li>
-                </ul>
-            </div>
-            <div class="roadmap-card next">
-                <div class="roadmap-phase" data-i18n="roadmap_v22">v2.2 — Next Up</div>
-                <h3 data-i18n="roadmap_v22_title">Social & Multiplayer</h3>
-                <ul class="roadmap-list">
-                    <li data-i18n="r2_1">Visit friends' cats on their desktops</li>
-                    <li data-i18n="r2_2">Cat mood music & ambient sounds</li>
-                    <li data-i18n="r2_3">Desktop widgets (stats, diary preview)</li>
-                    <li data-i18n="r2_4">iCloud sync between Macs</li>
-                    <li data-i18n="r2_5">Custom color skins & patterns</li>
-                    <li data-i18n="r2_6">Photo mode with custom backgrounds</li>
-                </ul>
-            </div>
-            <div class="roadmap-card future">
-                <div class="roadmap-phase" data-i18n="roadmap_v3">v3.0 — The Future</div>
-                <h3 data-i18n="roadmap_v3_title">New Pets & Worlds</h3>
-                <ul class="roadmap-list">
-                    <li data-i18n="r3_1">New pet types: dog, hamster, parrot, bunny</li>
-                    <li data-i18n="r3_2">Pet houses & furniture decorating</li>
-                    <li data-i18n="r3_3">Multi-pet households</li>
-                    <li data-i18n="r3_4">iOS companion app</li>
-                    <li data-i18n="r3_5">AI personality — unique dialog for each cat</li>
-                    <li data-i18n="r3_6">Community marketplace for accessories</li>
-                </ul>
-            </div>
-        </div>
+<!-- ═══ INSTALL ═══ -->
+<section class="story story-center">
+    <h2 class="rv" data-i18n="install_title">Adopt Me</h2>
+    <p class="story-text rv rv-delay-1" style="margin:0 auto" data-i18n="install_sub">It takes 10 seconds. I promise.</p>
+    <div class="steps">
+        <div class="step rv"><div class="step-n">1</div><div class="step-t" data-i18n="step1">Download <strong>Murchi.dmg</strong></div></div>
+        <div class="step rv rv-delay-1"><div class="step-n">2</div><div class="step-t" data-i18n="step2">Drag <strong>Murchi</strong> to Applications</div></div>
+        <div class="step rv rv-delay-2"><div class="step-n">3</div><div class="step-t" data-i18n="step3">If macOS blocks it, run in Terminal: <strong>xattr -cr /Applications/Murchi.app</strong></div></div>
+        <div class="step rv rv-delay-3"><div class="step-n">4</div><div class="step-t" data-i18n="step4">Launch it! <strong>Cmd+Shift+M</strong> to call me anytime</div></div>
     </div>
 </section>
 
-<!-- Install -->
-<section class="section reveal">
-    <div class="container">
-        <h2 class="section-title" data-i18n="install_title">Get Started in Seconds</h2>
-        <div class="steps">
-            <div class="step">
-                <div class="step-num">1</div>
-                <div class="step-text" data-i18n="step1">Download <strong>Murchi.dmg</strong> above</div>
-            </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div class="step-text" data-i18n="step2">Open the DMG and drag <strong>Murchi</strong> to Applications</div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div class="step-text" data-i18n="step3">Launch it. If macOS blocks: <strong>Settings > Privacy > Open Anyway</strong></div>
-            </div>
-            <div class="step">
-                <div class="step-num">4</div>
-                <div class="step-text" data-i18n="step4">Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Pay what you want -->
-<section class="pay-section reveal">
-    <div class="pay-card">
-        <div class="charity-badge" data-i18n="charity_badge">50% goes to animal charity</div>
-        <h2 data-i18n="pay_title">Pay What You Want</h2>
-        <p class="subtitle" data-i18n="pay_subtitle">Murchi is free forever. Support development if you'd like — half goes to animal rescue.</p>
+<!-- ═══ SUPPORT ═══ -->
+<section class="story story-center">
+    <h2 class="rv" data-i18n="pay_title">Help Me <span class="story-accent">Grow</span></h2>
+    <div class="donate-card rv rv-delay-1">
+        <div class="badge" data-i18n="charity_badge">50% goes to animal charity</div>
+        <h3 data-i18n="pay_h">Pay What You Want</h3>
+        <p class="sub" data-i18n="pay_subtitle">I'm free forever. But if you want to help — half goes to animal rescue.</p>
         <div class="crypto-grid">
-            <div class="crypto-row" onclick="copyAddr(this, 'bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d')">
-                <div class="crypto-icon btc">BTC</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">Bitcoin</div>
-                    <div class="crypto-addr">bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d</div>
-                </div>
+            <div class="crypto-row" onclick="copyAddr(this,'bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d')">
+                <div class="crypto-ic btc">BTC</div>
+                <div class="crypto-info"><div class="crypto-label">Bitcoin</div><div class="crypto-addr">bc1qryvllmwrurnkykq7wkd9n4mhn6w7trpt4nz99d</div></div>
                 <button class="copy-btn" data-i18n="copy">Copy</button>
             </div>
-            <div class="crypto-row" onclick="copyAddr(this, '0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91')">
-                <div class="crypto-icon eth">ETH</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">ETH / USDT / USDC</div>
-                    <div class="crypto-addr">0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91</div>
-                </div>
+            <div class="crypto-row" onclick="copyAddr(this,'0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91')">
+                <div class="crypto-ic eth">ETH</div>
+                <div class="crypto-info"><div class="crypto-label">ETH / USDT / USDC</div><div class="crypto-addr">0xa018C2B8F71fb047c26D428aBEd36fA55E7DbD91</div></div>
                 <button class="copy-btn" data-i18n="copy">Copy</button>
             </div>
-            <div class="crypto-row" onclick="copyAddr(this, 'CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9')">
-                <div class="crypto-icon sol">SOL</div>
-                <div class="crypto-info">
-                    <div class="crypto-label">Solana</div>
-                    <div class="crypto-addr">CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9</div>
-                </div>
+            <div class="crypto-row" onclick="copyAddr(this,'CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9')">
+                <div class="crypto-ic sol">SOL</div>
+                <div class="crypto-info"><div class="crypto-label">Solana</div><div class="crypto-addr">CMbX7U9bmcgHo5qTzzQzRUet2qNvCYFC79LSnwL9cTu9</div></div>
                 <button class="copy-btn" data-i18n="copy">Copy</button>
             </div>
         </div>
-        <div class="charity-note" data-i18n="charity_note">50% of every donation goes to animal shelters and rescue organizations</div>
+        <div class="charity-note" data-i18n="charity_note">50% of every donation goes to animal shelters</div>
     </div>
 </section>
 
-<!-- Donations -->
-<section class="donations-section reveal">
-    <div class="donations-card">
-        <h2 class="section-title" data-i18n="donations_title">Donation Wall</h2>
-        <p class="empty-donations" data-i18n="donations_empty">Be the first to support Murchi and help animals!</p>
-    </div>
-</section>
-
-<!-- Footer -->
 <footer>
-    <div class="container">
-        <p>&copy; 2026 <a href="https://murchi.pet">murchi.pet</a> &middot; <span data-i18n="footer_made">Made with love for cats everywhere</span></p>
-    </div>
+    <div>&copy; 2026 <a href="https://murchi.pet">murchi.pet</a> &middot; <span data-i18n="footer_made">Made with love for pets everywhere</span></div>
 </footer>
 
 <script>
-// ══════════════════════════════════════════════
-//  INTERACTIVE CAT DEMO
-// ══════════════════════════════════════════════
+// ═══ DEMO ═══
+(function(){
+    var screen = document.getElementById('demo-screen');
+    var pet = document.getElementById('pet-sprite');
+    var hint = document.getElementById('demo-hint');
+    var starsEl = document.getElementById('demo-stars');
 
-(function() {
-    const screen = document.getElementById('desktop-screen');
-    const canvas = document.getElementById('demo-canvas');
-    const ctx = canvas.getContext('2d');
-    const statsEl = document.getElementById('demo-stats');
-    const hintEl = document.getElementById('click-hint');
-
-    const SCALE = 4;
-    canvas.width = 16 * SCALE;
-    canvas.height = 16 * SCALE;
-    canvas.style.width = (16 * SCALE) + 'px';
-    canvas.style.height = (16 * SCALE) + 'px';
-
-    // Sprites
-    const T = 0, B = 0x2D2D3F, G = 0x9898B0, GD = 0x7E7E98, P = 0xFFBBCC, W = 0xF0F0F8;
-    const GR = 0x88DD88, Y = 0xFFDD33, BL = 0x55AAFF;
-
-    const sprites = {
-        idle: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        walk1: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,B,W,W,B,G,G,G,G,G,G,B,W,W,B,T],
-            [T,T,B,B,T,B,B,B,B,B,B,T,B,B,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        walk2: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,B,G,G,G,G,G,G,B,W,B,T,T],
-            [T,T,T,B,T,T,B,B,B,B,T,T,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        happy: [
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],
-            [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,G,B,B,G,G,G,G,B,B,G,G,B,T],
-            [T,B,G,G,G,B,G,G,G,G,B,G,G,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
-            [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],
-            [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],
-            [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],
-            [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-        ],
-        sleep: [
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-            [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],
-            [T,B,G,G,B,B,B,B,B,B,B,B,G,G,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,B,G,B,B,B,G,G,G,G,B,B,B,G,B,T],
-            [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],
-            [T,T,B,G,G,G,G,P,P,G,G,G,G,B,T,T],
-            [T,T,T,B,G,G,G,G,G,G,G,G,B,T,T,T],
-            [T,B,B,G,G,G,G,G,G,G,G,G,G,B,B,T],
-            [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],
-            [T,T,B,B,B,B,B,B,B,B,B,B,B,B,T,T],
-        ],
-    };
-
-    function drawSprite(data, flipX) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let y = 0; y < 16; y++) {
-            for (let x = 0; x < 16; x++) {
-                const hex = data[y][x];
-                if (!hex) continue;
-                const r = (hex >> 16) & 0xFF;
-                const g = (hex >> 8) & 0xFF;
-                const b = hex & 0xFF;
-                ctx.fillStyle = `rgb(${r},${g},${b})`;
-                const px = flipX ? (15 - x) : x;
-                ctx.fillRect(px * SCALE, y * SCALE, SCALE, SCALE);
-            }
-        }
+    // Generate stars
+    for(var i=0;i<30;i++){
+        var s=document.createElement('div');s.className='demo-star';
+        s.style.left=Math.random()*100+'%';s.style.top=Math.random()*70+'%';
+        s.style.animationDelay=Math.random()*3+'s';s.style.animationDuration=(2+Math.random()*3)+'s';
+        starsEl.appendChild(s);
     }
 
-    // Cat state
-    const rect = screen.getBoundingClientRect;
-    let catX = 300, catY = 0;
-    let targetX = null;
-    let facingRight = true;
-    let behavior = 'idle'; // idle, walking, sleeping, happy
-    let frame = 0;
-    let behaviorTimer = 0;
-    let showStats = false;
-    let statsTimer = 0;
-    let hintHidden = false;
-
-    // Stats
-    const demoStats = {
-        food: 72, happy: 85, energy: 60, social: 55, clean: 90, health: 95
-    };
-    const statColors = {
-        food: '#ff8c40', happy: '#ff5a80', energy: '#4dc0ff',
-        social: '#a66dff', clean: '#40e899', health: '#ff4d5a'
-    };
-    const statIcons = {
-        food: '🍖', happy: '❤️', energy: '⚡',
-        social: '👥', clean: '🚿', health: '💚'
-    };
-
-    function buildStatsHTML() {
-        let html = '';
-        for (const [key, val] of Object.entries(demoStats)) {
-            html += `<div class="demo-stat-row" style="transform:translateX(-10px);opacity:0;animation:statSlide 0.3s ${Object.keys(demoStats).indexOf(key) * 0.06}s forwards">
-                <div class="demo-stat-icon">${statIcons[key]}</div>
-                <div class="demo-stat-bar"><div class="demo-stat-fill" style="width:${val}%;background:${statColors[key]}"></div></div>
-                <div class="demo-stat-pct">${val}%</div>
-            </div>`;
-        }
-        return html;
+    var hintGone=false,bobPhase=0;
+    // Center the cat
+    var petW=140,petH=140;
+    function positionPet(){
+        var cx=screen.clientWidth/2-petW/2;
+        var cy=screen.clientHeight-90-petH;
+        pet.style.left=cx+'px';pet.style.top=cy+'px';
     }
+    positionPet();
 
-    // Ground Y (just above dock)
-    function getGroundY() {
-        return screen.clientHeight - 72;
+    // Idle breathing animation
+    function breathe(){
+        bobPhase+=0.04;
+        var bob=Math.sin(bobPhase)*3;
+        var baseTop=screen.clientHeight-90-petH;
+        pet.style.top=(baseTop+bob)+'px';
+        requestAnimationFrame(breathe);
     }
-    function getDockLeft() {
-        const sw = screen.clientWidth;
-        const dw = document.querySelector('.fake-dock').offsetWidth;
-        return (sw - dw) / 2;
-    }
-    function getDockRight() {
-        return getDockLeft() + document.querySelector('.fake-dock').offsetWidth;
-    }
+    requestAnimationFrame(breathe);
 
-    // Position cat
-    function updateCatPosition() {
-        const groundY = getGroundY();
-        canvas.style.left = catX + 'px';
-        canvas.style.top = (groundY - canvas.height) + 'px';
-        // Stats follow cat
-        statsEl.style.left = (catX - 10) + 'px';
-        statsEl.style.top = (groundY - canvas.height - 65) + 'px';
-    }
-
-    // Particles
-    function spawnParticle(emoji, x, y) {
-        const p = document.createElement('div');
-        p.className = 'demo-particle';
-        p.textContent = emoji;
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        p.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
-        screen.appendChild(p);
-        setTimeout(() => p.remove(), 1500);
-    }
-
-    // Speech bubble
-    function showBubble(text) {
-        const b = document.createElement('div');
-        b.className = 'demo-bubble';
-        b.textContent = text;
-        b.style.left = (catX + canvas.width / 2) + 'px';
-        b.style.top = (getGroundY() - canvas.height - 24) + 'px';
-        b.style.transform = 'translateX(-50%)';
-        screen.appendChild(b);
-        setTimeout(() => b.remove(), 2500);
-    }
-
-    const bubbles = [
-        "Purrrr~", "Meow!", "Love you!", "*happy*", "More pets!",
-        "Nya~", "*purrs*", "Hehe~", "Yay!", "*nuzzle*"
-    ];
-
-    // Click handler
-    screen.addEventListener('click', function(e) {
-        const rect = screen.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        const catRight = catX + canvas.width;
-        const catTop = getGroundY() - canvas.height;
-
-        // Check if clicked on cat
-        if (clickX >= catX && clickX <= catRight && clickY >= catTop && clickY <= getGroundY()) {
-            // Pet the cat!
-            behavior = 'happy';
-            behaviorTimer = 90;
-            if (!hintHidden) {
-                hintEl.style.display = 'none';
-                hintHidden = true;
-            }
-
-            // Show stats
-            statsEl.innerHTML = buildStatsHTML();
-            statsEl.classList.add('visible');
-            showStats = true;
-            statsTimer = 120;
-
-            // Particles
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => {
-                    const px = catX + 10 + Math.random() * (canvas.width - 20);
-                    const py = catTop - 5 + Math.random() * 20;
-                    spawnParticle(['❤️', '💖', '💕', '✨'][i % 4], px, py);
-                }, i * 120);
-            }
-
-            // Bubble
-            showBubble(bubbles[Math.floor(Math.random() * bubbles.length)]);
-
-            // Animate stats change
-            demoStats.happy = Math.min(100, demoStats.happy + 3);
-            demoStats.social = Math.min(100, demoStats.social + 2);
-        }
+    // Follow mouse — tilt toward cursor
+    var curRotate=0,curScaleX=1;
+    screen.addEventListener('mousemove',function(e){
+        var r=screen.getBoundingClientRect();
+        var mx=e.clientX-r.left,my=e.clientY-r.top;
+        var petCx=screen.clientWidth/2,petCy=screen.clientHeight-90-petH/2;
+        var dx=mx-petCx,dy=my-petCy;
+        var angle=Math.atan2(dy,Math.abs(dx))*0.15; // subtle vertical tilt
+        var lean=Math.max(-12,Math.min(12,dx*0.03)); // lean toward mouse
+        curScaleX=dx<0?-1:1;
+        curRotate=lean;
+        pet.style.transform='scaleX('+curScaleX+') rotate('+lean+'deg)';
     });
 
-    // Main loop
-    function tick() {
-        frame++;
+    screen.addEventListener('mouseleave',function(){
+        curRotate=0;curScaleX=1;
+        pet.style.transform='scaleX(1) rotate(0deg)';
+    });
 
-        // Behavior AI
-        if (behaviorTimer > 0) {
-            behaviorTimer--;
-            if (behaviorTimer === 0) {
-                behavior = 'idle';
-                targetX = null;
-            }
+    // Click — hearts & bubbles
+    pet.addEventListener('click',function(e){
+        e.stopPropagation();
+        if(!hintGone){hint.style.display='none';hintGone=true}
+        var r=screen.getBoundingClientRect();
+        var px=screen.clientWidth/2-petW/2,py=screen.clientHeight-90-petH;
+        for(var i=0;i<5;i++){
+            (function(idx){setTimeout(function(){
+                var p=document.createElement('div');p.className='demo-particle';
+                p.textContent=['❤️','💖','💕','✨','🌟'][idx%5];
+                p.style.left=(px+20+Math.random()*100)+'px';
+                p.style.top=(py-10+Math.random()*30)+'px';
+                screen.appendChild(p);setTimeout(function(){p.remove()},1500);
+            },idx*100)})(i);
         }
-
-        if (behavior === 'idle' && frame % 120 === 0 && Math.random() < 0.6) {
-            // Start walking
-            const sw = screen.clientWidth;
-            targetX = 40 + Math.random() * (sw - 120);
-            behavior = 'walking';
-            behaviorTimer = 300;
-        }
-
-        if (behavior === 'idle' && frame % 600 === 0 && Math.random() < 0.3) {
-            behavior = 'sleeping';
-            behaviorTimer = 200;
-        }
-
-        // Walking
-        if (behavior === 'walking' && targetX !== null) {
-            const speed = 1.2;
-            const dx = targetX - catX;
-            if (Math.abs(dx) < speed * 2) {
-                catX = targetX;
-                targetX = null;
-                behavior = 'idle';
-                behaviorTimer = 0;
-            } else {
-                catX += dx > 0 ? speed : -speed;
-                facingRight = dx > 0;
-            }
-        }
-
-        // Clamp
-        const maxX = screen.clientWidth - canvas.width - 10;
-        catX = Math.max(10, Math.min(maxX, catX));
-
-        // Draw sprite
-        let sprite;
-        if (behavior === 'sleeping') {
-            sprite = sprites.sleep;
-        } else if (behavior === 'happy') {
-            sprite = sprites.happy;
-        } else if (behavior === 'walking') {
-            sprite = (Math.floor(frame / 8) % 2 === 0) ? sprites.walk1 : sprites.walk2;
-        } else {
-            sprite = sprites.idle;
-        }
-        drawSprite(sprite, !facingRight);
-
-        // Stats timer
-        if (showStats) {
-            statsTimer--;
-            if (statsTimer <= 0) {
-                statsEl.classList.remove('visible');
-                showStats = false;
-            }
-        }
-
-        updateCatPosition();
-        requestAnimationFrame(tick);
-    }
-
-    // Init
-    catX = screen.clientWidth / 2 - canvas.width / 2;
-    updateCatPosition();
-    drawSprite(sprites.idle, false);
-
-    // Inject stat animation keyframes
-    const styleTag = document.createElement('style');
-    styleTag.textContent = `@keyframes statSlide { to { transform: translateX(0); opacity: 1; } }`;
-    document.head.appendChild(styleTag);
-
-    requestAnimationFrame(tick);
+        var b=document.createElement('div');b.className='demo-bubble';
+        b.textContent=["Purrrr~","Meow!","Love you!","*happy*","Nya~","Hehe~"][Math.floor(Math.random()*6)];
+        b.style.left=(px+petW/2)+'px';b.style.top=(py-20)+'px';b.style.transform='translateX(-50%)';
+        screen.appendChild(b);setTimeout(function(){b.remove()},2500);
+        // Happy bounce
+        pet.style.transform='scaleX('+curScaleX+') rotate('+curRotate+'deg) scale(1.1)';
+        setTimeout(function(){pet.style.transform='scaleX('+curScaleX+') rotate('+curRotate+'deg) scale(1)'},200);
+    });
 })();
 
+// ═══ SCROLL REVEAL ═══
+var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vis')});
+},{threshold:0.1});
+document.querySelectorAll('.rv').forEach(function(el){obs.observe(el)});
 
-// ══════════════════════════════════════════════
-//  SCROLL REVEAL
-// ══════════════════════════════════════════════
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('visible');
-    });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-
-// ══════════════════════════════════════════════
-//  COPY ADDRESS
-// ══════════════════════════════════════════════
-function copyAddr(row, addr) {
+// ═══ COPY ═══
+function copyAddr(row,addr){
     navigator.clipboard.writeText(addr);
-    const btn = row.querySelector('.copy-btn');
-    btn.textContent = translations[currentLang].copied || 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => {
-        btn.textContent = translations[currentLang].copy || 'Copy';
-        btn.classList.remove('copied');
-    }, 2000);
+    var btn=row.querySelector('.copy-btn');
+    btn.textContent=translations[currentLang].copied||'Copied!';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent=translations[currentLang].copy||'Copy';btn.classList.remove('copied')},2000);
 }
 
+// ═══ TRANSLATIONS ═══
+var translations={
+en:{tagline:"Your desktop companion.<br>Lives on your Mac. Needs your love.",download:"Download for macOS",github_star:"Star on GitHub",
+meet_title:"Hey!<br>I'm <span class=\"story-accent\">Murchi</span>.",meet_text:"I'm your desktop pet. I live right here, on your macOS screen. I walk around, chase butterflies, knock things off your desk, and make your day better.",
+demo_title:"Watch Me<br><span class=\"story-accent\">Live</span>",demo_text:"I roam your desktop, sit on the Dock, and react when you pet me. Try it!",click_hint:"Click me!",
+feat_title:"I eat. I sleep.<br>I <span class=\"story-accent\">play</span>.",feat_text:"25+ unique behaviors. A full life, right on your desktop.",
+f1_title:"25+ Behaviors",f1_desc:"Walking, sleeping, zoomies, grooming, bathing, chasing butterflies, watching birds, knocking glasses off tables. I have a life of my own.",
+f2_title:"Feed & Care",f2_desc:"Fish, milk, treats. Keep my hunger, happiness, energy, and health in check.",
+f3_title:"Toys & Stuff",f3_desc:"Yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.",
+f7_title:"My Diary",f7_desc:"I keep a personal blog about my day. When I got fed, played, saw a butterfly, got sick, celebrated a birthday.",
+f4_title:"Level Up",f4_desc:"Earn XP from caring. Evolve from Baby to Cosmic across 5 stages.",
+f5_title:"Particles",f5_desc:"Hearts, stars, sparkles, poof clouds, paw prints, sleep Z's.",
+f8_title:"Dock Life",f8_desc:"I walk on the macOS Dock. Sometimes I fall off the edges!",
+emo_title:"Sometimes...<br>I feel <span class=\"story-accent\">alone</span> <span class=\"tear\">💧</span>",
+emo_text:"I sit by myself and watch the cursor move around... Where are my friends? I dream about dogs running next to me, hamsters in their wheels, parrots sitting on my head...",
+emo_but:"But then you <span class=\"story-accent\">pet me</span>,<br>and everything is okay.",
+emo_ok:"Hearts float around me. I purr. I'm the happiest pet alive. And I know — one day, my friends will come too.",
+road_title:"My <span class=\"story-accent\">Dreams</span>",road_text:"Things I'm wishing for. Some are almost here...",
+roadmap_v21:"v2.1 — Soon",roadmap_v21_title:"More Items & Games",r1_1:"25+ behaviors",r1_2:"My diary",r1_3:"5 accessories",r1_4:"15+ new accessories",r1_5:"Sushi, cake, pizza",r1_6:"Mini-games",r1_7:"Seasonal events",
+roadmap_v22:"v2.2 — Next",roadmap_v22_title:"Friends & Social",r2_1:"Visit friends' pets",r2_2:"Mood music",r2_3:"Desktop widgets",r2_4:"iCloud sync",r2_5:"Custom skins",r2_6:"Photo mode",
+roadmap_v3:"v3.0 — One Day",roadmap_v3_title:"New Friends!",r3_1:"Dogs, hamsters, parrots",r3_2:"Pet houses",r3_3:"Multi-pet life",r3_4:"iOS app",r3_5:"AI personality",r3_6:"Community marketplace",
+install_title:"Adopt Me",install_sub:"It takes 10 seconds. I promise.",
+step1:"Download <strong>Murchi.dmg</strong>",step2:"Drag <strong>Murchi</strong> to Applications",step3:"If macOS blocks it, run in Terminal: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Launch it! <strong>Cmd+Shift+M</strong> to call me anytime",
+pay_title:"Help Me <span class=\"story-accent\">Grow</span>",charity_badge:"50% goes to animal charity",pay_h:"Pay What You Want",pay_subtitle:"I'm free forever. But if you want to help — half goes to animal rescue.",
+copy:"Copy",copied:"Copied!",charity_note:"50% of every donation goes to animal shelters",footer_made:"Made with love for pets everywhere"},
 
-// ══════════════════════════════════════════════
-//  TRANSLATIONS
-// ══════════════════════════════════════════════
-const translations = {
-    en: {
-        tagline: "Your desktop Tamagotchi. A pixel-art cat that lives on your macOS. Feed, play, love.",
-        download: "Download for macOS",
-        github_star: "Star on GitHub",
-        github_sub: "Help Murchi grow!",
-        demo_label: "Live Preview — click the cat!",
-        click_hint: "Click the cat to pet it",
-        features_title: "Everything a Cat Needs",
-        features_subtitle: "A full Tamagotchi experience right on your desktop",
-        f1_title: "25+ Behaviors", f1_desc: "Walking, sleeping, zoomies, grooming, bathing, promenading, chasing butterflies, watching birds, knocking glasses off tables, and much more. Your cat has a life of its own.",
-        f2_title: "Feed & Care", f2_desc: "Fish, milk, treats. Keep hunger, happiness, energy, hygiene, and health in check.",
-        f3_title: "Toys & Accessories", f3_desc: "Mouse, yarn ball, laser pointer. Hats, bow ties, crowns, glasses, flowers.",
-        f4_title: "Level Up & Evolve", f4_desc: "Earn XP from caring. Evolve from Baby to Cosmic Murchi across 5 stages.",
-        f5_title: "Particle Magic", f5_desc: "Hearts, stars, sparkles, poof clouds, paw prints, sleep Z particles.",
-        f7_title: "Cat Diary", f7_desc: "Murchi keeps a personal blog about its day — when it got fed, played, saw a butterfly, got sick, celebrated a birthday. Read it like a real pet journal.",
-        f8_title: "Lives on Your Dock", f8_desc: "Walks on the macOS Dock as a physical platform. Falls off the edges!",
-        install_title: "Get Started in Seconds",
-        step1: "Download <strong>Murchi.dmg</strong> above",
-        step2: "Open the DMG and drag <strong>Murchi</strong> to Applications",
-        step3: "Launch it. If macOS blocks: <strong>Settings > Privacy > Open Anyway</strong>",
-        step4: "Murchi appears on your desktop! <strong>Cmd+Shift+M</strong> to summon",
-        charity_badge: "50% goes to animal charity",
-        pay_title: "Pay What You Want",
-        pay_subtitle: "Murchi is free forever. Support development if you'd like — half goes to animal rescue.",
-        copy: "Copy", copied: "Copied!",
-        charity_note: "50% of every donation goes to animal shelters and rescue organizations",
-        donations_title: "Donation Wall",
-        donations_empty: "Be the first to support Murchi and help animals!",
-        roadmap_title: "Roadmap",
-        roadmap_subtitle: "What's coming next for Murchi",
-        roadmap_v21: "v2.1 — Coming Soon",
-        roadmap_v21_title: "More Items & Mini-Games",
-        r1_1: "25+ cat behaviors", r1_2: "Cat diary with blog entries", r1_3: "5 accessories (hat, bow tie, crown, glasses, flower)",
-        r1_4: "15+ new accessories (scarves, sunglasses, bandanas...)", r1_5: "New foods: sushi, cake, pizza, ice cream",
-        r1_6: "Mini-games: catch the fish, dodge the vacuum", r1_7: "Seasonal events (Halloween, Christmas, New Year)",
-        roadmap_v22: "v2.2 — Next Up",
-        roadmap_v22_title: "Social & Multiplayer",
-        r2_1: "Visit friends' cats on their desktops", r2_2: "Cat mood music & ambient sounds",
-        r2_3: "Desktop widgets (stats, diary preview)", r2_4: "iCloud sync between Macs",
-        r2_5: "Custom color skins & patterns", r2_6: "Photo mode with custom backgrounds",
-        roadmap_v3: "v3.0 — The Future",
-        roadmap_v3_title: "New Pets & Worlds",
-        r3_1: "New pet types: dog, hamster, parrot, bunny", r3_2: "Pet houses & furniture decorating",
-        r3_3: "Multi-pet households", r3_4: "iOS companion app",
-        r3_5: "AI personality — unique dialog for each cat", r3_6: "Community marketplace for accessories",
-        footer_made: "Made with love for cats everywhere"
-    },
-    ru: {
-        tagline: "Тамагочи на рабочем столе. Пиксельный кот для macOS. Корми, играй, люби.",
-        download: "Скачать для macOS",
-        github_star: "Звезда на GitHub",
-        github_sub: "Помоги Murchi расти!",
-        demo_label: "Живое превью — кликни на кота!",
-        click_hint: "Нажми на кота, чтобы погладить",
-        features_title: "Все, что нужно коту",
-        features_subtitle: "Полный тамагочи прямо на рабочем столе",
-        f1_title: "25+ действий", f1_desc: "Ходит, спит, бегает, умывается, купается, гуляет, ловит бабочек, наблюдает за птицами, скидывает стаканы со стола и многое другое.",
-        f2_title: "Корми и ухаживай", f2_desc: "Рыбка, молоко, лакомства. Следи за голодом, счастьем, энергией, гигиеной и здоровьем.",
-        f3_title: "Игрушки и аксессуары", f3_desc: "Мышка, клубок, лазер. Шляпы, бабочки, короны, очки, цветы.",
-        f4_title: "Уровни и эволюция", f4_desc: "Получай опыт за заботу. Эволюция от малыша до Космического Мурчи.",
-        f5_title: "Магия частиц", f5_desc: "Сердечки, звёзды, блёстки, облачка, следы лап, Zzz во сне.",
-        f7_title: "Дневник кота", f7_desc: "Мурчи ведёт личный блог — когда его кормили, играли, видел бабочку, заболел, праздновал день рождения. Читай как настоящий журнал питомца.",
-        f8_title: "Живёт на Доке", f8_desc: "Ходит по Доку macOS как по платформе. Падает с краёв!",
-        install_title: "Начни за секунды",
-        step1: "Скачай <strong>Murchi.dmg</strong> выше",
-        step2: "Открой DMG и перетащи <strong>Murchi</strong> в Applications",
-        step3: "Запусти. Если macOS блокирует: <strong>Настройки > Конфиденциальность > Всё равно открыть</strong>",
-        step4: "Мурчи на рабочем столе! <strong>Cmd+Shift+M</strong> чтобы позвать",
-        charity_badge: "50% на благотворительность для животных",
-        pay_title: "Заплати сколько хочешь",
-        pay_subtitle: "Мурчи бесплатен навсегда. Хотите поддержать — половина идёт на помощь животным.",
-        copy: "Копировать", copied: "Скопировано!",
-        charity_note: "50% каждого доната идёт в приюты для животных",
-        donations_title: "Стена донатов",
-        donations_empty: "Стань первым, кто поддержит Мурчи и поможет животным!",
-        roadmap_title: "Планы",
-        roadmap_subtitle: "Что будет дальше в Мурчи",
-        roadmap_v21: "v2.1 — Скоро",
-        roadmap_v21_title: "Больше предметов и мини-игры",
-        r1_1: "25+ действий кота", r1_2: "Дневник с записями", r1_3: "5 аксессуаров (шляпа, бабочка, корона, очки, цветок)",
-        r1_4: "15+ новых аксессуаров (шарфы, очки, банданы...)", r1_5: "Новая еда: суши, торт, пицца, мороженое",
-        r1_6: "Мини-игры: поймай рыбку, уклонись от пылесоса", r1_7: "Сезонные ивенты (Хэллоуин, Рождество, Новый год)",
-        roadmap_v22: "v2.2 — Далее",
-        roadmap_v22_title: "Социальное и мультиплеер",
-        r2_1: "Ходить в гости к котам друзей", r2_2: "Музыка настроения и звуки",
-        r2_3: "Виджеты для рабочего стола", r2_4: "Синхронизация через iCloud",
-        r2_5: "Кастомные скины и расцветки", r2_6: "Фото-режим с фонами",
-        roadmap_v3: "v3.0 — Будущее",
-        roadmap_v3_title: "Новые питомцы и миры",
-        r3_1: "Новые питомцы: собака, хомяк, попугай, кролик", r3_2: "Домики и мебель",
-        r3_3: "Несколько питомцев одновременно", r3_4: "iOS приложение-компаньон",
-        r3_5: "AI-личность — уникальные диалоги для каждого кота", r3_6: "Маркетплейс аксессуаров от сообщества",
-        footer_made: "Сделано с любовью к котикам по всему миру"
-    },
-    es: {
-        tagline: "Tu Tamagotchi de escritorio. Un gato pixel para macOS. Alimenta, juega, ama.",
-        download: "Descargar para macOS",
-        github_star: "Estrella en GitHub",
-        github_sub: "Ayuda a Murchi a crecer!",
-        demo_label: "Vista previa en vivo — haz clic en el gato!",
-        click_hint: "Haz clic en el gato para acariciarlo",
-        features_title: "Todo lo que un gato necesita",
-        features_subtitle: "Una experiencia Tamagotchi completa en tu escritorio",
-        f1_title: "25+ comportamientos", f1_desc: "Caminar, dormir, correr, acicalarse, banarse, pasear, perseguir mariposas, observar pajaros, tirar vasos de la mesa y mucho mas.",
-        f2_title: "Alimenta y cuida", f2_desc: "Pescado, leche, golosinas. Controla hambre, felicidad, energia, higiene y salud.",
-        f3_title: "Juguetes y accesorios", f3_desc: "Raton, ovillo, laser. Sombreros, pajaritas, coronas, gafas, flores.",
-        f4_title: "Sube de nivel", f4_desc: "Gana XP cuidando. Evoluciona de bebe a Murchi Cosmico en 5 etapas.",
-        f5_title: "Magia de particulas", f5_desc: "Corazones, estrellas, destellos, nubes, huellas, particulas Z al dormir.",
-        f7_title: "Diario del gato", f7_desc: "Murchi escribe un blog personal sobre su dia — comidas, juegos, mariposas, enfermedades, cumpleanos. Leelo como un diario real.",
-        f8_title: "Vive en tu Dock", f8_desc: "Camina sobre el Dock de macOS como plataforma. Se cae por los bordes!",
-        install_title: "Empieza en segundos",
-        step1: "Descarga <strong>Murchi.dmg</strong> arriba",
-        step2: "Abre el DMG y arrastra <strong>Murchi</strong> a Aplicaciones",
-        step3: "Abrelo. Si macOS bloquea: <strong>Ajustes > Privacidad > Abrir de todos modos</strong>",
-        step4: "Murchi aparece en tu escritorio! <strong>Cmd+Shift+M</strong> para invocarlo",
-        charity_badge: "50% va a caridad animal",
-        pay_title: "Paga lo que quieras",
-        pay_subtitle: "Murchi es gratis para siempre. Apoya el desarrollo si quieres — la mitad va al rescate animal.",
-        copy: "Copiar", copied: "Copiado!",
-        charity_note: "El 50% de cada donacion va a refugios y organizaciones de rescate animal",
-        donations_title: "Muro de donaciones",
-        donations_empty: "Se el primero en apoyar a Murchi y ayudar a los animales!",
-        footer_made: "Hecho con amor para los gatos de todo el mundo"
-    },
-    zh: {
-        tagline: "桌面上的电子宠物。macOS上的像素猫。喂食、玩耍、爱护。",
-        download: "下载 macOS 版",
-        github_star: "GitHub 上加星",
-        github_sub: "帮助 Murchi 成长！",
-        demo_label: "实时预览 — 点击猫咪！",
-        click_hint: "点击猫咪来抚摸它",
-        features_title: "猫咪所需的一切",
-        features_subtitle: "桌面上的完整电子宠物体验",
-        f1_title: "25+ 种行为", f1_desc: "走路、睡觉、狂奔、梳理、洗澡、散步、追蝴蝶、看鸟、把杯子推下桌子等等。你的猫有自己的生活。",
-        f2_title: "喂食和照顾", f2_desc: "鱼、牛奶、零食。管理饥饿、快乐、能量、卫生和健康。",
-        f3_title: "玩具和配饰", f3_desc: "玩具鼠、毛线球、激光笔。帽子、领结、皇冠、眼镜、花朵。",
-        f4_title: "升级进化", f4_desc: "通过照顾获取经验。从宝宝进化到宇宙Murchi，共5个阶段。",
-        f5_title: "粒子魔法", f5_desc: "爱心、星星、闪光、烟雾、爪印、睡眠Z粒子。",
-        f7_title: "猫咪日记", f7_desc: "Murchi写个人博客记录每天——什么时候吃饭、玩耍、看到蝴蝶、生病、过生日。像真正的宠物日记一样阅读。",
-        f8_title: "住在Dock上", f8_desc: "在macOS Dock上走来走去。会从边缘掉下去！",
-        install_title: "几秒钟开始",
-        step1: "下载上方的 <strong>Murchi.dmg</strong>",
-        step2: "打开 DMG，将 <strong>Murchi</strong> 拖入应用程序",
-        step3: "启动它。如果macOS阻止：<strong>设置 > 隐私 > 仍然打开</strong>",
-        step4: "Murchi出现在桌面！<strong>Cmd+Shift+M</strong> 召唤",
-        charity_badge: "50% 捐给动物慈善",
-        pay_title: "随意付费",
-        pay_subtitle: "Murchi永久免费。想支持就支持——一半捐给动物救助。",
-        copy: "复制", copied: "已复制！",
-        charity_note: "每笔捐款的50%捐给动物收容所和救助组织",
-        donations_title: "捐赠墙",
-        donations_empty: "成为第一个支持Murchi和帮助动物的人！",
-        footer_made: "用爱为全世界的猫咪制作"
-    },
-    ja: {
-        tagline: "デスクトップのたまごっち。macOSのピクセル猫。餌をあげて、遊んで、愛して。",
-        download: "macOS版をダウンロード",
-        github_star: "GitHub でスターを",
-        github_sub: "Murchi を応援しよう！",
-        demo_label: "ライブプレビュー — 猫をクリック！",
-        click_hint: "猫をクリックして撫でよう",
-        features_title: "猫に必要な全て",
-        features_subtitle: "デスクトップで完全なたまごっち体験",
-        f1_title: "25以上の行動", f1_desc: "歩く、寝る、走り回る、毛づくろい、お風呂、散歩、蝶を追いかける、鳥を見る、コップを落とすなど。猫は自分の生活を持っています。",
-        f2_title: "餌やり＆お世話", f2_desc: "魚、ミルク、おやつ。空腹、幸福度、体力、衛生、健康を管理。",
-        f3_title: "おもちゃ＆アクセサリー", f3_desc: "ネズミ、毛糸玉、レーザー。帽子、蝶ネクタイ、王冠、眼鏡、花。",
-        f4_title: "レベルアップ＆進化", f4_desc: "お世話でXPを獲得。ベビーからコスミックMurchiまで5段階の進化。",
-        f5_title: "パーティクルマジック", f5_desc: "ハート、星、キラキラ、煙、足跡、睡眠Zパーティクル。",
-        f7_title: "猫の日記", f7_desc: "Murchiが日々のブログを書きます — いつ食べた、遊んだ、蝶を見た、病気になった、誕生日を祝った。本物のペット日記として読めます。",
-        f8_title: "Dockに住む", f8_desc: "macOSのDockの上を歩きます。端から落ちることも！",
-        install_title: "数秒で始められます",
-        step1: "上の <strong>Murchi.dmg</strong> をダウンロード",
-        step2: "DMGを開いて <strong>Murchi</strong> をアプリケーションにドラッグ",
-        step3: "起動。macOSがブロックしたら：<strong>設定 > プライバシー > このまま開く</strong>",
-        step4: "Murchiがデスクトップに！<strong>Cmd+Shift+M</strong> で呼び出し",
-        charity_badge: "50%が動物チャリティーに",
-        pay_title: "お好きな金額で",
-        pay_subtitle: "Murchiは永久無料。サポートしたい方はどうぞ — 半分が動物救助に。",
-        copy: "コピー", copied: "コピーしました！",
-        charity_note: "全寄付の50%が動物シェルターや保護団体に届きます",
-        donations_title: "寄付の壁",
-        donations_empty: "Murchiを最初に応援して動物を助けよう！",
-        footer_made: "世界中の猫への愛を込めて"
-    },
-    ko: {
-        tagline: "데스크탑 다마고치. macOS의 픽셀 고양이. 먹이주고, 놀아주고, 사랑하세요.",
-        download: "macOS용 다운로드",
-        github_star: "GitHub 스타",
-        github_sub: "Murchi 성장을 도와주세요!",
-        demo_label: "라이브 미리보기 — 고양이를 클릭하세요!",
-        click_hint: "고양이를 클릭해서 쓰다듬기",
-        features_title: "고양이에게 필요한 모든 것",
-        features_subtitle: "데스크탑에서 완전한 다마고치 체험",
-        f1_title: "25가지 이상의 행동", f1_desc: "걷기, 자기, 달리기, 그루밍, 목욕, 산책, 나비 쫓기, 새 구경, 컵 떨어뜨리기 등. 고양이는 자기만의 삶을 살아요.",
-        f2_title: "먹이 & 돌보기", f2_desc: "생선, 우유, 간식. 배고픔, 행복, 에너지, 위생, 건강 관리.",
-        f3_title: "장난감 & 액세서리", f3_desc: "쥐, 실타래, 레이저. 모자, 나비넥타이, 왕관, 안경, 꽃.",
-        f4_title: "레벨 업 & 진화", f4_desc: "돌보며 XP 획득. 아기에서 코스믹 Murchi까지 5단계 진화.",
-        f5_title: "파티클 마법", f5_desc: "하트, 별, 반짝임, 연기, 발자국, 수면 Z 파티클.",
-        f7_title: "고양이 일기", f7_desc: "Murchi가 매일 블로그를 써요 — 밥 먹은 시간, 놀이, 나비, 아픈 날, 생일. 진짜 반려동물 일기처럼 읽어보세요.",
-        f8_title: "Dock 위에서 살아요", f8_desc: "macOS Dock 위를 걸어다녀요. 가장자리에서 떨어지기도!",
-        install_title: "몇 초면 시작",
-        step1: "위에서 <strong>Murchi.dmg</strong> 다운로드",
-        step2: "DMG를 열고 <strong>Murchi</strong>를 응용 프로그램으로 드래그",
-        step3: "실행. macOS가 차단하면: <strong>설정 > 개인정보 > 그래도 열기</strong>",
-        step4: "Murchi가 데스크탑에! <strong>Cmd+Shift+M</strong>으로 소환",
-        charity_badge: "50%가 동물 자선단체에",
-        pay_title: "원하는 만큼 지불",
-        pay_subtitle: "Murchi는 영원히 무료. 지원하고 싶다면 — 절반이 동물 구조에.",
-        copy: "복사", copied: "복사됨!",
-        charity_note: "모든 기부금의 50%가 동물 보호소와 구조 단체에",
-        donations_title: "기부 벽",
-        donations_empty: "Murchi를 처음으로 응원하고 동물을 도와주세요!",
-        footer_made: "전 세계 고양이를 위한 사랑으로"
-    },
-    de: {
-        tagline: "Dein Desktop-Tamagotchi. Eine Pixel-Katze fur macOS. Futtern, spielen, lieben.",
-        download: "Fur macOS herunterladen",
-        github_star: "Stern auf GitHub",
-        github_sub: "Hilf Murchi zu wachsen!",
-        demo_label: "Live-Vorschau — klick die Katze!",
-        click_hint: "Klicke die Katze zum Streicheln",
-        features_title: "Alles was eine Katze braucht",
-        features_subtitle: "Ein vollstandiges Tamagotchi-Erlebnis auf deinem Desktop",
-        f1_title: "25+ Verhaltensweisen", f1_desc: "Laufen, schlafen, rennen, putzen, baden, spazieren, Schmetterlinge jagen, Vogel beobachten, Glaser vom Tisch werfen und vieles mehr.",
-        f2_title: "Futtern & Pflegen", f2_desc: "Fisch, Milch, Leckerlis. Verwalte Hunger, Gluck, Energie, Hygiene und Gesundheit.",
-        f3_title: "Spielzeug & Zubehor", f3_desc: "Maus, Wollknauel, Laserpointer. Hute, Fliegen, Kronen, Brillen, Blumen.",
-        f4_title: "Level-Aufstieg & Evolution", f4_desc: "Sammle XP durch Pflege. Entwickle dich vom Baby zum Kosmischen Murchi in 5 Stufen.",
-        f5_title: "Partikel-Magie", f5_desc: "Herzen, Sterne, Glitzer, Rauchwolken, Pfotenabdrucke, Schlaf-Z-Partikel.",
-        f7_title: "Katzen-Tagebuch", f7_desc: "Murchi schreibt ein personliches Blog uber seinen Tag — Futterung, Spiel, Schmetterlinge, Krankheit, Geburtstag. Lies es wie ein echtes Haustier-Journal.",
-        f8_title: "Lebt auf dem Dock", f8_desc: "Lauft auf dem macOS Dock als Plattform. Fallt uber den Rand!",
-        install_title: "In Sekunden starten",
-        step1: "Lade oben <strong>Murchi.dmg</strong> herunter",
-        step2: "Offne die DMG und ziehe <strong>Murchi</strong> in Programme",
-        step3: "Starte es. Falls macOS blockiert: <strong>Einstellungen > Datenschutz > Trotzdem offnen</strong>",
-        step4: "Murchi auf dem Desktop! <strong>Cmd+Shift+M</strong> zum Herbeirufen",
-        charity_badge: "50% gehen an Tierschutz",
-        pay_title: "Zahl was du willst",
-        pay_subtitle: "Murchi ist fur immer kostenlos. Unterstutze die Entwicklung — die Halfte geht an Tierrettung.",
-        copy: "Kopieren", copied: "Kopiert!",
-        charity_note: "50% jeder Spende gehen an Tierheime und Rettungsorganisationen",
-        donations_title: "Spendenwand",
-        donations_empty: "Sei der Erste, der Murchi unterstutzt und Tieren hilft!",
-        footer_made: "Mit Liebe fur Katzen uberall auf der Welt gemacht"
-    },
-    fr: {
-        tagline: "Votre Tamagotchi de bureau. Un chat pixel pour macOS. Nourrir, jouer, aimer.",
-        download: "Telecharger pour macOS",
-        github_star: "Etoile sur GitHub",
-        github_sub: "Aidez Murchi a grandir !",
-        demo_label: "Apercu en direct — cliquez sur le chat !",
-        click_hint: "Cliquez sur le chat pour le caresser",
-        features_title: "Tout ce dont un chat a besoin",
-        features_subtitle: "Une experience Tamagotchi complete sur votre bureau",
-        f1_title: "25+ comportements", f1_desc: "Marcher, dormir, courir, se toiletter, se baigner, se promener, chasser des papillons, observer des oiseaux, faire tomber des verres et bien plus.",
-        f2_title: "Nourrir et soigner", f2_desc: "Poisson, lait, friandises. Gerez la faim, le bonheur, l'energie, l'hygiene et la sante.",
-        f3_title: "Jouets et accessoires", f3_desc: "Souris, pelote, laser. Chapeaux, noeuds papillon, couronnes, lunettes, fleurs.",
-        f4_title: "Monter de niveau", f4_desc: "Gagnez de l'XP en prenant soin. Evoluez de bebe a Murchi Cosmique en 5 etapes.",
-        f5_title: "Magie des particules", f5_desc: "Coeurs, etoiles, etincelles, nuages, empreintes, particules Z au sommeil.",
-        f7_title: "Journal du chat", f7_desc: "Murchi tient un blog personnel — repas, jeux, papillons, maladie, anniversaire. Lisez-le comme un vrai journal d'animal.",
-        f8_title: "Vit sur le Dock", f8_desc: "Marche sur le Dock macOS comme une plateforme. Tombe des bords !",
-        install_title: "Commencez en quelques secondes",
-        step1: "Telechargez <strong>Murchi.dmg</strong> ci-dessus",
-        step2: "Ouvrez le DMG et glissez <strong>Murchi</strong> dans Applications",
-        step3: "Lancez-le. Si macOS bloque : <strong>Reglages > Confidentialite > Ouvrir quand meme</strong>",
-        step4: "Murchi sur votre bureau ! <strong>Cmd+Shift+M</strong> pour l'invoquer",
-        charity_badge: "50% pour la charite animale",
-        pay_title: "Payez ce que vous voulez",
-        pay_subtitle: "Murchi est gratuit pour toujours. Soutenez si vous le souhaitez — la moitie va au sauvetage animal.",
-        copy: "Copier", copied: "Copie !",
-        charity_note: "50% de chaque don va aux refuges et organisations de sauvetage d'animaux",
-        donations_title: "Mur des dons",
-        donations_empty: "Soyez le premier a soutenir Murchi et aider les animaux !",
-        footer_made: "Fait avec amour pour les chats du monde entier"
-    },
-    pt: {
-        tagline: "Seu Tamagotchi de desktop. Um gato pixel para macOS. Alimente, brinque, ame.",
-        download: "Baixar para macOS",
-        github_star: "Estrela no GitHub",
-        github_sub: "Ajude o Murchi a crescer!",
-        demo_label: "Preview ao vivo — clique no gato!",
-        click_hint: "Clique no gato para acariciar",
-        features_title: "Tudo que um gato precisa",
-        features_subtitle: "Uma experiencia Tamagotchi completa no seu desktop",
-        f1_title: "25+ comportamentos", f1_desc: "Andar, dormir, correr, se limpar, tomar banho, passear, perseguir borboletas, observar passaros, derrubar copos e muito mais.",
-        f2_title: "Alimentar e cuidar", f2_desc: "Peixe, leite, petiscos. Gerencie fome, felicidade, energia, higiene e saude.",
-        f3_title: "Brinquedos e acessorios", f3_desc: "Rato, novelo, laser. Chapeus, gravatas-borboleta, coroas, oculos, flores.",
-        f4_title: "Subir de nivel", f4_desc: "Ganhe XP cuidando. Evolua de bebe a Murchi Cosmico em 5 estagios.",
-        f5_title: "Magia de particulas", f5_desc: "Coracoes, estrelas, brilhos, nuvens, pegadas, particulas Z ao dormir.",
-        f7_title: "Diario do gato", f7_desc: "Murchi escreve um blog pessoal sobre seu dia — refeicoes, brincadeiras, borboletas, doencas, aniversario. Leia como um diario de pet real.",
-        f8_title: "Vive no Dock", f8_desc: "Anda no Dock do macOS como plataforma. Cai das bordas!",
-        install_title: "Comece em segundos",
-        step1: "Baixe o <strong>Murchi.dmg</strong> acima",
-        step2: "Abra o DMG e arraste <strong>Murchi</strong> para Aplicativos",
-        step3: "Abra. Se o macOS bloquear: <strong>Configuracoes > Privacidade > Abrir mesmo assim</strong>",
-        step4: "Murchi no seu desktop! <strong>Cmd+Shift+M</strong> para invocar",
-        charity_badge: "50% vai para caridade animal",
-        pay_title: "Pague o que quiser",
-        pay_subtitle: "Murchi e gratis para sempre. Apoie se quiser — metade vai para resgate animal.",
-        copy: "Copiar", copied: "Copiado!",
-        charity_note: "50% de cada doacao vai para abrigos e organizacoes de resgate animal",
-        donations_title: "Mural de doacoes",
-        donations_empty: "Seja o primeiro a apoiar o Murchi e ajudar os animais!",
-        footer_made: "Feito com amor para gatos de todo o mundo"
-    },
-    tr: {
-        tagline: "Masaustu Tamagotchi'niz. macOS icin piksel kedi. Besle, oyna, sev.",
-        download: "macOS icin indir",
-        github_star: "GitHub'da Yildiz",
-        github_sub: "Murchi'nin buyumesine yardim edin!",
-        demo_label: "Canli onizleme — kediye tikla!",
-        click_hint: "Kediye tiklayarak oksa",
-        features_title: "Bir kedinin ihtiyaci olan her sey",
-        features_subtitle: "Masaustunuzde tam bir Tamagotchi deneyimi",
-        f1_title: "25+ davranis", f1_desc: "Yurume, uyuma, kosma, timar, banyo, gezinti, kelebek kovalama, kus izleme, bardak dusurme ve daha fazlasi.",
-        f2_title: "Besle ve bak", f2_desc: "Balik, sut, odul. Aclik, mutluluk, enerji, hijyen ve saglik yonet.",
-        f3_title: "Oyuncaklar ve aksesuarlar", f3_desc: "Fare, yun yumagi, lazer. Sapkalar, papyonlar, taclar, gozlukler, cicekler.",
-        f4_title: "Seviye atla", f4_desc: "Bakarak XP kazan. Bebekten Kozmik Murchi'ye 5 asamada evrimles.",
-        f5_title: "Parcacik sihiri", f5_desc: "Kalpler, yildizlar, pariltiar, bulutlar, pati izleri, uyku Z parcaciklari.",
-        f7_title: "Kedi gunlugu", f7_desc: "Murchi gunluk blog yazar — yemek, oyun, kelebek, hastalik, dogum gunu. Gercek bir evcil hayvan gunlugu gibi oku.",
-        f8_title: "Dock'ta yasar", f8_desc: "macOS Dock uzerinde platform olarak yurur. Kenarlardan duser!",
-        install_title: "Saniyeler icinde basla",
-        step1: "Yukaridan <strong>Murchi.dmg</strong> indirin",
-        step2: "DMG'yi acin ve <strong>Murchi</strong>'yi Uygulamalar'a surukleyin",
-        step3: "Baslatin. macOS engellerse: <strong>Ayarlar > Gizlilik > Yine de Ac</strong>",
-        step4: "Murchi masaustunuzde! <strong>Cmd+Shift+M</strong> ile cagirin",
-        charity_badge: "%50 hayvan yardimina gidiyor",
-        pay_title: "Istedigin kadar ode",
-        pay_subtitle: "Murchi sonsuza kadar ucretsiz. Desteklemek istersen — yarisi hayvan kurtarmaya.",
-        copy: "Kopyala", copied: "Kopyalandi!",
-        charity_note: "Her bagisin %50'si hayvan barinaklarina ve kurtarma kuruluslarina gider",
-        donations_title: "Bagis duvari",
-        donations_empty: "Murchi'yi destekleyen ve hayvanlara yardim eden ilk kisi olun!",
-        footer_made: "Dunyanin her yerindeki kediler icin sevgiyle yapildi"
-    }
+ru:{tagline:"Твой питомец на рабочем столе.<br>Живёт на Mac. Нуждается в любви.",download:"Скачать для macOS",github_star:"GitHub",
+meet_title:"Привет!<br>Я — <span class=\"story-accent\">Мурчи</span>.",meet_text:"Я твой питомец на рабочем столе. Живу прямо на экране macOS. Хожу, ловлю бабочек, скидываю вещи со стола и делаю твой день лучше.",
+demo_title:"Смотри, как я<br><span class=\"story-accent\">живу</span>",demo_text:"Я гуляю по рабочему столу, сижу на Dock и реагирую когда ты меня гладишь. Попробуй!",click_hint:"Нажми на меня!",
+feat_title:"Я ем. Сплю.<br><span class=\"story-accent\">Играю</span>.",feat_text:"25+ уникальных действий. Целая жизнь на твоём экране.",
+f1_title:"25+ действий",f1_desc:"Хожу, сплю, бегаю, умываюсь, купаюсь, ловлю бабочек, наблюдаю за птицами, скидываю стаканы со стола. У меня своя жизнь.",
+f2_title:"Корми и ухаживай",f2_desc:"Рыбка, молоко, лакомства. Следи за голодом, счастьем, энергией и здоровьем.",
+f3_title:"Игрушки",f3_desc:"Клубок, лазер. Шляпы, бабочки, короны, очки, цветы.",
+f7_title:"Мой дневник",f7_desc:"Я веду личный блог о своём дне. Когда меня кормили, играли, видел бабочку, заболел, праздновал день рождения.",
+f4_title:"Уровни",f4_desc:"Получай опыт за заботу. Эволюция через 5 стадий.",
+f5_title:"Частицы",f5_desc:"Сердечки, звёзды, блёстки, облачка, следы лап, Zzz.",
+f8_title:"Жизнь на Доке",f8_desc:"Хожу по Доку macOS. Иногда падаю с краёв!",
+emo_title:"Иногда...<br>мне <span class=\"story-accent\">одиноко</span> <span class=\"tear\">💧</span>",
+emo_text:"Я сижу один и смотрю как курсор двигается... Где мои друзья? Я мечтаю о собаках, бегающих рядом, хомячках в колесе, попугаях на моей голове...",
+emo_but:"Но потом ты <span class=\"story-accent\">гладишь</span> меня,<br>и всё хорошо.",
+emo_ok:"Вокруг летают сердечки. Я мурчу. Я самый счастливый питомец. И я знаю — однажды мои друзья тоже придут.",
+road_title:"Мои <span class=\"story-accent\">мечты</span>",road_text:"То, о чём я мечтаю. Кое-что уже скоро...",
+roadmap_v21:"v2.1 — Скоро",roadmap_v21_title:"Больше вещей и игры",r1_1:"25+ действий",r1_2:"Мой дневник",r1_3:"5 аксессуаров",r1_4:"15+ новых аксессуаров",r1_5:"Суши, торт, пицца",r1_6:"Мини-игры",r1_7:"Сезонные ивенты",
+roadmap_v22:"v2.2 — Далее",roadmap_v22_title:"Друзья",r2_1:"В гости к друзьям",r2_2:"Музыка",r2_3:"Виджеты",r2_4:"iCloud",r2_5:"Скины",r2_6:"Фото-режим",
+roadmap_v3:"v3.0 — Когда-нибудь",roadmap_v3_title:"Новые друзья!",r3_1:"Собаки, хомяки, попугаи",r3_2:"Домики",r3_3:"Много питомцев",r3_4:"iOS",r3_5:"AI-личность",r3_6:"Маркетплейс",
+install_title:"Забери меня",install_sub:"Это займёт 10 секунд. Обещаю.",
+step1:"Скачай <strong>Murchi.dmg</strong>",step2:"Перетащи <strong>Murchi</strong> в Applications",step3:"Если macOS блокирует, выполни в Терминале: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Запусти! <strong>Cmd+Shift+M</strong> чтобы позвать меня",
+pay_title:"Помоги мне <span class=\"story-accent\">расти</span>",charity_badge:"50% на помощь животным",pay_h:"Заплати сколько хочешь",pay_subtitle:"Я бесплатен навсегда. Но если хочешь помочь — половина идёт на спасение животных.",
+copy:"Копировать",copied:"Скопировано!",charity_note:"50% каждого доната идёт в приюты",footer_made:"Сделано с любовью к питомцам"},
+
+es:{tagline:"Tu companero de escritorio.<br>Vive en tu Mac. Necesita tu amor.",download:"Descargar",github_star:"GitHub",meet_title:"Hola!<br>Soy <span class=\"story-accent\">Murchi</span>.",meet_text:"Soy tu mascota de escritorio. Camino, persigo mariposas y hago tu dia mejor.",demo_title:"Mirame<br><span class=\"story-accent\">vivir</span>",demo_text:"Paseo por tu escritorio y reacciono cuando me acaricias.",click_hint:"Haz clic!",feat_title:"Como. Duermo.<br><span class=\"story-accent\">Juego</span>.",feat_text:"25+ comportamientos unicos.",f1_title:"25+ comportamientos",f1_desc:"Caminar, dormir, correr, banarse, perseguir mariposas y mas.",f2_title:"Alimentar",f2_desc:"Pescado, leche. Controla hambre, felicidad y salud.",f3_title:"Juguetes",f3_desc:"Ovillo, laser. Sombreros, coronas, gafas.",f7_title:"Mi diario",f7_desc:"Escribo un blog sobre mi dia.",f4_title:"Subir nivel",f4_desc:"XP por cuidarme. 5 etapas.",f5_title:"Particulas",f5_desc:"Corazones, estrellas, destellos.",f8_title:"Vivo en el Dock",f8_desc:"Camino en el Dock. Me caigo!",emo_title:"A veces...<br>me siento <span class=\"story-accent\">solo</span> <span class=\"tear\">💧</span>",emo_text:"Sueno con perros, hamsters y loros...",emo_but:"Pero cuando me <span class=\"story-accent\">acaricias</span>,<br>todo esta bien.",emo_ok:"Corazones flotan. Ronroneo. Soy feliz.",road_title:"Mis <span class=\"story-accent\">suenos</span>",road_text:"Lo que deseo...",install_title:"Adoptame",install_sub:"10 segundos. Lo prometo.",step1:"Descarga <strong>Murchi.dmg</strong>",step2:"Arrastra a Aplicaciones",step3:"Si macOS lo bloquea, ejecuta en Terminal: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Abrelo! <strong>Cmd+Shift+M</strong> para invocarme",pay_title:"Ayudame a <span class=\"story-accent\">crecer</span>",charity_badge:"50% caridad animal",pay_h:"Paga lo que quieras",pay_subtitle:"Soy gratis. La mitad va a rescate animal.",copy:"Copiar",copied:"Copiado!",charity_note:"50% a refugios",footer_made:"Hecho con amor",
+roadmap_v21:"v2.1",roadmap_v21_title:"Mas cosas",r1_1:"25+ comportamientos",r1_2:"Diario",r1_3:"5 accesorios",r1_4:"15+ nuevos",r1_5:"Sushi, pizza",r1_6:"Mini-juegos",r1_7:"Eventos",roadmap_v22:"v2.2",roadmap_v22_title:"Social",r2_1:"Visitar amigos",r2_2:"Musica",r2_3:"Widgets",r2_4:"iCloud",r2_5:"Skins",r2_6:"Fotos",roadmap_v3:"v3.0",roadmap_v3_title:"Amigos nuevos!",r3_1:"Perros, hamsters",r3_2:"Casitas",r3_3:"Multi-mascota",r3_4:"iOS",r3_5:"IA",r3_6:"Marketplace"},
+
+zh:{tagline:"你的桌面伙伴。<br>住在Mac上。需要你的爱。",download:"下载",github_star:"GitHub",meet_title:"嗨!<br>我是<span class=\"story-accent\">Murchi</span>。",meet_text:"我是你的桌面宠物。我追蝴蝶、推杯子，让你的一天更美好。",demo_title:"看我<br><span class=\"story-accent\">生活</span>",demo_text:"我在桌面上漫步，你摸我我会开心！",click_hint:"点我！",feat_title:"我吃。我睡。<br>我<span class=\"story-accent\">玩</span>。",feat_text:"25+种独特行为。",f1_title:"25+行为",f1_desc:"走路、睡觉、追蝴蝶、推杯子。",f2_title:"喂食",f2_desc:"鱼、牛奶。管理饥饿和健康。",f3_title:"玩具",f3_desc:"毛线球、激光笔、帽子。",f7_title:"我的日记",f7_desc:"我写博客记录每一天。",f4_title:"升级",f4_desc:"照顾我获取经验。5阶段进化。",f5_title:"粒子",f5_desc:"爱心、星星、闪光。",f8_title:"Dock生活",f8_desc:"在Dock上走。会掉下去！",emo_title:"有时候...<br>我感到<span class=\"story-accent\">孤独</span> <span class=\"tear\">💧</span>",emo_text:"我梦想着有狗、仓鼠和鹦鹉做朋友...",emo_but:"但当你<span class=\"story-accent\">摸我</span>，<br>一切都好了。",emo_ok:"爱心飘浮。我呼噜。我是最幸福的宠物。",road_title:"我的<span class=\"story-accent\">梦想</span>",road_text:"我在许愿的事情...",install_title:"领养我",install_sub:"只要10秒。",step1:"下载<strong>Murchi.dmg</strong>",step2:"拖入应用程序",step3:"如果macOS阻止，在终端运行：<strong>xattr -cr /Applications/Murchi.app</strong>",step4:"启动！<strong>Cmd+Shift+M</strong>召唤我",pay_title:"帮我<span class=\"story-accent\">成长</span>",charity_badge:"50%捐给动物",pay_h:"随意付费",pay_subtitle:"永久免费。一半捐给动物救助。",copy:"复制",copied:"已复制！",charity_note:"50%捐给动物收容所",footer_made:"用爱制作",
+roadmap_v21:"v2.1",roadmap_v21_title:"更多",r1_1:"25+行为",r1_2:"日记",r1_3:"5配饰",r1_4:"15+新配饰",r1_5:"寿司、披萨",r1_6:"小游戏",r1_7:"活动",roadmap_v22:"v2.2",roadmap_v22_title:"社交",r2_1:"拜访朋友",r2_2:"音乐",r2_3:"小部件",r2_4:"iCloud",r2_5:"皮肤",r2_6:"拍照",roadmap_v3:"v3.0",roadmap_v3_title:"新朋友！",r3_1:"狗、仓鼠、鹦鹉",r3_2:"宠物屋",r3_3:"多宠物",r3_4:"iOS",r3_5:"AI性格",r3_6:"市场"},
+
+ja:{tagline:"デスクトップの相棒。<br>Macに住む。愛が必要。",download:"ダウンロード",github_star:"GitHub",meet_title:"やあ!<br>僕は<span class=\"story-accent\">Murchi</span>。",meet_text:"デスクトップペットだよ。蝶を追いかけたり、コップを落としたり。",demo_title:"僕の<br><span class=\"story-accent\">生活</span>を見て",demo_text:"デスクトップを歩き回って、撫でると反応するよ!",click_hint:"クリック!",feat_title:"食べる。寝る。<br><span class=\"story-accent\">遊ぶ</span>。",feat_text:"25以上のユニークな行動。",f1_title:"25+の行動",f1_desc:"歩く、寝る、蝶を追う、コップを落とす。",f2_title:"餌やり",f2_desc:"魚、ミルク。空腹と健康を管理。",f3_title:"おもちゃ",f3_desc:"毛糸玉、レーザー、帽子。",f7_title:"僕の日記",f7_desc:"毎日のブログを書くよ。",f4_title:"レベルアップ",f4_desc:"お世話でXP獲得。5段階進化。",f5_title:"パーティクル",f5_desc:"ハート、星、キラキラ。",f8_title:"Dock生活",f8_desc:"Dockの上を歩く。落ちることも!",emo_title:"時々...<br><span class=\"story-accent\">寂しく</span>なる <span class=\"tear\">💧</span>",emo_text:"犬やハムスターやインコの友達がほしい...",emo_but:"でも<span class=\"story-accent\">撫でて</span>くれると、<br>全部大丈夫。",emo_ok:"ハートが飛ぶ。ゴロゴロ。最高に幸せ。",road_title:"僕の<span class=\"story-accent\">夢</span>",road_text:"願い事...",install_title:"僕を迎えて",install_sub:"10秒だよ。約束。",step1:"<strong>Murchi.dmg</strong>をダウンロード",step2:"アプリケーションにドラッグ",step3:"macOSがブロックしたら、ターミナルで実行: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"起動！<strong>Cmd+Shift+M</strong>で呼ぶ",pay_title:"成長を<span class=\"story-accent\">助けて</span>",charity_badge:"50%が動物チャリティーに",pay_h:"お好きな金額で",pay_subtitle:"永久無料。半分が動物救助に。",copy:"コピー",copied:"コピー済!",charity_note:"50%が動物保護団体に",footer_made:"愛を込めて",
+roadmap_v21:"v2.1",roadmap_v21_title:"もっと",r1_1:"25+行動",r1_2:"日記",r1_3:"5アクセ",r1_4:"15+新アクセ",r1_5:"寿司、ピザ",r1_6:"ミニゲーム",r1_7:"イベント",roadmap_v22:"v2.2",roadmap_v22_title:"ソーシャル",r2_1:"友達訪問",r2_2:"音楽",r2_3:"ウィジェット",r2_4:"iCloud",r2_5:"スキン",r2_6:"フォト",roadmap_v3:"v3.0",roadmap_v3_title:"新しい仲間!",r3_1:"犬、ハムスター",r3_2:"ペットハウス",r3_3:"マルチペット",r3_4:"iOS",r3_5:"AI性格",r3_6:"マーケット"},
+
+ko:{tagline:"데스크탑 반려동물.<br>Mac에 살아. 사랑이 필요해.",download:"다운로드",github_star:"GitHub",meet_title:"안녕!<br>나는 <span class=\"story-accent\">Murchi</span>.",meet_text:"데스크탑 반려동물이야. 나비를 쫓고, 컵을 떨어뜨려.",demo_title:"내 <span class=\"story-accent\">생활</span>을<br>봐줘",demo_text:"데스크탑을 돌아다니고, 쓰다듬으면 반응해!",click_hint:"클릭!",feat_title:"먹고. 자고.<br><span class=\"story-accent\">놀아</span>.",feat_text:"25가지+ 행동.",emo_title:"가끔...<br><span class=\"story-accent\">외로워</span> <span class=\"tear\">💧</span>",emo_text:"강아지, 햄스터, 앵무새 친구가 있으면 좋겠어...",emo_but:"하지만 <span class=\"story-accent\">쓰다듬어</span>주면,<br>다 괜찮아.",emo_ok:"하트가 날아. 골골. 세상에서 가장 행복해.",road_title:"나의 <span class=\"story-accent\">꿈</span>",road_text:"소원들...",install_title:"데려가줘",install_sub:"10초면 돼. 약속.",copy:"복사",copied:"복사됨!",footer_made:"사랑을 담아",
+f1_title:"25+행동",f1_desc:"걷기, 자기, 나비 쫓기, 컵 떨어뜨리기.",f2_title:"먹이기",f2_desc:"생선, 우유. 건강 관리.",f3_title:"장난감",f3_desc:"실타래, 레이저, 모자.",f7_title:"내 일기",f7_desc:"매일 블로그를 써.",f4_title:"레벨업",f4_desc:"돌봄으로 XP. 5단계 진화.",f5_title:"파티클",f5_desc:"하트, 별, 반짝임.",f8_title:"Dock 생활",f8_desc:"Dock 위를 걸어. 떨어지기도!",
+step1:"<strong>Murchi.dmg</strong> 다운로드",step2:"응용프로그램으로 드래그",step3:"macOS가 차단하면 터미널에서 실행: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"실행! <strong>Cmd+Shift+M</strong>으로 소환",
+pay_title:"성장을 <span class=\"story-accent\">도와줘</span>",charity_badge:"50% 동물 자선",pay_h:"원하는 만큼",pay_subtitle:"영원히 무료. 절반은 동물 구조에.",charity_note:"50%가 동물 보호소에",
+roadmap_v21:"v2.1",roadmap_v21_title:"더 많이",r1_1:"25+행동",r1_2:"일기",r1_3:"5액세서리",r1_4:"15+새 액세서리",r1_5:"스시, 피자",r1_6:"미니게임",r1_7:"이벤트",roadmap_v22:"v2.2",roadmap_v22_title:"소셜",r2_1:"친구 방문",r2_2:"음악",r2_3:"위젯",r2_4:"iCloud",r2_5:"스킨",r2_6:"포토",roadmap_v3:"v3.0",roadmap_v3_title:"새 친구!",r3_1:"강아지, 햄스터",r3_2:"펫 하우스",r3_3:"멀티펫",r3_4:"iOS",r3_5:"AI성격",r3_6:"마켓"},
+
+de:{tagline:"Dein Desktop-Begleiter.<br>Lebt auf deinem Mac. Braucht Liebe.",download:"Laden",github_star:"GitHub",meet_title:"Hey!<br>Ich bin <span class=\"story-accent\">Murchi</span>.",meet_text:"Dein Desktop-Haustier. Ich jage Schmetterlinge und mache deinen Tag besser.",demo_title:"Schau mir<br><span class=\"story-accent\">zu</span>",demo_text:"Ich laufe auf dem Desktop und reagiere auf Streicheln!",click_hint:"Klick!",feat_title:"Essen. Schlafen.<br><span class=\"story-accent\">Spielen</span>.",feat_text:"25+ Verhaltensweisen.",emo_title:"Manchmal...<br>bin ich <span class=\"story-accent\">einsam</span> <span class=\"tear\">💧</span>",emo_text:"Ich traume von Hunden, Hamstern und Papageien...",emo_but:"Aber wenn du mich <span class=\"story-accent\">streichelst</span>,<br>ist alles gut.",emo_ok:"Herzen schweben. Ich schnurre. Ich bin glucklich.",road_title:"Meine <span class=\"story-accent\">Traume</span>",road_text:"Meine Wunsche...",install_title:"Adoptiere mich",install_sub:"10 Sekunden. Versprochen.",copy:"Kopieren",copied:"Kopiert!",footer_made:"Mit Liebe gemacht",
+f1_title:"25+ Verhalten",f1_desc:"Laufen, schlafen, Schmetterlinge jagen, Glaser umwerfen.",f2_title:"Futtern",f2_desc:"Fisch, Milch. Hunger und Gesundheit.",f3_title:"Spielzeug",f3_desc:"Wollknäuel, Laser, Hute.",f7_title:"Mein Tagebuch",f7_desc:"Ich schreibe ein Blog uber meinen Tag.",f4_title:"Level Up",f4_desc:"XP durch Pflege. 5 Stufen.",f5_title:"Partikel",f5_desc:"Herzen, Sterne, Glitzer.",f8_title:"Dock-Leben",f8_desc:"Laufe auf dem Dock. Falle runter!",
+step1:"<strong>Murchi.dmg</strong> laden",step2:"In Programme ziehen",step3:"Wenn macOS blockiert, im Terminal ausfuhren: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Starten! <strong>Cmd+Shift+M</strong> zum Rufen",
+pay_title:"Hilf mir <span class=\"story-accent\">wachsen</span>",charity_badge:"50% Tierschutz",pay_h:"Zahl was du willst",pay_subtitle:"Kostenlos. Halfte geht an Tierrettung.",charity_note:"50% an Tierheime",
+roadmap_v21:"v2.1",roadmap_v21_title:"Mehr",r1_1:"25+ Verhalten",r1_2:"Tagebuch",r1_3:"5 Accessoires",r1_4:"15+ neue",r1_5:"Sushi, Pizza",r1_6:"Minispiele",r1_7:"Events",roadmap_v22:"v2.2",roadmap_v22_title:"Sozial",r2_1:"Freunde besuchen",r2_2:"Musik",r2_3:"Widgets",r2_4:"iCloud",r2_5:"Skins",r2_6:"Fotos",roadmap_v3:"v3.0",roadmap_v3_title:"Neue Freunde!",r3_1:"Hunde, Hamster",r3_2:"Hauser",r3_3:"Multi-Pet",r3_4:"iOS",r3_5:"KI",r3_6:"Marktplatz"},
+
+fr:{tagline:"Ton compagnon de bureau.<br>Vit sur ton Mac. A besoin d'amour.",download:"Telecharger",github_star:"GitHub",meet_title:"Salut!<br>Je suis <span class=\"story-accent\">Murchi</span>.",meet_text:"Ton animal de bureau. Je chasse les papillons et rends ta journee meilleure.",demo_title:"Regarde-moi<br><span class=\"story-accent\">vivre</span>",demo_text:"Je me promene et reagis aux caresses!",click_hint:"Clique!",feat_title:"Manger. Dormir.<br><span class=\"story-accent\">Jouer</span>.",feat_text:"25+ comportements.",emo_title:"Parfois...<br>je me sens <span class=\"story-accent\">seul</span> <span class=\"tear\">💧</span>",emo_text:"Je reve de chiens, hamsters et perroquets...",emo_but:"Mais quand tu me <span class=\"story-accent\">caresses</span>,<br>tout va bien.",emo_ok:"Des coeurs flottent. Je ronronne. Je suis heureux.",road_title:"Mes <span class=\"story-accent\">reves</span>",road_text:"Mes souhaits...",install_title:"Adopte-moi",install_sub:"10 secondes. Promis.",copy:"Copier",copied:"Copie!",footer_made:"Fait avec amour",
+f1_title:"25+ comportements",f1_desc:"Marcher, dormir, chasser les papillons, renverser des verres.",f2_title:"Nourrir",f2_desc:"Poisson, lait. Faim et sante.",f3_title:"Jouets",f3_desc:"Pelote, laser, chapeaux.",f7_title:"Mon journal",f7_desc:"J'ecris un blog sur ma journee.",f4_title:"Monter",f4_desc:"XP par les soins. 5 etapes.",f5_title:"Particules",f5_desc:"Coeurs, etoiles, etincelles.",f8_title:"Vie Dock",f8_desc:"Je marche sur le Dock. Je tombe!",
+step1:"Telecharge <strong>Murchi.dmg</strong>",step2:"Glisse dans Applications",step3:"Si macOS bloque, lance dans le Terminal: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Lance! <strong>Cmd+Shift+M</strong> pour m'appeler",
+pay_title:"Aide-moi a <span class=\"story-accent\">grandir</span>",charity_badge:"50% animaux",pay_h:"Paie ce que tu veux",pay_subtitle:"Gratuit. La moitie va au sauvetage animal.",charity_note:"50% aux refuges",
+roadmap_v21:"v2.1",roadmap_v21_title:"Plus",r1_1:"25+ comportements",r1_2:"Journal",r1_3:"5 accessoires",r1_4:"15+ nouveaux",r1_5:"Sushi, pizza",r1_6:"Mini-jeux",r1_7:"Evenements",roadmap_v22:"v2.2",roadmap_v22_title:"Social",r2_1:"Visiter amis",r2_2:"Musique",r2_3:"Widgets",r2_4:"iCloud",r2_5:"Skins",r2_6:"Photos",roadmap_v3:"v3.0",roadmap_v3_title:"Nouveaux amis!",r3_1:"Chiens, hamsters",r3_2:"Maisons",r3_3:"Multi-pet",r3_4:"iOS",r3_5:"IA",r3_6:"Marketplace"},
+
+pt:{tagline:"Seu companheiro de desktop.<br>Vive no Mac. Precisa de amor.",download:"Baixar",github_star:"GitHub",meet_title:"Oi!<br>Sou <span class=\"story-accent\">Murchi</span>.",meet_text:"Seu pet de desktop. Persigo borboletas e melhoro seu dia.",demo_title:"Me veja<br><span class=\"story-accent\">viver</span>",demo_text:"Passeio pelo desktop e reajo quando me acaricia!",click_hint:"Clique!",feat_title:"Comer. Dormir.<br><span class=\"story-accent\">Brincar</span>.",feat_text:"25+ comportamentos.",emo_title:"As vezes...<br>me sinto <span class=\"story-accent\">sozinho</span> <span class=\"tear\">💧</span>",emo_text:"Sonho com caes, hamsters e papagaios...",emo_but:"Mas quando voce me <span class=\"story-accent\">acaricia</span>,<br>tudo fica bem.",emo_ok:"Coracoes flutuam. Ronrono. Sou feliz.",road_title:"Meus <span class=\"story-accent\">sonhos</span>",road_text:"Meus desejos...",install_title:"Me adote",install_sub:"10 segundos. Prometo.",copy:"Copiar",copied:"Copiado!",footer_made:"Feito com amor",
+f1_title:"25+ comportamentos",f1_desc:"Andar, dormir, perseguir borboletas, derrubar copos.",f2_title:"Alimentar",f2_desc:"Peixe, leite. Fome e saude.",f3_title:"Brinquedos",f3_desc:"Novelo, laser, chapeus.",f7_title:"Meu diario",f7_desc:"Escrevo um blog sobre meu dia.",f4_title:"Subir nivel",f4_desc:"XP por cuidar. 5 estagios.",f5_title:"Particulas",f5_desc:"Coracoes, estrelas, brilhos.",f8_title:"Vida no Dock",f8_desc:"Ando no Dock. Caio!",
+step1:"Baixe <strong>Murchi.dmg</strong>",step2:"Arraste para Aplicativos",step3:"Se o macOS bloquear, execute no Terminal: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Abra! <strong>Cmd+Shift+M</strong> pra me chamar",
+pay_title:"Me ajude a <span class=\"story-accent\">crescer</span>",charity_badge:"50% animais",pay_h:"Pague o que quiser",pay_subtitle:"Gratis. Metade vai pra resgate animal.",charity_note:"50% pra abrigos",
+roadmap_v21:"v2.1",roadmap_v21_title:"Mais",r1_1:"25+ comportamentos",r1_2:"Diario",r1_3:"5 acessorios",r1_4:"15+ novos",r1_5:"Sushi, pizza",r1_6:"Minigames",r1_7:"Eventos",roadmap_v22:"v2.2",roadmap_v22_title:"Social",r2_1:"Visitar amigos",r2_2:"Musica",r2_3:"Widgets",r2_4:"iCloud",r2_5:"Skins",r2_6:"Fotos",roadmap_v3:"v3.0",roadmap_v3_title:"Novos amigos!",r3_1:"Caes, hamsters",r3_2:"Casinhas",r3_3:"Multi-pet",r3_4:"iOS",r3_5:"IA",r3_6:"Marketplace"},
+
+tr:{tagline:"Masaustu arkadasin.<br>Mac'inde yasar. Sevgine ihtiyaci var.",download:"Indir",github_star:"GitHub",meet_title:"Selam!<br>Ben <span class=\"story-accent\">Murchi</span>.",meet_text:"Masaustu evcil hayvanin. Kelebek kovalar, bardak dusururum.",demo_title:"Beni<br><span class=\"story-accent\">izle</span>",demo_text:"Masaustunde dolasir, seversen tepki veririm!",click_hint:"Tikla!",feat_title:"Yerim. Uyurum.<br><span class=\"story-accent\">Oynarim</span>.",feat_text:"25+ davranis.",emo_title:"Bazen...<br><span class=\"story-accent\">yalniz</span> hissederim <span class=\"tear\">💧</span>",emo_text:"Kopekler, hamsterlar ve papağanlar hayal ederim...",emo_but:"Ama beni <span class=\"story-accent\">sevdiginde</span>,<br>her sey guzel.",emo_ok:"Kalpler ucusuyor. Mirildanim. Mutluyum.",road_title:"<span class=\"story-accent\">Hayallerim</span>",road_text:"Dileklerim...",install_title:"Beni sahiplen",install_sub:"10 saniye. Soz.",copy:"Kopyala",copied:"Kopyalandi!",footer_made:"Sevgiyle yapildi",
+f1_title:"25+ davranis",f1_desc:"Yurumek, uyumak, kelebek kovalamak, bardak dusurmek.",f2_title:"Besle",f2_desc:"Balik, sut. Aclik ve saglik.",f3_title:"Oyuncak",f3_desc:"Yumak, lazer, sapka.",f7_title:"Gunlugum",f7_desc:"Gunumu anlatan blog yazarim.",f4_title:"Seviye",f4_desc:"Bakimla XP. 5 asama.",f5_title:"Parcacik",f5_desc:"Kalpler, yildizlar.",f8_title:"Dock hayati",f8_desc:"Dock'ta yururum. Duserim!",
+step1:"<strong>Murchi.dmg</strong> indir",step2:"Uygulamalara surekle",step3:"macOS engellerse, Terminal'de calistir: <strong>xattr -cr /Applications/Murchi.app</strong>",step4:"Baslat! <strong>Cmd+Shift+M</strong> ile cagir",
+pay_title:"Buyumeme <span class=\"story-accent\">yardim et</span>",charity_badge:"50% hayvan yardimi",pay_h:"Istedigin kadar ode",pay_subtitle:"Ucretsiz. Yarisi hayvan kurtarma icin.",charity_note:"50% barinaklara",
+roadmap_v21:"v2.1",roadmap_v21_title:"Daha fazla",r1_1:"25+ davranis",r1_2:"Gunluk",r1_3:"5 aksesuar",r1_4:"15+ yeni",r1_5:"Sushi, pizza",r1_6:"Mini-oyun",r1_7:"Etkinlik",roadmap_v22:"v2.2",roadmap_v22_title:"Sosyal",r2_1:"Arkadaslari ziyaret",r2_2:"Muzik",r2_3:"Widget",r2_4:"iCloud",r2_5:"Skin",r2_6:"Foto",roadmap_v3:"v3.0",roadmap_v3_title:"Yeni arkadaslar!",r3_1:"Kopek, hamster",r3_2:"Ev",r3_3:"Coklu pet",r3_4:"iOS",r3_5:"Yapay zeka",r3_6:"Pazar yeri"}
 };
 
-let currentLang = 'en';
-
-function setLang(lang) {
-    currentLang = lang;
-    const t = translations[lang];
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (t[key]) el.innerHTML = t[key];
+var currentLang='en';
+function setLang(lang){
+    currentLang=lang;var t=translations[lang];if(!t)return;
+    document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang)});
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+        var key=el.dataset.i18n;if(t[key])el.innerHTML=t[key];
     });
-    document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.lang === lang);
-    });
-    document.querySelectorAll('.copy-btn:not(.copied)').forEach(b => {
-        b.textContent = t.copy || 'Copy';
-    });
-    localStorage.setItem('murchi-lang', lang);
 }
-
-document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => setLang(btn.dataset.lang));
-});
-
-const saved = localStorage.getItem('murchi-lang');
-if (saved && translations[saved]) setLang(saved);
-else {
-    const bl = navigator.language.slice(0, 2);
-    if (translations[bl]) setLang(bl);
-}
+document.querySelectorAll('.lang-btn').forEach(function(btn){btn.addEventListener('click',function(){setLang(this.dataset.lang)})});
 </script>
-
 </body>
 </html>

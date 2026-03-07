@@ -38,8 +38,8 @@
     <circle cx="580" cy="75" r="0.7" fill="white"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.2s" repeatCount="indefinite"/></circle>
   </g>
 
-  <!-- ===== KAWAII CAT (left) ===== -->
-  <g transform="translate(85, 65) scale(0.9)" filter="url(#glow)">
+  <!-- ===== KAWAII CAT (centered left) ===== -->
+  <g transform="translate(135, 55) scale(1.1)" filter="url(#glow)">
     <!-- Tail -->
     <path d="M5,72 Q-8,60 -5,48 Q-2,38 5,42" stroke="#8a8aaa" stroke-width="4" fill="none" stroke-linecap="round">
       <animate attributeName="d" values="M5,72 Q-8,60 -5,48 Q-2,38 5,42;M5,72 Q-12,58 -8,46 Q-4,36 2,40;M5,72 Q-8,60 -5,48 Q-2,38 5,42" dur="3s" repeatCount="indefinite"/>
@@ -96,107 +96,71 @@
     <ellipse cx="60" cy="88" rx="8" ry="5" fill="#9898B0"/>
     <ellipse cx="60" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
     <!-- Breathing -->
-    <animateTransform attributeName="transform" type="translate" values="85,65;85,63;85,65" dur="2.5s" repeatCount="indefinite" additive="replace"/>
+    <animateTransform attributeName="transform" type="translate" values="135,55;135,53;135,55" dur="2.5s" repeatCount="indefinite" additive="replace"/>
   </g>
 
-  <!-- Cat hearts -->
+  <!-- Floating hearts -->
   <g filter="url(#softglow)">
-    <text x="175" y="85" font-size="14" fill="#ff5a80" opacity="0.8">
-      <animate attributeName="y" values="85;65;85" dur="3s" repeatCount="indefinite"/>
+    <text x="245" y="80" font-size="16" fill="#ff5a80" opacity="0.8">
+      <animate attributeName="y" values="80;58;80" dur="3s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
       &#9829;
     </text>
-    <text x="160" y="70" font-size="10" fill="#ff5a80" opacity="0.5">
-      <animate attributeName="y" values="70;52;70" dur="2.5s" repeatCount="indefinite"/>
+    <text x="230" y="65" font-size="11" fill="#ff5a80" opacity="0.5">
+      <animate attributeName="y" values="65;45;65" dur="2.5s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
       &#9829;
     </text>
-  </g>
-
-  <!-- ===== KAWAII BEAR (right) ===== -->
-  <g transform="translate(600, 65) scale(0.9)" filter="url(#glow)">
-    <!-- Ears -->
-    <circle cx="20" cy="12" r="12" fill="#c4956a"/>
-    <circle cx="20" cy="12" r="7" fill="#e8c9a0"/>
-    <circle cx="70" cy="12" r="12" fill="#c4956a"/>
-    <circle cx="70" cy="12" r="7" fill="#e8c9a0"/>
-    <!-- Head -->
-    <ellipse cx="45" cy="36" rx="30" ry="25" fill="#c4956a"/>
-    <!-- Face -->
-    <ellipse cx="45" cy="42" rx="14" ry="10" fill="#e8c9a0"/>
-    <!-- Eyes -->
-    <circle cx="33" cy="34" r="4" fill="#2D2D3F"/>
-    <circle cx="31.5" cy="32.5" r="1.5" fill="white"/>
-    <circle cx="57" cy="34" r="4" fill="#2D2D3F"/>
-    <circle cx="55.5" cy="32.5" r="1.5" fill="white"/>
-    <!-- Blink -->
-    <ellipse cx="33" cy="34" rx="5" ry="4" fill="#c4956a" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4.5s" repeatCount="indefinite"/>
-    </ellipse>
-    <ellipse cx="57" cy="34" rx="5" ry="4" fill="#c4956a" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0" dur="4.5s" repeatCount="indefinite"/>
-    </ellipse>
-    <!-- Nose -->
-    <ellipse cx="45" cy="41" rx="3.5" ry="2.5" fill="#2D2D3F"/>
-    <ellipse cx="44" cy="40.5" rx="1" ry="0.7" fill="#5a5a7a"/>
-    <!-- Mouth -->
-    <path d="M41,44 Q45,48 49,44" stroke="#8a6a4a" stroke-width="1" fill="none"/>
-    <!-- Cheeks -->
-    <ellipse cx="24" cy="42" rx="5" ry="3.5" fill="#f4a6a0" opacity="0.35"/>
-    <ellipse cx="66" cy="42" rx="5" ry="3.5" fill="#f4a6a0" opacity="0.35"/>
-    <!-- Body -->
-    <ellipse cx="45" cy="75" rx="24" ry="20" fill="#c4956a"/>
-    <ellipse cx="45" cy="77" rx="16" ry="14" fill="#e8c9a0"/>
-    <!-- Bow tie -->
-    <path d="M37,58 L45,62 L53,58 L45,54 Z" fill="#ff6b6b"/>
-    <circle cx="45" cy="58" r="2.5" fill="#ff8888"/>
-    <!-- Paws -->
-    <ellipse cx="28" cy="90" rx="9" ry="6" fill="#c4956a"/>
-    <ellipse cx="28" cy="91" rx="5" ry="3" fill="#e8c9a0"/>
-    <ellipse cx="62" cy="90" rx="9" ry="6" fill="#c4956a"/>
-    <ellipse cx="62" cy="91" rx="5" ry="3" fill="#e8c9a0"/>
-    <!-- Breathing -->
-    <animateTransform attributeName="transform" type="translate" values="600,65;600,63;600,65" dur="3s" repeatCount="indefinite" additive="replace"/>
-  </g>
-
-  <!-- Bear sparkles -->
-  <g filter="url(#softglow)">
-    <text x="690" y="85" font-size="12" fill="#fbbf24" opacity="0.7">
-      <animate attributeName="y" values="85;68;85" dur="3.2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/>
+    <text x="110" y="50" font-size="9" fill="#a78bfa" opacity="0.4">
+      <animate attributeName="y" values="50;35;50" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2.8s" repeatCount="indefinite"/>
       &#10022;
     </text>
-    <text x="680" y="72" font-size="8" fill="#a78bfa" opacity="0.5">
-      <animate attributeName="y" values="72;56;72" dur="2.8s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Music notes floating (right side) -->
+  <g filter="url(#softglow)">
+    <text x="640" y="80" font-size="14" fill="#a78bfa" opacity="0.6">
+      <animate attributeName="y" values="80;55;80" dur="3.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.15;0.6" dur="3.5s" repeatCount="indefinite"/>
+      &#9834;
+    </text>
+    <text x="670" y="95" font-size="11" fill="#f472b6" opacity="0.5">
+      <animate attributeName="y" values="95;72;95" dur="2.8s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.8s" repeatCount="indefinite"/>
-      &#10022;
+      &#9835;
+    </text>
+    <text x="700" y="70" font-size="9" fill="#fbbf24" opacity="0.4">
+      <animate attributeName="y" values="70;50;70" dur="3.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3.2s" repeatCount="indefinite"/>
+      &#9833;
     </text>
   </g>
 
   <!-- Title -->
-  <text x="400" y="98" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="52" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi &amp; Kuma</text>
+  <text x="490" y="95" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="56" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
 
   <!-- Subtitle -->
-  <text x="400" y="128" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pets for macOS</text>
+  <text x="490" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pet for macOS</text>
 
   <!-- Feature pills -->
-  <g transform="translate(400, 155)" text-anchor="middle">
-    <rect x="-278" y="0" width="90" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
-    <rect x="-178" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
-    <rect x="-78" y="0" width="90" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-    <rect x="22" y="0" width="100" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
-    <rect x="132" y="0" width="90" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
-    <text x="-233" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">25+ behaviors</text>
-    <text x="-133" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">cat diary</text>
-    <text x="-33" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">kawaii vector</text>
-    <text x="72" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single file</text>
-    <text x="177" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">pay what you want</text>
+  <g transform="translate(490, 148)" text-anchor="middle">
+    <rect x="-280" y="0" width="95" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
+    <rect x="-175" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
+    <rect x="-75" y="0" width="95" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+    <rect x="30" y="0" width="105" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
+    <rect x="145" y="0" width="90" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+    <text x="-232" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">30+ behaviors</text>
+    <text x="-130" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">music detect</text>
+    <text x="-28" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">SVG vector art</text>
+    <text x="82" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single Swift file</text>
+    <text x="190" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">0 dependencies</text>
   </g>
 
   <!-- Version badge -->
-  <rect x="345" y="195" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-  <text x="400" y="210" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">v2.1 &mdash; Free Forever</text>
+  <rect x="435" y="190" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+  <text x="490" y="205" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">Free Forever</text>
 
   <!-- Bottom URL -->
-  <text x="400" y="245" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
+  <text x="490" y="245" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
 </svg>
