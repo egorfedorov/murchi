@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://murchi.pet">
-    <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/banner.svg" alt="Murchi — Kawaii Desktop Pet for macOS" width="800">
+    <img src="https://raw.githubusercontent.com/egorfedorov/murchi/main/.github/banner.svg" alt="Murchi — Desktop Tamagotchi for macOS" width="800">
   </a>
 </p>
 
@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <sub>A kawaii vector cat that lives on your macOS desktop. One Swift file. Zero dependencies. 9000+ lines of love.</sub>
+  <sub>Your desktop tamagotchi for macOS. Lives on your screen. Needs your love.</sub>
 </p>
 
 <br>
@@ -25,7 +25,8 @@
 </p>
 <p align="center">
   <sub>Pay what you want (even $0). 50% goes to animal shelters.</sub><br>
-  <sub>Open DMG &rarr; drag to Applications &rarr; done. macOS 12+ required.</sub>
+  <sub>Open DMG &rarr; drag to Applications &rarr; done. macOS 12+ required.</sub><br>
+  <sub>App Store coming soon!</sub>
 </p>
 
 <br>
@@ -36,11 +37,11 @@
 
 <h2 align="center">What is Murchi?</h2>
 
-<p align="center"><sub>A desktop tamagotchi cat with full SVG vector art, physics, emotions, and a life of its own</sub></p>
+<p align="center"><sub>A desktop tamagotchi with full SVG vector art, physics, emotions, and a life of its own</sub></p>
 
 <br>
 
-Murchi is a kawaii cat that lives on your macOS screen. It walks on your Dock, climbs screen edges, chases your cursor, reacts to music, writes diary entries, and has real emotions. Everything is rendered as smooth SVG vector art with 16-frame animations for every pose.
+Murchi is a desktop tamagotchi that lives on your macOS screen. It walks on your Dock, climbs screen edges, chases your cursor, reacts to music, writes diary entries, and has real emotions. Everything is rendered as smooth SVG vector art with 16-frame animations for every pose.
 
 The entire app is a **single Swift file** — no Xcode project, no dependencies, no storyboards. Just compile and run.
 
@@ -205,6 +206,8 @@ Requires Xcode command-line tools (`xcode-select --install`).
 > xattr -cr /Applications/Murchi.app
 > ```
 > This removes the quarantine flag added to apps downloaded from the internet.
+
+> **App Store:** Coming soon! For now — download the DMG and install manually.
 
 <br>
 

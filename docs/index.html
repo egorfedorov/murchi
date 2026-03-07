@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Murchi & Kuma — Kawaii Desktop Pets for macOS</title>
-    <meta name="description" content="Murchi & Kuma are kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. Feed, play, love. 25+ behaviors, diary, toys, accessories.">
-    <meta name="keywords" content="tamagotchi, desktop pet, virtual pet, kawaii cat, kawaii bear, macOS pet, desktop tamagotchi, murchi, kuma, digital pet">
+    <title>Murchi — Desktop Tamagotchi for macOS</title>
+    <meta name="description" content="Murchi is a desktop tamagotchi for macOS. Lives on your screen. Needs your love. 30+ behaviors, diary, toys, accessories.">
+    <meta name="keywords" content="tamagotchi, desktop tamagotchi, desktop pet, virtual pet, macOS pet, murchi, digital pet">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://murchi.pet">
-    <meta property="og:title" content="Murchi & Kuma — Kawaii Desktop Pets for macOS">
-    <meta property="og:description" content="Kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. 25+ behaviors, diary, toys, sound effects.">
+    <meta property="og:title" content="Murchi — Desktop Tamagotchi for macOS">
+    <meta property="og:description" content="Desktop tamagotchi for macOS. Lives on your screen. Needs your love. 30+ behaviors, diary, toys, sound effects.">
     <meta property="og:image" content="https://murchi.pet/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Murchi & Kuma">
+    <meta property="og:site_name" content="Murchi">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Murchi & Kuma — Kawaii Desktop Pets for macOS">
-    <meta name="twitter:description" content="Kawaii desktop Tamagotchi pets for macOS. A cute cat and bear that live on your screen. 25+ behaviors, diary, toys, sound effects.">
+    <meta name="twitter:title" content="Murchi — Desktop Tamagotchi for macOS">
+    <meta name="twitter:description" content="Desktop tamagotchi for macOS. Lives on your screen. Needs your love. 30+ behaviors, diary, toys, sound effects.">
     <meta name="twitter:image" content="https://murchi.pet/og.png">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
@@ -1032,8 +1032,8 @@
             </div>
         </div>
 
-        <h1 class="hero-title">Murchi & Kuma</h1>
-        <p class="hero-tagline" data-i18n="tagline">Your kawaii desktop companions for macOS. A cute cat and bear that live on your screen.</p>
+        <h1 class="hero-title">Murchi</h1>
+        <p class="hero-tagline" data-i18n="tagline">Your desktop tamagotchi. Lives on your Mac. Needs your love.</p>
 
         <div class="hero-actions">
             <a href="#get" class="btn-primary">
@@ -1192,6 +1192,7 @@
                 <div class="step-text" data-i18n="step4">Your pet appears on the desktop! <strong>Cmd+Shift+M</strong> to summon</div>
             </div>
         </div>
+        <p class="section-subtitle" style="margin-top:16px;opacity:0.5;font-size:14px" data-i18n="appstore_note">App Store coming soon! For now — manual install via DMG.</p>
     </div>
 </section>
 
@@ -1201,7 +1202,7 @@
         <div class="pwyw-card">
             <div class="pwyw-badge" data-i18n="pwyw_badge">50% goes to animal shelters &middot; 50% supports development</div>
             <h2 class="pwyw-title" data-i18n="pwyw_title">Name Your Price</h2>
-            <p class="pwyw-subtitle" data-i18n="pwyw_subtitle">Murchi & Kuma are free forever. If you'd like to support us, every dollar helps real animals.</p>
+            <p class="pwyw-subtitle" data-i18n="pwyw_subtitle">Murchi are free forever. If you'd like to support us, every dollar helps real animals.</p>
 
             <div class="price-options">
                 <button class="price-btn active" data-price="0">$0</button>
@@ -1213,7 +1214,7 @@
             </div>
 
             <div class="price-message free" id="price-message">
-                <span data-i18n="price_free">That's okay! Murchi & Kuma love you anyway &#128149;</span>
+                <span data-i18n="price_free">That's okay! Murchi love you anyway &#128149;</span>
             </div>
 
             <!-- Free download button (shown when $0) -->
@@ -1260,7 +1261,7 @@
                 </div>
                 <a href="https://github.com/egorfedorov/murchi/releases/latest/download/Murchi.dmg" class="crypto-download">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span data-i18n="download_after_pay">Download Murchi & Kuma</span>
+                    <span data-i18n="download_after_pay">Download Murchi</span>
                 </a>
             </div>
         </div>
@@ -1435,7 +1436,7 @@ function copyAddr(row, addr) {
 // ══════════════════════════════════════════════
 const translations = {
     en: {
-        tagline: "Your kawaii desktop companions for macOS. A cute cat and bear that live on your screen.",
+        tagline: "Your desktop tamagotchi. Lives on your Mac. Needs your love.",
         download: "Download for macOS",
         github_star: "Star on GitHub",
         chars_title: "Meet the Duo",
@@ -1474,12 +1475,13 @@ const translations = {
         step2: "Open the DMG and drag <strong>Murchi</strong> to Applications",
         step3: "If macOS blocks it: open Terminal, run <strong>xattr -cr /Applications/Murchi.app</strong>",
         step4: "Your pet appears on the desktop! <strong>Cmd+Shift+M</strong> to summon",
+        appstore_note: "App Store coming soon! For now — manual install via DMG.",
         pwyw_badge: "50% goes to animal shelters &middot; 50% supports development",
         pwyw_title: "Name Your Price",
-        pwyw_subtitle: "Murchi & Kuma are free forever. If you'd like to support us, every dollar helps real animals.",
-        price_free: "That's okay! Murchi & Kuma love you anyway &#128149;",
+        pwyw_subtitle: "Murchi are free forever. If you'd like to support us, every dollar helps real animals.",
+        price_free: "That's okay! Murchi love you anyway &#128149;",
         price_paid: "Thank you! &#128149; You're helping real animals",
-        get_btn: "Get Murchi & Kuma",
+        get_btn: "Get Murchi",
         pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
         github_cta: "Star on GitHub",
         footer_made: "Made with love for animals everywhere",
@@ -1490,10 +1492,10 @@ const translations = {
         get_free: "Download Free",
         pay_amount: "Pay ${price}",
         pay_instruction: "Send the amount to one of the addresses below, then download",
-        download_after_pay: "Download Murchi & Kuma"
+        download_after_pay: "Download Murchi"
     },
     ru: {
-        tagline: "Кавайные питомцы на рабочем столе macOS. Милый кот и медведь, которые живут на вашем экране.",
+        tagline: "Твой тамагочи на рабочем столе. Живёт на Mac. Нуждается в любви.",
         download: "Скачать для macOS",
         github_star: "Звезда на GitHub",
         chars_title: "Познакомьтесь с друзьями",
@@ -1532,6 +1534,7 @@ const translations = {
         step2: "Открой DMG и перетащи <strong>Murchi</strong> в Applications",
         step3: "Если macOS блокирует: откройте Терминал и выполните <strong>xattr -cr /Applications/Murchi.app</strong>",
         step4: "Питомец на рабочем столе! <strong>Cmd+Shift+M</strong> чтобы позвать",
+        appstore_note: "App Store скоро! Пока — ручная установка через DMG.",
         pwyw_badge: "50% в приюты для животных &middot; 50% на разработку",
         pwyw_title: "Назови свою цену",
         pwyw_subtitle: "Мурчи и Кума бесплатны навсегда. Хотите поддержать — каждый доллар помогает настоящим животным.",
@@ -1548,10 +1551,10 @@ const translations = {
         get_free: "Скачать бесплатно",
         pay_amount: "Оплатить ${price}",
         pay_instruction: "Отправьте сумму на один из адресов ниже, затем скачайте",
-        download_after_pay: "Скачать Murchi & Kuma"
+        download_after_pay: "Скачать Murchi"
     },
     es: {
-        tagline: "Tus companeros kawaii de escritorio para macOS. Un gato y un oso adorables que viven en tu pantalla.",
+        tagline: "Tu tamagotchi de escritorio. Vive en tu Mac. Necesita tu amor.",
         download: "Descargar para macOS",
         github_star: "Estrella en GitHub",
         chars_title: "Conoce al duo",
@@ -1590,6 +1593,7 @@ const translations = {
         step2: "Abre el DMG y arrastra <strong>Murchi</strong> a Aplicaciones",
         step3: "Abrelo. Si macOS bloquea: <strong>Ajustes > Privacidad > Abrir de todos modos</strong>",
         step4: "Tu mascota en el escritorio! <strong>Cmd+Shift+M</strong> para invocarlo",
+        appstore_note: "App Store pronto! Por ahora — instalacion manual via DMG.",
         pwyw_badge: "50% para refugios animales &middot; 50% para desarrollo",
         pwyw_title: "Pon tu precio",
         pwyw_subtitle: "Murchi y Kuma son gratis para siempre. Si quieres apoyar, cada dolar ayuda a animales reales.",
@@ -1606,10 +1610,10 @@ const translations = {
         get_free: "Descargar gratis",
         pay_amount: "Pagar ${price}",
         pay_instruction: "Envia el monto a una de las direcciones abajo, luego descarga",
-        download_after_pay: "Descargar Murchi & Kuma"
+        download_after_pay: "Descargar Murchi"
     },
     zh: {
-        tagline: "macOS上的卡哇伊桌面伙伴。一只可爱的猫和熊住在你的屏幕上。",
+        tagline: "你的桌面电子宠物。住在你的Mac上。需要你的爱。",
         download: "下载 macOS 版",
         github_star: "GitHub 上加星",
         chars_title: "认识这对搭档",
@@ -1648,6 +1652,7 @@ const translations = {
         step2: "打开DMG，将 <strong>Murchi</strong> 拖入应用程序",
         step3: "启动它。如果macOS阻止：<strong>设置 > 隐私 > 仍然打开</strong>",
         step4: "宠物出现在桌面！<strong>Cmd+Shift+M</strong> 召唤",
+        appstore_note: "App Store即将上线！目前请通过DMG手动安装。",
         pwyw_badge: "50%捐给动物收容所 &middot; 50%支持开发",
         pwyw_title: "随意定价",
         pwyw_subtitle: "Murchi和Kuma永久免费。想支持就支持，每一分钱都帮助真正的动物。",
@@ -1664,10 +1669,10 @@ const translations = {
         get_free: "免费下载",
         pay_amount: "支付 ${price}",
         pay_instruction: "将金额发送到以下地址之一，然后下载",
-        download_after_pay: "下载 Murchi & Kuma"
+        download_after_pay: "下载 Murchi"
     },
     ja: {
-        tagline: "macOSのカワイイデスクトップコンパニオン。可愛い猫とクマがあなたの画面に住んでいます。",
+        tagline: "あなたのデスクトップたまごっち。Macに住んでいます。あなたの愛が必要です。",
         download: "macOS版をダウンロード",
         github_star: "GitHub でスターを",
         chars_title: "二人に会おう",
@@ -1706,6 +1711,7 @@ const translations = {
         step2: "DMGを開いて <strong>Murchi</strong> をアプリケーションにドラッグ",
         step3: "起動。macOSがブロックしたら：<strong>設定 > プライバシー > このまま開く</strong>",
         step4: "ペットがデスクトップに！<strong>Cmd+Shift+M</strong> で呼び出し",
+        appstore_note: "App Storeまもなく！今はDMGで手動インストール。",
         pwyw_badge: "50%が動物シェルターに &middot; 50%が開発支援に",
         pwyw_title: "お好きな価格で",
         pwyw_subtitle: "MurchiとKumaは永久無料。サポートしたい方はどうぞ — すべてが本物の動物を助けます。",
@@ -1722,10 +1728,10 @@ const translations = {
         get_free: "無料ダウンロード",
         pay_amount: "${price} を支払う",
         pay_instruction: "以下のアドレスに送金してからダウンロードしてください",
-        download_after_pay: "Murchi & Kuma をダウンロード"
+        download_after_pay: "Murchi をダウンロード"
     },
     ko: {
-        tagline: "macOS의 귀여운 데스크탑 반려동물. 귀여운 고양이와 곰이 화면에 살아요.",
+        tagline: "당신의 데스크탑 다마고치. Mac에 살아요. 당신의 사랑이 필요해요.",
         download: "macOS용 다운로드",
         github_star: "GitHub 스타",
         chars_title: "듀오를 만나세요",
@@ -1764,6 +1770,7 @@ const translations = {
         step2: "DMG를 열고 <strong>Murchi</strong>를 응용 프로그램으로 드래그",
         step3: "실행. macOS가 차단하면: <strong>설정 > 개인정보 > 그래도 열기</strong>",
         step4: "데스크탑에 반려동물이! <strong>Cmd+Shift+M</strong>으로 소환",
+        appstore_note: "App Store 곧 출시! 지금은 DMG로 수동 설치.",
         pwyw_badge: "50%가 동물 보호소에 &middot; 50%가 개발 지원에",
         pwyw_title: "가격을 정하세요",
         pwyw_subtitle: "Murchi와 Kuma는 영원히 무료. 지원하고 싶다면, 모든 금액이 실제 동물을 돕습니다.",
@@ -1780,10 +1787,10 @@ const translations = {
         get_free: "무료 다운로드",
         pay_amount: "${price} 결제",
         pay_instruction: "아래 주소 중 하나로 금액을 보낸 후 다운로드하세요",
-        download_after_pay: "Murchi & Kuma 다운로드"
+        download_after_pay: "Murchi 다운로드"
     },
     de: {
-        tagline: "Deine kawaii Desktop-Begleiter fur macOS. Eine susse Katze und ein Bar leben auf deinem Bildschirm.",
+        tagline: "Dein Desktop-Tamagotchi. Lebt auf deinem Mac. Braucht deine Liebe.",
         download: "Fur macOS herunterladen",
         github_star: "Stern auf GitHub",
         chars_title: "Lerne das Duo kennen",
@@ -1822,12 +1829,13 @@ const translations = {
         step2: "DMG offnen und <strong>Murchi</strong> in Programme ziehen",
         step3: "Starten. Falls macOS blockiert: <strong>Einstellungen > Datenschutz > Trotzdem offnen</strong>",
         step4: "Dein Haustier auf dem Desktop! <strong>Cmd+Shift+M</strong> zum Herbeirufen",
+        appstore_note: "App Store kommt bald! Vorerst — manuelle Installation via DMG.",
         pwyw_badge: "50% fur Tierheime &middot; 50% fur Entwicklung",
         pwyw_title: "Nenn deinen Preis",
         pwyw_subtitle: "Murchi und Kuma sind fur immer kostenlos. Wenn du unterstutzen mochtest, hilft jeder Dollar echten Tieren.",
         price_free: "Kein Problem! Murchi und Kuma lieben dich trotzdem &#128149;",
         price_paid: "Danke! &#128149; Du hilfst echten Tieren",
-        get_btn: "Murchi & Kuma holen",
+        get_btn: "Murchi holen",
         pwyw_note: "macOS 12+ &middot; Universal (Apple Silicon + Intel) &middot; ~5 MB",
         github_cta: "Stern auf GitHub",
         footer_made: "Mit Liebe fur Tiere uberall auf der Welt gemacht",
@@ -1838,10 +1846,10 @@ const translations = {
         get_free: "Kostenlos herunterladen",
         pay_amount: "${price} bezahlen",
         pay_instruction: "Senden Sie den Betrag an eine der Adressen unten, dann laden Sie herunter",
-        download_after_pay: "Murchi & Kuma herunterladen"
+        download_after_pay: "Murchi herunterladen"
     },
     fr: {
-        tagline: "Vos compagnons kawaii de bureau pour macOS. Un chat et un ours mignons vivent sur votre ecran.",
+        tagline: "Votre tamagotchi de bureau. Vit sur votre Mac. A besoin de votre amour.",
         download: "Telecharger pour macOS",
         github_star: "Etoile sur GitHub",
         chars_title: "Decouvrez le duo",
@@ -1880,6 +1888,7 @@ const translations = {
         step2: "Ouvrez le DMG et glissez <strong>Murchi</strong> dans Applications",
         step3: "Lancez-le. Si macOS bloque : <strong>Reglages > Confidentialite > Ouvrir quand meme</strong>",
         step4: "Votre animal sur le bureau ! <strong>Cmd+Shift+M</strong> pour l'invoquer",
+        appstore_note: "App Store bientot ! Pour l'instant — installation manuelle via DMG.",
         pwyw_badge: "50% pour les refuges &middot; 50% pour le developpement",
         pwyw_title: "Fixez votre prix",
         pwyw_subtitle: "Murchi et Kuma sont gratuits pour toujours. Si vous souhaitez soutenir, chaque dollar aide de vrais animaux.",
@@ -1896,10 +1905,10 @@ const translations = {
         get_free: "Telecharger gratuitement",
         pay_amount: "Payer ${price}",
         pay_instruction: "Envoyez le montant a l'une des adresses ci-dessous, puis telechargez",
-        download_after_pay: "Telecharger Murchi & Kuma"
+        download_after_pay: "Telecharger Murchi"
     },
     pt: {
-        tagline: "Seus companheiros kawaii de desktop para macOS. Um gato e um urso fofos que vivem na sua tela.",
+        tagline: "Seu tamagotchi de desktop. Vive no seu Mac. Precisa do seu amor.",
         download: "Baixar para macOS",
         github_star: "Estrela no GitHub",
         chars_title: "Conheca a dupla",
@@ -1938,6 +1947,7 @@ const translations = {
         step2: "Abra o DMG e arraste <strong>Murchi</strong> para Aplicativos",
         step3: "Abra. Se o macOS bloquear: <strong>Configuracoes > Privacidade > Abrir mesmo assim</strong>",
         step4: "Seu pet no desktop! <strong>Cmd+Shift+M</strong> para invocar",
+        appstore_note: "App Store em breve! Por enquanto — instalacao manual via DMG.",
         pwyw_badge: "50% para abrigos de animais &middot; 50% para desenvolvimento",
         pwyw_title: "Defina seu preco",
         pwyw_subtitle: "Murchi e Kuma sao gratis para sempre. Se quiser apoiar, cada dolar ajuda animais reais.",
@@ -1954,10 +1964,10 @@ const translations = {
         get_free: "Baixar gratis",
         pay_amount: "Pagar ${price}",
         pay_instruction: "Envie o valor para um dos enderecos abaixo, depois baixe",
-        download_after_pay: "Baixar Murchi & Kuma"
+        download_after_pay: "Baixar Murchi"
     },
     ar: {
-        tagline: "رفاقك الكاوايي على سطح المكتب لنظام macOS. قطة ودب لطيفان يعيشان على شاشتك.",
+        tagline: "تاماغوتشي سطح المكتب الخاص بك. يعيش على جهاز Mac الخاص بك. يحتاج حبك.",
         download: "تحميل لنظام macOS",
         github_star: "نجمة على GitHub",
         chars_title: "تعرف على الثنائي",
@@ -1996,6 +2006,7 @@ const translations = {
         step2: "افتح DMG واسحب <strong>Murchi</strong> الى التطبيقات",
         step3: "شغله. اذا macOS يمنع: <strong>الاعدادات > الخصوصية > افتح على اي حال</strong>",
         step4: "حيوانك على سطح المكتب! <strong>Cmd+Shift+M</strong> لاستدعائه",
+        appstore_note: "App Store قريبا! حاليا — تثبيت يدوي عبر DMG.",
         pwyw_badge: "50% لملاجئ الحيوانات &middot; 50% لدعم التطوير",
         pwyw_title: "حدد سعرك",
         pwyw_subtitle: "Murchi و Kuma مجانيان للابد. اذا اردت الدعم، كل دولار يساعد حيوانات حقيقية.",
@@ -2012,7 +2023,7 @@ const translations = {
         get_free: "تحميل مجاني",
         pay_amount: "ادفع ${price}",
         pay_instruction: "ارسل المبلغ الى احد العناوين ادناه ثم قم بالتحميل",
-        download_after_pay: "تحميل Murchi & Kuma"
+        download_after_pay: "تحميل Murchi"
     }
 };
 
