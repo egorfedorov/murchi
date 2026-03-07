@@ -10,13 +10,56 @@
       <stop offset="50%" stop-color="#f472b6"/>
       <stop offset="100%" stop-color="#fbbf24"/>
     </linearGradient>
+    <!-- Cat gradients -->
+    <linearGradient id="ear_r" x1="173" x2="222.6" y1="17.31" y2="85.12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="ear_l" x1="30.6" x2="77.19" y1="16.07" y2="83.28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0A878" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="wh_r" x1="231.8" x2="231.8" y1="117.7" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="wh_r2" x1="227.1" x2="227.1" y1="134.2" y2="146.9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paw_r" x1="192.8" x2="192.8" y1="172.2" y2="222.2" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="body_b" x1="125.3" x2="125.3" y1="171.9" y2="236.2" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/><stop stop-color="#FFC8A2" offset="1"/>
+    </linearGradient>
+    <linearGradient id="toe_l" x1="87" x2="87" y1="209.1" y2="235.3" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="toe_r" x1="162.5" x2="162.5" y1="209.1" y2="235" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="belt" x1="125.4" x2="125.4" y1="175.7" y2="186.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="head" x1="109.9" x2="130.3" y1="26.71" y2="178.9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/><stop stop-color="#FFC8A2" offset="1"/>
+    </linearGradient>
+    <linearGradient id="mouth" x1="124.6" x2="124.6" y1="128.9" y2="144" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A0522D" offset="0"/><stop stop-color="#8B4513" offset="1"/>
+    </linearGradient>
+    <linearGradient id="wh_l" x1="17.86" x2="17.86" y1="117.6" y2="125.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="wh_l2" x1="22.44" x2="22.44" y1="134.4" y2="146.8" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="toes" x1="124.6" x2="124.6" y1="209.1" y2="237.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/><stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
   </defs>
 
   <!-- Background -->
   <rect width="800" height="260" rx="16" fill="url(#bg)"/>
   <rect width="800" height="260" rx="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
 
-  <!-- Stars (static) -->
+  <!-- Stars -->
   <g opacity="0.4">
     <circle cx="50" cy="30" r="1" fill="white"/>
     <circle cx="150" cy="60" r="0.8" fill="white"/>
@@ -32,115 +75,101 @@
     <circle cx="470" cy="30" r="0.9" fill="white"/>
   </g>
 
-  <!-- ===== KAWAII CAT ===== -->
-  <g transform="translate(135, 55) scale(1.1)">
-    <!-- Tail -->
-    <path d="M5,72 Q-8,60 -5,48 Q-2,38 5,42" stroke="#8a8aaa" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <circle cx="-4" cy="42" r="3" fill="#6a6a8a"/>
-    <!-- Ears -->
-    <path d="M18,22 L25,2 L36,20 Z" fill="#9898B0" stroke="#7a7a96" stroke-width="1"/>
-    <path d="M22,18 L25,6 L32,18 Z" fill="#ffbbcc"/>
-    <path d="M54,20 L65,2 L72,22 Z" fill="#9898B0" stroke="#7a7a96" stroke-width="1"/>
-    <path d="M58,18 L65,6 L68,18 Z" fill="#ffbbcc"/>
-    <!-- Head -->
-    <ellipse cx="45" cy="36" rx="28" ry="22" fill="#9898B0"/>
-    <!-- Forehead stripes -->
-    <path d="M38,20 L40,28" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-    <path d="M45,18 L45,27" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-    <path d="M52,20 L50,28" stroke="#7a7a96" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-    <!-- Eyes -->
-    <ellipse cx="35" cy="36" rx="5" ry="6" fill="white"/>
-    <ellipse cx="35" cy="36" rx="3.5" ry="5" fill="#88DD88"/>
-    <ellipse cx="35" cy="36" rx="1.5" ry="4" fill="#2D2D3F"/>
-    <circle cx="33" cy="34" r="1.2" fill="white"/>
-    <ellipse cx="55" cy="36" rx="5" ry="6" fill="white"/>
-    <ellipse cx="55" cy="36" rx="3.5" ry="5" fill="#88DD88"/>
-    <ellipse cx="55" cy="36" rx="1.5" ry="4" fill="#2D2D3F"/>
-    <circle cx="53" cy="34" r="1.2" fill="white"/>
+  <!-- ===== REAL MURCHI CAT (sitting pose from app) ===== -->
+  <g transform="translate(70, 10) scale(0.96)">
+    <!-- Right ear -->
+    <path d="m161.5 33.27c15.41-13.14 34.6-21.99 52.49-22.26 8.22-0.13 11.32 2.97 12.91 11.05 3.67 19.2 1.44 46-5.14 69.55l-60.26-58.34z" fill="url(#ear_r)"/>
+    <path d="m179.1 41.12c11.74-7.16 20.74-12.94 27.1-11.85 10.74 1.96 5.45 26.07 2.05 38.45l-29.15-26.6z" fill="#FFE4CC"/>
+    <!-- Left ear -->
+    <path d="m87.17 32.92c-15.56-13.06-34.69-21.61-51.76-21.64-7.55-0.01-10.64 2.59-12.6 10.67-4.06 17.06-2.78 43.34 4.14 69.12l60.22-58.15z" fill="url(#ear_l)"/>
+    <path d="m70.01 40.63c-11.63-6.4-20.65-10.61-27-11.5-10.74-1.45-7.4 21.05-3.4 38.73l30.4-27.23z" fill="#FFE4CC"/>
+    <!-- Right whiskers -->
+    <path d="m226.4 117.7h13c3.33 0 3.97 2.36 3.97 3.99 0 1.96-1.44 3.55-3.97 3.62l-13 0.49c-4.44 0.27-6.26-0.93-6.26-3.9 0-2.68 1.59-4.2 6.26-4.2z" fill="url(#wh_r)"/>
+    <path d="m222.7 135 13.21 4.44c2.9 1.06 2.83 3.08 2.26 4.9-0.69 2.23-2.71 2.79-5.25 2.03l-13.48-3.77c-3.4-1.13-4.74-2.88-3.92-5.42 0.89-2.74 3.43-3.38 7.18-2.18z" fill="url(#wh_r2)"/>
+    <!-- Right paw/tail -->
+    <path d="m175.1 198.6c16.19-2.24 23.89-17.58 34.9-24.3 13.07-7.16 21.62 3.48 23.64 11.03 3.75 13.89-8.82 27.78-25.01 32.28-12.16 4.12-21.16 4.61-30.98 4.61l-2.55-23.62z" fill="url(#paw_r)"/>
+    <!-- Body bottom -->
+    <path d="m82.92 178.1c-10.09 17.68-13.84 37.89-10.87 48.19 2.67 9.35 12.36 9.35 27.7 7.9l4.51-1.45 41.65 0.96c11.01 2.4 27.07 1.94 30.28-4.41 4.51-9-0.51-32.07-8.48-51.6l-39.53-5.85-45.26 6.26z" fill="url(#body_b)"/>
+    <path d="m72.71 225.8c2.02-8.69 10-10.71 19.82-9.64l0.42-6.07c0.42 7.98 2.96 18.21 8.8 24.06-10.5 2.02-26.64 3.01-29.04-8.35z" fill="url(#toe_l)"/>
+    <path d="m156.7 216.1c8.41-0.42 17.23 1.6 20.13 8.83 0.89 8.44-6.66 10.33-19.72 9.77-3.4-0.14-6.93-0.77-9.61-2.08 5.42-4.51 8.17-11.37 9.61-23.53l-0.41 7.01z" fill="url(#toe_r)"/>
+    <path d="m82.03 180.2c0.76-1.59 1.52-3.03 2.35-4.55l83.33 1.31 1.13 3.59c-20.73 6.49-60.98 7.62-86.81-0.35z" fill="url(#belt)"/>
+    <!-- Head/body main -->
+    <path d="m123.7 26.71c-58.47 0-101.4 39.02-101.4 90.51 0 36.44 25.83 57.64 68.02 60.38 9.69 1.23 23.79 1.51 33.88 1.51 11.22 0 22.82-0.92 32.51-2.05 41.11-3.9 69.91-22.2 69.91-59.84 0-45.77-40.02-90.51-102.9-90.51z" fill="url(#head)"/>
+    <!-- Right eye -->
+    <path d="m171.8 82.11c-14.8 0-25.47 14.8-25.47 28.21 0 14.39 10.87 24.62 24.92 24.62 14.46 0 25.6-12.02 25.6-26.14 0-13.89-11-26.69-25.05-26.69z" fill="#fff"/>
+    <path d="m166.9 89.41c-11.6 0-20.15 11-20.15 21.5 0 11.4 8.69 20.54 19.69 20.54 11.15 0 19.7-11.01 19.7-21.37 0-10.77-8.41-20.67-19.24-20.67z" fill="#2D2D2D"/>
+    <path d="m161.5 95.12c-4.3 0-5.75 3.21-5.75 5.51 0 3.53 2.81 5.62 5.34 5.62 3.68 0 5.85-2.9 5.85-5.44 0-3.1-2.4-5.69-5.44-5.69z" fill="#fff"/>
+    <!-- Left eye -->
+    <path d="m76.41 82.11c14.53-0.9 26.3 12.66 26.3 26.69 0 13.89-11.15 26.35-25.61 26.35-14.05 0-25.05-12.02-25.05-26.14 0-13.41 9.86-26.9 24.36-26.9z" fill="#fff"/>
+    <path d="m82.92 89.27c11.01 0 19.24 10.77 19.24 21.78 0 11.4-8.69 20.54-19.24 20.54s-20.15-10.16-20.15-20.99c0-11.54 9.35-21.33 20.15-21.33z" fill="#2D2D2D"/>
+    <path d="m87.84 95.12c4.3 0 5.75 3.21 5.75 5.51 0 3.53-2.81 5.62-5.34 5.62-3.68 0-5.85-2.9-5.85-5.44 0-3.1 2.4-5.69 5.44-5.69z" fill="#fff"/>
     <!-- Nose -->
-    <path d="M43,42 L45,44 L47,42 Z" fill="#ffbbcc"/>
+    <path d="m124.4 117.2c-7.16 0-10.62 1.45-10.62 5.09 0 3.71 6.36 9.42 10.62 9.42 4.58 0 10.8-6.72 10.8-9.42 0-3.64-4-5.09-10.8-5.09z" fill="#FF91A4"/>
     <!-- Mouth -->
-    <path d="M41,46 Q45,49 49,46" stroke="#7a7a96" stroke-width="1" fill="none"/>
+    <path d="m107.1 133.8c-1.66 0.49-1.66 2.31-1.03 3.86 2.68 5.56 10.44 7.58 15.46 5.56 1.3-0.56 2.33-1.31 3.09-2.31 1.69 2.55 4.53 3.28 7.57 2.96 5.78-0.65 10.66-4.91 11.15-7.76 0.21-1.37-0.78-2.65-2.23-2.45-1.75 0.28-1.89 2.03-3.02 3.3-1.89 2.16-4.29 2.61-6.72 2.16-3.33-0.69-3.75-3.01-3.75-6.41h-4.85c0 2.67-0.14 5.41-3.11 6.41-3.04 1.06-6.93-0.14-9.1-3.46-0.83-1.38-1.82-2.34-3.46-1.86z" fill="url(#mouth)"/>
+    <!-- Left whiskers -->
+    <path d="m20.51 117.7h-9.95c-3.33 0-4.53 2.02-4.56 3.92-0.04 2.23 1.55 4.11 4.56 4.11l14.15-0.21c4.23 0 5.3-2.16 4.95-4.7-0.35-2.4-2.01-3.39-9.15-3.12z" fill="url(#wh_l)"/>
+    <path d="m26.43 135.4-12.71 3.89c-2.9 1.06-2.83 3.74-2.27 5.05 1 2.43 3.02 2.64 5.28 2.08l13.76-3.97c3.4-1.13 3.82-3.37 2.92-5.7-1.06-2.54-3.9-2.4-6.98-1.35z" fill="url(#wh_l2)"/>
     <!-- Cheeks -->
-    <ellipse cx="26" cy="43" rx="5" ry="3" fill="#ffccdd" opacity="0.4"/>
-    <ellipse cx="64" cy="43" rx="5" ry="3" fill="#ffccdd" opacity="0.4"/>
-    <!-- Whiskers -->
-    <line x1="14" y1="40" x2="28" y2="42" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
-    <line x1="14" y1="45" x2="28" y2="44" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
-    <line x1="62" y1="42" x2="76" y2="40" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
-    <line x1="62" y1="44" x2="76" y2="45" stroke="#b8b8d0" stroke-width="0.8" opacity="0.6"/>
-    <!-- Body -->
-    <ellipse cx="45" cy="72" rx="22" ry="18" fill="#9898B0"/>
-    <ellipse cx="45" cy="74" rx="14" ry="12" fill="#d4d4e8"/>
-    <!-- Collar -->
-    <path d="M25,58 Q45,64 65,58" stroke="#FFDD33" stroke-width="3" fill="none"/>
-    <circle cx="45" cy="62" r="3" fill="#55AAFF"/>
-    <!-- Paws -->
-    <ellipse cx="30" cy="88" rx="8" ry="5" fill="#9898B0"/>
-    <ellipse cx="30" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
-    <ellipse cx="60" cy="88" rx="8" ry="5" fill="#9898B0"/>
-    <ellipse cx="60" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
+    <path d="m196 130.1c-9 1.24-13.92 6.7-13.92 10.59 0 5.09 5.35 6.98 10.2 6.49 6.8-0.69 14.1-5.02 14.1-9.89 0-4.51-3.54-7.84-10.38-7.19z" fill="#FFE4CC"/>
+    <path d="m49.81 130.6c-6.49 0.35-7.8 4.25-7.66 7.15 0.38 6.36 7.31 9.44 15.28 9.79 6.46 0.27 9.43-3.29 9.29-7.19-0.21-5.78-9.5-10.17-16.91-9.75z" fill="#FFE4CC"/>
+    <!-- Toes -->
+    <path d="m121.7 211.5h5.6c-0.42 5.85-0.7 14.53 0.99 20.1 1.44 5.21 5.95 6.04 9.98 6.04 11.4 0 17.76-13.21 18.79-28.54l-0.89 7.01c-1.03 6.72-5.3 16.04-8.72 18.57-3.14 2.33-5.57 3.03-9.83 2.96-5.85-0.14-8.95-2.68-10.04-6.04h-5.38c-1.52 4.26-3.92 6.21-10.13 6.21-11.01 0-17.36-10.71-19.38-28.71l0.49 7.01c0.56 6 3.03 12.72 7.88 18 3.16 2.97 6.52 3.6 9.95 3.53 5.71-0.14 8.67-2.3 9.86-9.6 0.69-4.26 0.83-10.23 0.83-16.54z" fill="url(#toes)"/>
   </g>
 
   <!-- Hearts -->
-  <path d="M248,68 C248,64 252,60 256,64 C260,60 264,64 264,68 C264,74 256,80 256,80 C256,80 248,74 248,68 Z" fill="#ff5a80" opacity="0.7"/>
-  <path d="M234,52 C234,49.5 236.5,47 239,49.5 C241.5,47 244,49.5 244,52 C244,56 239,60 239,60 C239,60 234,56 234,52 Z" fill="#ff5a80" opacity="0.4"/>
+  <path d="M310,55 C310,50 315,46 319,50 C323,46 328,50 328,55 C328,62 319,68 319,68 C319,68 310,62 310,55 Z" fill="#ff5a80" opacity="0.7"/>
+  <path d="M295,38 C295,35 298,32 301,35 C304,32 307,35 307,38 C307,43 301,47 301,47 C301,47 295,43 295,38 Z" fill="#ff5a80" opacity="0.4"/>
+  <path d="M325,35 C325,33 327,31 329,33 C331,31 333,33 333,35 C333,38 329,41 329,41 C329,41 325,38 325,35 Z" fill="#a78bfa" opacity="0.35"/>
 
   <!-- Music notes (right side) -->
   <g opacity="0.5">
-    <!-- Note 1 -->
     <circle cx="648" cy="78" r="3.5" fill="#a78bfa"/>
     <rect x="651" y="58" width="2" height="20" fill="#a78bfa"/>
     <path d="M651,58 Q660,55 653,62" stroke="#a78bfa" stroke-width="1.5" fill="none"/>
-    <!-- Note 2 -->
     <circle cx="678" cy="65" r="3" fill="#f472b6"/>
     <rect x="681" y="47" width="1.5" height="18" fill="#f472b6"/>
     <path d="M681,47 Q689,44 683,51" stroke="#f472b6" stroke-width="1.2" fill="none"/>
-    <!-- Note 3 -->
     <circle cx="705" cy="85" r="2.5" fill="#fbbf24" opacity="0.8"/>
     <rect x="707" y="70" width="1.5" height="15" fill="#fbbf24" opacity="0.8"/>
   </g>
 
   <!-- Sparkles -->
-  <!-- Sparkle 1 -->
-  <g transform="translate(115, 42)" opacity="0.5">
-    <line x1="0" y1="-4" x2="0" y2="4" stroke="#a78bfa" stroke-width="1"/>
-    <line x1="-4" y1="0" x2="4" y2="0" stroke="#a78bfa" stroke-width="1"/>
-    <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#a78bfa" stroke-width="0.6"/>
-    <line x1="2.5" y1="-2.5" x2="-2.5" y2="2.5" stroke="#a78bfa" stroke-width="0.6"/>
+  <g transform="translate(300, 80)" opacity="0.4">
+    <line x1="0" y1="-4" x2="0" y2="4" stroke="#fbbf24" stroke-width="1"/>
+    <line x1="-4" y1="0" x2="4" y2="0" stroke="#fbbf24" stroke-width="1"/>
+    <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#fbbf24" stroke-width="0.6"/>
+    <line x1="2.5" y1="-2.5" x2="-2.5" y2="2.5" stroke="#fbbf24" stroke-width="0.6"/>
   </g>
-  <!-- Sparkle 2 -->
-  <g transform="translate(700, 50)" opacity="0.35">
-    <line x1="0" y1="-3" x2="0" y2="3" stroke="#fbbf24" stroke-width="1"/>
-    <line x1="-3" y1="0" x2="3" y2="0" stroke="#fbbf24" stroke-width="1"/>
-    <line x1="-2" y1="-2" x2="2" y2="2" stroke="#fbbf24" stroke-width="0.6"/>
-    <line x1="2" y1="-2" x2="-2" y2="2" stroke="#fbbf24" stroke-width="0.6"/>
+  <g transform="translate(710, 45)" opacity="0.3">
+    <line x1="0" y1="-3" x2="0" y2="3" stroke="#a78bfa" stroke-width="1"/>
+    <line x1="-3" y1="0" x2="3" y2="0" stroke="#a78bfa" stroke-width="1"/>
   </g>
 
   <!-- Title -->
-  <text x="490" y="95" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="56" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
+  <text x="530" y="95" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="56" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
 
   <!-- Subtitle -->
-  <text x="490" y="125" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pet for macOS</text>
+  <text x="530" y="125" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pet for macOS</text>
 
   <!-- Feature pills -->
-  <g transform="translate(490, 148)" text-anchor="middle">
-    <rect x="-280" y="0" width="95" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
-    <rect x="-175" y="0" width="90" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
-    <rect x="-75" y="0" width="95" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-    <rect x="30" y="0" width="105" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
-    <rect x="145" y="0" width="90" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
-    <text x="-232" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">30+ behaviors</text>
-    <text x="-130" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#f472b6" font-weight="600">music detect</text>
-    <text x="-28" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" font-weight="600">SVG vector art</text>
-    <text x="82" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single Swift file</text>
+  <g transform="translate(530, 148)" text-anchor="middle">
+    <rect x="-260" y="0" width="88" height="24" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
+    <rect x="-162" y="0" width="88" height="24" rx="12" fill="rgba(244,114,182,0.15)" stroke="rgba(244,114,182,0.3)" stroke-width="0.5"/>
+    <rect x="-64" y="0" width="95" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+    <rect x="41" y="0" width="95" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
+    <rect x="146" y="0" width="88" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+    <text x="-216" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">30+ behaviors</text>
+    <text x="-118" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#f472b6" font-weight="600">music detect</text>
+    <text x="-17" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" font-weight="600">SVG vector art</text>
+    <text x="88" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single Swift file</text>
     <text x="190" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">0 dependencies</text>
   </g>
 
   <!-- Version badge -->
-  <rect x="435" y="190" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-  <text x="490" y="205" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">Free Forever</text>
+  <rect x="475" y="190" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+  <text x="530" y="205" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">Free Forever</text>
 
   <!-- Bottom URL -->
-  <text x="490" y="245" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
+  <text x="530" y="245" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
 </svg>

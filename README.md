@@ -58,51 +58,51 @@ The entire app is a **single Swift file** — no Xcode project, no dependencies,
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>30+ Behaviors</h3>
+<h3>&#x1F3C3; 30+ Behaviors</h3>
 <sub>Walk, run, sleep, zoomies, climb edges, chase butterflies, watch birds, knock glasses, follow cursor, hide, poop, dance to music</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Music Detection</h3>
-<sub>Detects when you play music in Apple Music or Spotify. Cat puts on headphones and vibes — or gets angry if it hates the song</sub><br><br>
+<h3>&#x1F3B5; Music Detection</h3>
+<sub>Detects when you play music in Apple Music or Spotify. Cat puts on headphones and vibes &mdash; or gets angry if it hates the song</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Dock Physics</h3>
+<h3>&#x2693; Dock Physics</h3>
 <sub>Walks on macOS Dock as a physical platform. Real gravity, edge climbing, jumping off walls</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>SVG Vector Art</h3>
+<h3>&#x1F3A8; SVG Vector Art</h3>
 <sub>Every pose is hand-crafted SVG with smooth 16-frame animation cycles. Breathing, tail wag, blinking, trembling, strain</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Emotions & Stats</h3>
+<h3>&#x1F49B; Emotions &amp; Stats</h3>
 <sub>6 stats: hunger, happiness, energy, social, hygiene, health. 4 moods. Gets sick, sad, or ecstatic based on care</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Particle Effects</h3>
+<h3>&#x2728; Particle Effects</h3>
 <sub>Music notes, hearts, stars, sparkles, tears, confetti, sleep Zs, dream bubbles, soap bubbles</sub><br><br>
 </td>
 </tr>
 <tr>
 <td align="center" width="33%">
 <br>
-<h3>Toys & Accessories</h3>
-<sub>Mouse toy, yarn ball, laser dot. Party hat, bow tie, crown, sunglasses, flower, halo — unlock with XP</sub><br><br>
+<h3>&#x1F381; Toys &amp; Accessories</h3>
+<sub>Mouse toy, yarn ball, laser dot. Party hat, bow tie, crown, sunglasses, flower, halo &mdash; unlock with XP</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Pet Diary</h3>
+<h3>&#x1F4D6; Pet Diary</h3>
 <sub>Cat writes a personal journal about its day. Meals, play, butterflies, sickness, milestones</sub><br><br>
 </td>
 <td align="center" width="33%">
 <br>
-<h3>Sit in Corner</h3>
+<h3>&#x1F622; Sit in Corner</h3>
 <sub>Send the cat to the corner as punishment. It walks to the edge, sits facing the room, and cries until you forgive it</sub><br><br>
 </td>
 </tr>
