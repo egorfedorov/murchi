@@ -62,8 +62,8 @@ cat > "$CONTENTS/Info.plist" << 'PLIST'
 </plist>
 PLIST
 
-# Generate icon if needed
-if [ ! -f "$DIR/AppIcon.icns" ]; then
+# Generate icon if missing or outdated
+if [ ! -f "$DIR/AppIcon.icns" ] || [ "$DIR/generate-icon.swift" -nt "$DIR/AppIcon.icns" ]; then
     echo "Generating icon..."
     swiftc "$DIR/generate-icon.swift" -framework AppKit -framework Foundation -o "$DIR/gen-icon" -swift-version 5 2>/dev/null
     cd "$DIR" && ./gen-icon && rm -f gen-icon

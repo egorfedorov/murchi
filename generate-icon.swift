@@ -1,7 +1,7 @@
 import AppKit
 import Foundation
 
-// Generate Murchi app icon — pixel art cat face on gradient background
+// Generate Murchi app icon — plush kawaii cat portrait rendered as vector art.
 // Outputs .icns file for macOS app bundle
 
 func generateIcon() {
@@ -52,106 +52,286 @@ func renderIcon(size: Int) -> NSImage {
     let image = NSImage(size: NSSize(width: size, height: size))
     image.lockFocus()
 
-    let s = CGFloat(size)
+    if let context = NSGraphicsContext.current {
+        context.imageInterpolation = .high
+        let cg = context.cgContext
+        cg.setAllowsAntialiasing(true)
+        cg.setShouldAntialias(true)
+    }
 
-    // Background — rounded square with gradient
+    let s = CGFloat(size)
+    let outlineWidth = max(1.5, s * 0.014)
+    let smallIcon = size <= 32
+
     let bgRect = NSRect(x: 0, y: 0, width: s, height: s)
-    let cornerRadius = s * 0.22
+    let cornerRadius = s * 0.23
     let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: cornerRadius, yRadius: cornerRadius)
 
-    // Gradient background — soft purple to blue
     let gradient = NSGradient(colors: [
-        NSColor(red: 0.35, green: 0.25, blue: 0.65, alpha: 1.0),  // deep purple
-        NSColor(red: 0.25, green: 0.35, blue: 0.70, alpha: 1.0),  // blue-purple
-        NSColor(red: 0.20, green: 0.45, blue: 0.75, alpha: 1.0),  // soft blue
+        NSColor(red: 0.63, green: 0.92, blue: 0.93, alpha: 1.0),
+        NSColor(red: 0.50, green: 0.85, blue: 0.89, alpha: 1.0),
+        NSColor(red: 0.99, green: 0.81, blue: 0.86, alpha: 1.0),
     ])!
-    gradient.draw(in: bgPath, angle: -45)
+    gradient.draw(in: bgPath, angle: -58)
 
-    // Subtle inner glow
-    let innerGlow = NSBezierPath(roundedRect: bgRect.insetBy(dx: s * 0.02, dy: s * 0.02),
-                                  xRadius: cornerRadius * 0.9, yRadius: cornerRadius * 0.9)
-    NSColor(white: 1.0, alpha: 0.05).set()
-    innerGlow.lineWidth = s * 0.02
+    NSGraphicsContext.saveGraphicsState()
+    bgPath.addClip()
+    NSColor(red: 1.00, green: 0.93, blue: 0.88, alpha: 0.52).setFill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.48, y: s * 0.44, width: s * 0.48, height: s * 0.46)).fill()
+    NSColor(red: 0.87, green: 0.97, blue: 0.99, alpha: 0.55).setFill()
+    NSBezierPath(ovalIn: NSRect(x: -s * 0.10, y: s * 0.55, width: s * 0.46, height: s * 0.30)).fill()
+    NSColor(white: 1.0, alpha: 0.14).setFill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.08, y: s * 0.68, width: s * 0.42, height: s * 0.16)).fill()
+    NSGraphicsContext.restoreGraphicsState()
+
+    let innerGlow = NSBezierPath(
+        roundedRect: bgRect.insetBy(dx: s * 0.02, dy: s * 0.02),
+        xRadius: cornerRadius * 0.88,
+        yRadius: cornerRadius * 0.88
+    )
+    NSColor(white: 1.0, alpha: 0.12).setStroke()
+    innerGlow.lineWidth = max(1.0, s * 0.018)
     innerGlow.stroke()
 
-    // Draw pixel cat face — 16x16 grid mapped to icon
-    let T: UInt32 = 0, B: UInt32 = 0x2D2D3F
-    let G: UInt32 = 0x9898B0, GD: UInt32 = 0x7E7E98, W: UInt32 = 0xF0F0F8
-    let P: UInt32 = 0xFFBBCC, GR: UInt32 = 0x88DD88
-    let Y: UInt32 = 0xFFDD33, BL: UInt32 = 0x55AAFF
-    let H: UInt32 = 0xFF6688  // heart accent
+    let leftEarRect = NSRect(x: s * 0.18, y: s * 0.54, width: s * 0.23, height: s * 0.25)
+    let rightEarRect = NSRect(x: s * 0.59, y: s * 0.54, width: s * 0.23, height: s * 0.25)
+    let headRect = NSRect(x: s * 0.20, y: s * 0.20, width: s * 0.60, height: s * 0.57)
+    let leftEar = makeEarPath(in: leftEarRect, mirrored: false)
+    let rightEar = makeEarPath(in: rightEarRect, mirrored: true)
+    let headPath = NSBezierPath(ovalIn: headRect)
+    let furGradient = NSGradient(colors: [
+        NSColor(red: 0.99, green: 0.96, blue: 0.91, alpha: 1.0),
+        NSColor(red: 0.96, green: 0.87, blue: 0.73, alpha: 1.0)
+    ])!
+    let muzzleGradient = NSGradient(colors: [
+        NSColor(red: 1.0, green: 0.99, blue: 0.97, alpha: 1.0),
+        NSColor(red: 0.98, green: 0.92, blue: 0.87, alpha: 1.0)
+    ])!
+    let innerEarColor = NSColor(red: 0.98, green: 0.74, blue: 0.82, alpha: 1.0)
+    let outlineColor = NSColor(red: 0.49, green: 0.39, blue: 0.36, alpha: 1.0)
 
-    let catFace: [[UInt32]] = [
-        [T,T,B,B,T,T,T,T,T,T,T,T,B,B,T,T],  // ear tips
-        [T,B,G,G,B,T,T,T,T,T,T,B,G,G,B,T],  // ears
-        [T,B,G,P,G,B,B,B,B,B,B,G,P,G,B,T],  // ear inner + head
-        [T,B,G,G,G,G,G,G,G,G,G,G,G,G,B,T],  // head
-        [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],// eyes
-        [T,B,G,G,B,GR,G,G,G,G,GR,B,G,G,B,T],// eyes row 2
-        [T,T,B,G,G,G,G,W,W,G,G,G,G,B,T,T],  // muzzle
-        [T,T,B,G,G,G,W,P,P,W,G,G,G,B,T,T],  // nose
-        [T,T,T,B,G,G,G,W,W,G,G,G,B,T,T,T],  // mouth smile
-        [T,T,T,T,B,Y,Y,Y,Y,Y,Y,B,T,T,T,T],  // collar
-        [T,T,T,B,G,G,G,BL,G,G,G,G,B,T,T,T], // body + bell
-        [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],  // body
-        [T,T,B,G,G,G,G,G,G,G,G,G,G,B,T,T],  // body bottom
-        [T,T,B,W,W,G,G,G,G,G,G,W,W,B,T,T],  // paws
-        [T,T,T,B,B,B,B,B,B,B,B,B,B,T,T,T],  // base
-        [T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T],
-    ]
+    NSGraphicsContext.saveGraphicsState()
+    let shadow = NSShadow()
+    shadow.shadowColor = NSColor(red: 0.26, green: 0.34, blue: 0.38, alpha: 0.18)
+    shadow.shadowBlurRadius = s * 0.045
+    shadow.shadowOffset = NSSize(width: 0, height: -s * 0.015)
+    shadow.set()
+    furGradient.draw(in: leftEar, angle: 96)
+    furGradient.draw(in: rightEar, angle: 96)
+    furGradient.draw(in: headPath, angle: 92)
+    NSGraphicsContext.restoreGraphicsState()
 
-    let gridW = 16
-    let gridH = 16
-    let padding = s * 0.12
-    let catArea = s - padding * 2
-    let pixelSize = catArea / CGFloat(gridW)
-    let offsetX = padding
-    let offsetY = padding * 0.6  // slightly lower
+    furGradient.draw(in: leftEar, angle: 96)
+    furGradient.draw(in: rightEar, angle: 96)
+    furGradient.draw(in: headPath, angle: 92)
 
-    for row in 0..<gridH {
-        for col in 0..<gridW {
-            let hex = catFace[row][col]
-            guard hex != 0 else { continue }
-            let r = CGFloat((hex >> 16) & 0xFF) / 255.0
-            let g = CGFloat((hex >> 8) & 0xFF) / 255.0
-            let b = CGFloat(hex & 0xFF) / 255.0
-            NSColor(red: r, green: g, blue: b, alpha: 1.0).set()
-            let rect = NSRect(
-                x: offsetX + CGFloat(col) * pixelSize,
-                y: offsetY + CGFloat(gridH - 1 - row) * pixelSize,
-                width: pixelSize + 0.5,  // slight overlap to avoid gaps
-                height: pixelSize + 0.5
-            )
-            rect.fill()
+    let leftInnerEar = makeEarPath(in: leftEarRect.insetBy(dx: s * 0.04, dy: s * 0.04), mirrored: false)
+    let rightInnerEar = makeEarPath(in: rightEarRect.insetBy(dx: s * 0.04, dy: s * 0.04), mirrored: true)
+    innerEarColor.setFill()
+    leftInnerEar.fill()
+    rightInnerEar.fill()
+
+    stroke(leftEar, color: outlineColor, width: outlineWidth)
+    stroke(rightEar, color: outlineColor, width: outlineWidth)
+    stroke(headPath, color: outlineColor, width: outlineWidth)
+
+    NSColor(white: 1.0, alpha: 0.26).setFill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.30, y: s * 0.50, width: s * 0.23, height: s * 0.15)).fill()
+
+    if !smallIcon {
+        let pawY = s * 0.17
+        let pawSize = NSSize(width: s * 0.14, height: s * 0.10)
+        let leftPaw = NSBezierPath(ovalIn: NSRect(x: s * 0.33, y: pawY, width: pawSize.width, height: pawSize.height))
+        let rightPaw = NSBezierPath(ovalIn: NSRect(x: s * 0.53, y: pawY, width: pawSize.width, height: pawSize.height))
+        furGradient.draw(in: leftPaw, angle: 90)
+        furGradient.draw(in: rightPaw, angle: 90)
+        stroke(leftPaw, color: outlineColor, width: outlineWidth * 0.9)
+        stroke(rightPaw, color: outlineColor, width: outlineWidth * 0.9)
+
+        if size >= 128 {
+            let toeColor = NSColor(red: 0.96, green: 0.73, blue: 0.80, alpha: 0.95)
+            toeColor.setFill()
+            for x in [0.365, 0.405, 0.565, 0.605] {
+                NSBezierPath(ovalIn: NSRect(x: s * x, y: pawY + s * 0.04, width: s * 0.026, height: s * 0.022)).fill()
+            }
         }
     }
 
-    // Small heart in corner
-    if size >= 64 {
-        let heartSize = s * 0.09
-        let hx = s * 0.82
-        let hy = s * 0.82
+    let muzzleRect = NSRect(x: s * 0.30, y: s * 0.29, width: s * 0.40, height: s * 0.25)
+    let muzzlePath = NSBezierPath(roundedRect: muzzleRect, xRadius: s * 0.12, yRadius: s * 0.12)
+    muzzleGradient.draw(in: muzzlePath, angle: 90)
+    stroke(muzzlePath, color: NSColor(red: 0.88, green: 0.76, blue: 0.70, alpha: 0.9), width: max(1.0, outlineWidth * 0.55))
 
-        NSColor(red: 1, green: 0.35, blue: 0.45, alpha: 0.9).set()
-        let heartPath = NSBezierPath()
-        heartPath.move(to: NSPoint(x: hx, y: hy + heartSize * 0.3))
-        heartPath.curve(to: NSPoint(x: hx - heartSize, y: hy + heartSize),
-                       controlPoint1: NSPoint(x: hx - heartSize * 0.5, y: hy + heartSize * 0.3),
-                       controlPoint2: NSPoint(x: hx - heartSize, y: hy + heartSize * 0.7))
-        heartPath.curve(to: NSPoint(x: hx, y: hy - heartSize * 0.5),
-                       controlPoint1: NSPoint(x: hx - heartSize, y: hy + heartSize * 1.3),
-                       controlPoint2: NSPoint(x: hx, y: hy))
-        heartPath.curve(to: NSPoint(x: hx + heartSize, y: hy + heartSize),
-                       controlPoint1: NSPoint(x: hx, y: hy),
-                       controlPoint2: NSPoint(x: hx + heartSize, y: hy + heartSize * 1.3))
-        heartPath.curve(to: NSPoint(x: hx, y: hy + heartSize * 0.3),
-                       controlPoint1: NSPoint(x: hx + heartSize, y: hy + heartSize * 0.7),
-                       controlPoint2: NSPoint(x: hx + heartSize * 0.5, y: hy + heartSize * 0.3))
-        heartPath.fill()
+    let blushColor = NSColor(red: 0.97, green: 0.56, blue: 0.70, alpha: smallIcon ? 0.52 : 0.65)
+    blushColor.setFill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.26, y: s * 0.35, width: s * 0.11, height: s * 0.08)).fill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.63, y: s * 0.35, width: s * 0.11, height: s * 0.08)).fill()
+
+    let eyeWidth = s * (smallIcon ? 0.075 : 0.082)
+    let eyeHeight = eyeWidth * (smallIcon ? 1.05 : 1.30)
+    let eyeY = s * 0.44
+    let leftEyeRect = NSRect(x: s * 0.37, y: eyeY, width: eyeWidth, height: eyeHeight)
+    let rightEyeRect = NSRect(x: s * 0.55, y: eyeY, width: eyeWidth, height: eyeHeight)
+    let eyeColor = NSColor(red: 0.23, green: 0.18, blue: 0.24, alpha: 1.0)
+    eyeColor.setFill()
+    NSBezierPath(ovalIn: leftEyeRect).fill()
+    NSBezierPath(ovalIn: rightEyeRect).fill()
+
+    NSColor(white: 1.0, alpha: 0.94).setFill()
+    NSBezierPath(ovalIn: NSRect(x: leftEyeRect.minX + eyeWidth * 0.18, y: leftEyeRect.maxY - eyeHeight * 0.40, width: eyeWidth * 0.24, height: eyeHeight * 0.26)).fill()
+    NSBezierPath(ovalIn: NSRect(x: rightEyeRect.minX + eyeWidth * 0.18, y: rightEyeRect.maxY - eyeHeight * 0.40, width: eyeWidth * 0.24, height: eyeHeight * 0.26)).fill()
+
+    let nose = NSBezierPath()
+    nose.move(to: NSPoint(x: s * 0.50, y: s * 0.405))
+    nose.line(to: NSPoint(x: s * 0.47, y: s * 0.372))
+    nose.line(to: NSPoint(x: s * 0.53, y: s * 0.372))
+    nose.close()
+    nose.lineJoinStyle = .round
+    NSColor(red: 0.83, green: 0.47, blue: 0.53, alpha: 1.0).setFill()
+    nose.fill()
+
+    let smileColor = NSColor(red: 0.46, green: 0.35, blue: 0.34, alpha: 1.0)
+    let smile = NSBezierPath()
+    smile.move(to: NSPoint(x: s * 0.50, y: s * 0.372))
+    smile.line(to: NSPoint(x: s * 0.50, y: s * 0.345))
+    smile.appendArc(withCenter: NSPoint(x: s * 0.50, y: s * 0.345), radius: s * 0.052, startAngle: 200, endAngle: 340, clockwise: false)
+    smile.lineCapStyle = .round
+    smile.lineJoinStyle = .round
+    smileColor.setStroke()
+    smile.lineWidth = max(1.2, outlineWidth * 0.78)
+    smile.stroke()
+
+    if size >= 128 {
+        let whisker = NSBezierPath()
+        whisker.move(to: NSPoint(x: s * 0.39, y: s * 0.365))
+        whisker.line(to: NSPoint(x: s * 0.26, y: s * 0.385))
+        whisker.move(to: NSPoint(x: s * 0.39, y: s * 0.337))
+        whisker.line(to: NSPoint(x: s * 0.27, y: s * 0.325))
+        whisker.move(to: NSPoint(x: s * 0.61, y: s * 0.365))
+        whisker.line(to: NSPoint(x: s * 0.74, y: s * 0.385))
+        whisker.move(to: NSPoint(x: s * 0.61, y: s * 0.337))
+        whisker.line(to: NSPoint(x: s * 0.73, y: s * 0.325))
+        whisker.lineCapStyle = .round
+        whisker.lineWidth = max(1.1, outlineWidth * 0.55)
+        NSColor(red: 0.75, green: 0.63, blue: 0.58, alpha: 0.95).setStroke()
+        whisker.stroke()
+    }
+
+    drawHeart(
+        center: NSPoint(x: s * 0.78, y: s * 0.77),
+        size: s * (smallIcon ? 0.11 : 0.12),
+        color: NSColor(red: 1.0, green: 0.42, blue: 0.56, alpha: 0.96)
+    )
+
+    if size >= 64 {
+        drawSparkle(center: NSPoint(x: s * 0.20, y: s * 0.77), radius: s * 0.032, color: NSColor(white: 1.0, alpha: 0.82))
+        drawSparkle(center: NSPoint(x: s * 0.70, y: s * 0.22), radius: s * 0.022, color: NSColor(white: 1.0, alpha: 0.62))
     }
 
     image.unlockFocus()
     return image
+}
+
+func makeEarPath(in rect: NSRect, mirrored: Bool) -> NSBezierPath {
+    let path = NSBezierPath()
+
+    if mirrored {
+        let start = NSPoint(x: rect.maxX - rect.width * 0.18, y: rect.minY + rect.height * 0.10)
+        path.move(to: start)
+        path.curve(
+            to: NSPoint(x: rect.maxX - rect.width * 0.48, y: rect.maxY),
+            controlPoint1: NSPoint(x: rect.maxX + rect.width * 0.03, y: rect.minY + rect.height * 0.52),
+            controlPoint2: NSPoint(x: rect.maxX - rect.width * 0.12, y: rect.minY + rect.height * 0.96)
+        )
+        path.curve(
+            to: NSPoint(x: rect.minX + rect.width * 0.04, y: rect.minY + rect.height * 0.20),
+            controlPoint1: NSPoint(x: rect.minX + rect.width * 0.70, y: rect.minY + rect.height * 0.98),
+            controlPoint2: NSPoint(x: rect.minX + rect.width * 0.18, y: rect.minY + rect.height * 0.60)
+        )
+        path.curve(
+            to: start,
+            controlPoint1: NSPoint(x: rect.minX + rect.width * 0.10, y: rect.minY + rect.height * 0.02),
+            controlPoint2: NSPoint(x: rect.maxX - rect.width * 0.05, y: rect.minY + rect.height * 0.02)
+        )
+    } else {
+        let start = NSPoint(x: rect.minX + rect.width * 0.18, y: rect.minY + rect.height * 0.10)
+        path.move(to: start)
+        path.curve(
+            to: NSPoint(x: rect.minX + rect.width * 0.48, y: rect.maxY),
+            controlPoint1: NSPoint(x: rect.minX - rect.width * 0.03, y: rect.minY + rect.height * 0.52),
+            controlPoint2: NSPoint(x: rect.minX + rect.width * 0.12, y: rect.minY + rect.height * 0.96)
+        )
+        path.curve(
+            to: NSPoint(x: rect.maxX - rect.width * 0.04, y: rect.minY + rect.height * 0.20),
+            controlPoint1: NSPoint(x: rect.maxX - rect.width * 0.70, y: rect.minY + rect.height * 0.98),
+            controlPoint2: NSPoint(x: rect.maxX - rect.width * 0.18, y: rect.minY + rect.height * 0.60)
+        )
+        path.curve(
+            to: start,
+            controlPoint1: NSPoint(x: rect.maxX - rect.width * 0.10, y: rect.minY + rect.height * 0.02),
+            controlPoint2: NSPoint(x: rect.minX + rect.width * 0.05, y: rect.minY + rect.height * 0.02)
+        )
+    }
+
+    path.close()
+    return path
+}
+
+func drawHeart(center: NSPoint, size: CGFloat, color: NSColor) {
+    let heart = NSBezierPath()
+    heart.move(to: NSPoint(x: center.x, y: center.y - size * 0.48))
+    heart.curve(
+        to: NSPoint(x: center.x - size * 0.55, y: center.y + size * 0.06),
+        controlPoint1: NSPoint(x: center.x - size * 0.34, y: center.y - size * 0.10),
+        controlPoint2: NSPoint(x: center.x - size * 0.58, y: center.y - size * 0.16)
+    )
+    heart.curve(
+        to: NSPoint(x: center.x, y: center.y + size * 0.48),
+        controlPoint1: NSPoint(x: center.x - size * 0.58, y: center.y + size * 0.44),
+        controlPoint2: NSPoint(x: center.x - size * 0.10, y: center.y + size * 0.62)
+    )
+    heart.curve(
+        to: NSPoint(x: center.x + size * 0.55, y: center.y + size * 0.06),
+        controlPoint1: NSPoint(x: center.x + size * 0.10, y: center.y + size * 0.62),
+        controlPoint2: NSPoint(x: center.x + size * 0.58, y: center.y + size * 0.44)
+    )
+    heart.curve(
+        to: NSPoint(x: center.x, y: center.y - size * 0.48),
+        controlPoint1: NSPoint(x: center.x + size * 0.58, y: center.y - size * 0.16),
+        controlPoint2: NSPoint(x: center.x + size * 0.34, y: center.y - size * 0.10)
+    )
+    heart.close()
+
+    color.setFill()
+    heart.fill()
+
+    NSColor(white: 1.0, alpha: 0.42).setFill()
+    NSBezierPath(ovalIn: NSRect(
+        x: center.x - size * 0.17,
+        y: center.y + size * 0.15,
+        width: size * 0.16,
+        height: size * 0.10
+    )).fill()
+}
+
+func drawSparkle(center: NSPoint, radius: CGFloat, color: NSColor) {
+    let sparkle = NSBezierPath()
+    sparkle.move(to: NSPoint(x: center.x, y: center.y + radius))
+    sparkle.line(to: NSPoint(x: center.x, y: center.y - radius))
+    sparkle.move(to: NSPoint(x: center.x - radius, y: center.y))
+    sparkle.line(to: NSPoint(x: center.x + radius, y: center.y))
+    sparkle.lineCapStyle = .round
+    sparkle.lineWidth = max(1.0, radius * 0.55)
+    color.setStroke()
+    sparkle.stroke()
+}
+
+func stroke(_ path: NSBezierPath, color: NSColor, width: CGFloat) {
+    path.lineJoinStyle = .round
+    path.lineCapStyle = .round
+    path.lineWidth = width
+    color.setStroke()
+    path.stroke()
 }
 
 generateIcon()

@@ -16,3 +16,8 @@ AppIcon.iconset/
 *.xcworkspace/
 build/
 DerivedData/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved

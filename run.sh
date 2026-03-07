@@ -8,6 +8,9 @@ echo "Compiling Murchi..."
 swiftc "$DIR/Murchi.swift" \
     -framework AppKit \
     -framework Foundation \
+    -framework AVFoundation \
+    -framework Carbon \
+    -framework UserNotifications \
     -o "$BIN" \
     -swift-version 5 \
     -O \
