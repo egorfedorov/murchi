@@ -5740,7 +5740,7 @@ class StatsHUDView: NSView {
 // MARK: - Main App Delegate
 
 class MurchiDelegate: NSObject, NSApplicationDelegate {
-    let currentVersion = "2.1.0"
+    let currentVersion = "2.3.0"
 
     // Windows
     var petWindow: NSPanel!
