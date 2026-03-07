@@ -1,49 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f0f2e"/>
-      <stop offset="50%" style="stop-color:#1a1040"/>
-      <stop offset="100%" style="stop-color:#0a0a20"/>
+      <stop offset="0%" stop-color="#0f0f2e"/>
+      <stop offset="50%" stop-color="#1a1040"/>
+      <stop offset="100%" stop-color="#0a0a20"/>
     </linearGradient>
     <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#a78bfa"/>
-      <stop offset="50%" style="stop-color:#f472b6"/>
-      <stop offset="100%" style="stop-color:#fbbf24"/>
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="50%" stop-color="#f472b6"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="softglow">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
 
   <!-- Background -->
   <rect width="800" height="260" rx="16" fill="url(#bg)"/>
   <rect width="800" height="260" rx="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
 
-  <!-- Stars -->
-  <g opacity="0.5">
-    <circle cx="50" cy="30" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/></circle>
-    <circle cx="150" cy="60" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/></circle>
-    <circle cx="280" cy="25" r="1.2" fill="white"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="4s" repeatCount="indefinite"/></circle>
-    <circle cx="520" cy="45" r="0.7" fill="white"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/></circle>
-    <circle cx="650" cy="20" r="1" fill="white"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="3.5s" repeatCount="indefinite"/></circle>
-    <circle cx="730" cy="55" r="0.9" fill="white"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/></circle>
-    <circle cx="100" cy="85" r="0.6" fill="white"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.2s" repeatCount="indefinite"/></circle>
-    <circle cx="700" cy="90" r="1.1" fill="white"><animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.2s" repeatCount="indefinite"/></circle>
-    <circle cx="400" cy="15" r="0.8" fill="white"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle cx="580" cy="75" r="0.7" fill="white"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="4.2s" repeatCount="indefinite"/></circle>
+  <!-- Stars (static) -->
+  <g opacity="0.4">
+    <circle cx="50" cy="30" r="1" fill="white"/>
+    <circle cx="150" cy="60" r="0.8" fill="white"/>
+    <circle cx="280" cy="25" r="1.2" fill="white"/>
+    <circle cx="520" cy="45" r="0.7" fill="white"/>
+    <circle cx="650" cy="20" r="1" fill="white"/>
+    <circle cx="730" cy="55" r="0.9" fill="white"/>
+    <circle cx="100" cy="85" r="0.6" fill="white"/>
+    <circle cx="700" cy="90" r="1.1" fill="white"/>
+    <circle cx="400" cy="15" r="0.8" fill="white"/>
+    <circle cx="580" cy="75" r="0.7" fill="white"/>
+    <circle cx="350" cy="50" r="0.5" fill="white"/>
+    <circle cx="470" cy="30" r="0.9" fill="white"/>
   </g>
 
-  <!-- ===== KAWAII CAT (centered left) ===== -->
-  <g transform="translate(135, 55) scale(1.1)" filter="url(#glow)">
+  <!-- ===== KAWAII CAT ===== -->
+  <g transform="translate(135, 55) scale(1.1)">
     <!-- Tail -->
-    <path d="M5,72 Q-8,60 -5,48 Q-2,38 5,42" stroke="#8a8aaa" stroke-width="4" fill="none" stroke-linecap="round">
-      <animate attributeName="d" values="M5,72 Q-8,60 -5,48 Q-2,38 5,42;M5,72 Q-12,58 -8,46 Q-4,36 2,40;M5,72 Q-8,60 -5,48 Q-2,38 5,42" dur="3s" repeatCount="indefinite"/>
-    </path>
+    <path d="M5,72 Q-8,60 -5,48 Q-2,38 5,42" stroke="#8a8aaa" stroke-width="4" fill="none" stroke-linecap="round"/>
     <circle cx="-4" cy="42" r="3" fill="#6a6a8a"/>
     <!-- Ears -->
     <path d="M18,22 L25,2 L36,20 Z" fill="#9898B0" stroke="#7a7a96" stroke-width="1"/>
@@ -65,13 +57,6 @@
     <ellipse cx="55" cy="36" rx="3.5" ry="5" fill="#88DD88"/>
     <ellipse cx="55" cy="36" rx="1.5" ry="4" fill="#2D2D3F"/>
     <circle cx="53" cy="34" r="1.2" fill="white"/>
-    <!-- Blink -->
-    <ellipse cx="35" cy="36" rx="5" ry="6" fill="#9898B0" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
-    </ellipse>
-    <ellipse cx="55" cy="36" rx="5" ry="6" fill="#9898B0" opacity="0">
-      <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0" dur="4s" repeatCount="indefinite"/>
-    </ellipse>
     <!-- Nose -->
     <path d="M43,42 L45,44 L47,42 Z" fill="#ffbbcc"/>
     <!-- Mouth -->
@@ -95,53 +80,48 @@
     <ellipse cx="30" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
     <ellipse cx="60" cy="88" rx="8" ry="5" fill="#9898B0"/>
     <ellipse cx="60" cy="89" rx="5" ry="3" fill="#F0F0F8"/>
-    <!-- Breathing -->
-    <animateTransform attributeName="transform" type="translate" values="135,55;135,53;135,55" dur="2.5s" repeatCount="indefinite" additive="replace"/>
   </g>
 
-  <!-- Floating hearts -->
-  <g filter="url(#softglow)">
-    <text x="245" y="80" font-size="16" fill="#ff5a80" opacity="0.8">
-      <animate attributeName="y" values="80;58;80" dur="3s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
-      &#9829;
-    </text>
-    <text x="230" y="65" font-size="11" fill="#ff5a80" opacity="0.5">
-      <animate attributeName="y" values="65;45;65" dur="2.5s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
-      &#9829;
-    </text>
-    <text x="110" y="50" font-size="9" fill="#a78bfa" opacity="0.4">
-      <animate attributeName="y" values="50;35;50" dur="2.8s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2.8s" repeatCount="indefinite"/>
-      &#10022;
-    </text>
+  <!-- Hearts -->
+  <path d="M248,68 C248,64 252,60 256,64 C260,60 264,64 264,68 C264,74 256,80 256,80 C256,80 248,74 248,68 Z" fill="#ff5a80" opacity="0.7"/>
+  <path d="M234,52 C234,49.5 236.5,47 239,49.5 C241.5,47 244,49.5 244,52 C244,56 239,60 239,60 C239,60 234,56 234,52 Z" fill="#ff5a80" opacity="0.4"/>
+
+  <!-- Music notes (right side) -->
+  <g opacity="0.5">
+    <!-- Note 1 -->
+    <circle cx="648" cy="78" r="3.5" fill="#a78bfa"/>
+    <rect x="651" y="58" width="2" height="20" fill="#a78bfa"/>
+    <path d="M651,58 Q660,55 653,62" stroke="#a78bfa" stroke-width="1.5" fill="none"/>
+    <!-- Note 2 -->
+    <circle cx="678" cy="65" r="3" fill="#f472b6"/>
+    <rect x="681" y="47" width="1.5" height="18" fill="#f472b6"/>
+    <path d="M681,47 Q689,44 683,51" stroke="#f472b6" stroke-width="1.2" fill="none"/>
+    <!-- Note 3 -->
+    <circle cx="705" cy="85" r="2.5" fill="#fbbf24" opacity="0.8"/>
+    <rect x="707" y="70" width="1.5" height="15" fill="#fbbf24" opacity="0.8"/>
   </g>
 
-  <!-- Music notes floating (right side) -->
-  <g filter="url(#softglow)">
-    <text x="640" y="80" font-size="14" fill="#a78bfa" opacity="0.6">
-      <animate attributeName="y" values="80;55;80" dur="3.5s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.6;0.15;0.6" dur="3.5s" repeatCount="indefinite"/>
-      &#9834;
-    </text>
-    <text x="670" y="95" font-size="11" fill="#f472b6" opacity="0.5">
-      <animate attributeName="y" values="95;72;95" dur="2.8s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.8s" repeatCount="indefinite"/>
-      &#9835;
-    </text>
-    <text x="700" y="70" font-size="9" fill="#fbbf24" opacity="0.4">
-      <animate attributeName="y" values="70;50;70" dur="3.2s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3.2s" repeatCount="indefinite"/>
-      &#9833;
-    </text>
+  <!-- Sparkles -->
+  <!-- Sparkle 1 -->
+  <g transform="translate(115, 42)" opacity="0.5">
+    <line x1="0" y1="-4" x2="0" y2="4" stroke="#a78bfa" stroke-width="1"/>
+    <line x1="-4" y1="0" x2="4" y2="0" stroke="#a78bfa" stroke-width="1"/>
+    <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#a78bfa" stroke-width="0.6"/>
+    <line x1="2.5" y1="-2.5" x2="-2.5" y2="2.5" stroke="#a78bfa" stroke-width="0.6"/>
+  </g>
+  <!-- Sparkle 2 -->
+  <g transform="translate(700, 50)" opacity="0.35">
+    <line x1="0" y1="-3" x2="0" y2="3" stroke="#fbbf24" stroke-width="1"/>
+    <line x1="-3" y1="0" x2="3" y2="0" stroke="#fbbf24" stroke-width="1"/>
+    <line x1="-2" y1="-2" x2="2" y2="2" stroke="#fbbf24" stroke-width="0.6"/>
+    <line x1="2" y1="-2" x2="-2" y2="2" stroke="#fbbf24" stroke-width="0.6"/>
   </g>
 
   <!-- Title -->
-  <text x="490" y="95" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="56" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
+  <text x="490" y="95" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="56" font-weight="900" fill="url(#titleGrad)" text-anchor="middle" letter-spacing="-2">Murchi</text>
 
   <!-- Subtitle -->
-  <text x="490" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pet for macOS</text>
+  <text x="490" y="125" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" font-weight="300">Kawaii Desktop Pet for macOS</text>
 
   <!-- Feature pills -->
   <g transform="translate(490, 148)" text-anchor="middle">
@@ -150,17 +130,17 @@
     <rect x="-75" y="0" width="95" height="24" rx="12" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
     <rect x="30" y="0" width="105" height="24" rx="12" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.3)" stroke-width="0.5"/>
     <rect x="145" y="0" width="90" height="24" rx="12" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
-    <text x="-232" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">30+ behaviors</text>
-    <text x="-130" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#f472b6" font-weight="600">music detect</text>
-    <text x="-28" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" font-weight="600">SVG vector art</text>
-    <text x="82" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single Swift file</text>
-    <text x="190" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">0 dependencies</text>
+    <text x="-232" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#a78bfa" font-weight="600">30+ behaviors</text>
+    <text x="-130" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#f472b6" font-weight="600">music detect</text>
+    <text x="-28" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" font-weight="600">SVG vector art</text>
+    <text x="82" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#fbbf24" font-weight="600">single Swift file</text>
+    <text x="190" y="16" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#3b82f6" font-weight="600">0 dependencies</text>
   </g>
 
   <!-- Version badge -->
   <rect x="435" y="190" width="110" height="22" rx="11" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
-  <text x="490" y="205" font-family="system-ui, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">Free Forever</text>
+  <text x="490" y="205" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="#34d399" text-anchor="middle" font-weight="600">Free Forever</text>
 
   <!-- Bottom URL -->
-  <text x="490" y="245" font-family="system-ui, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
+  <text x="490" y="245" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="#64748b" text-anchor="middle" font-weight="500">murchi.pet</text>
 </svg>
