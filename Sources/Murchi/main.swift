@@ -2172,6 +2172,203 @@ class CatRenderer {
 
 typealias Sprites = CatRenderer
 
+// MARK: - Vector Sprites (replaces pixel art)
+
+enum VectorSprites {
+    static func poop(size: CGFloat = 30) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let cx = size / 2, s = size * 0.8
+        // Swirl poop shape — 3 coils + top
+        let brown = NSColor(red: 0.55, green: 0.35, blue: 0.18, alpha: 1)
+        let lightBrown = NSColor(red: 0.68, green: 0.45, blue: 0.25, alpha: 1)
+        let highlight = NSColor(red: 0.78, green: 0.58, blue: 0.35, alpha: 1)
+        // Base
+        let baseRect = CGRect(x: cx - s * 0.4, y: size * 0.08, width: s * 0.8, height: s * 0.32)
+        ctx.setFillColor(brown.cgColor)
+        ctx.addPath(CGPath(roundedRect: baseRect, cornerWidth: s * 0.14, cornerHeight: s * 0.14, transform: nil))
+        ctx.fillPath()
+        // Middle coil
+        let midRect = CGRect(x: cx - s * 0.32, y: size * 0.26, width: s * 0.64, height: s * 0.28)
+        ctx.setFillColor(lightBrown.cgColor)
+        ctx.addPath(CGPath(roundedRect: midRect, cornerWidth: s * 0.12, cornerHeight: s * 0.12, transform: nil))
+        ctx.fillPath()
+        // Top coil
+        let topRect = CGRect(x: cx - s * 0.2, y: size * 0.44, width: s * 0.4, height: s * 0.24)
+        ctx.setFillColor(brown.cgColor)
+        ctx.addPath(CGPath(roundedRect: topRect, cornerWidth: s * 0.1, cornerHeight: s * 0.1, transform: nil))
+        ctx.fillPath()
+        // Tip
+        ctx.setFillColor(lightBrown.cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - s * 0.08, y: size * 0.62, width: s * 0.16, height: s * 0.16))
+        ctx.fillPath()
+        // Highlight
+        ctx.setFillColor(highlight.cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - s * 0.12, y: size * 0.35, width: s * 0.1, height: s * 0.08))
+        ctx.fillPath()
+        // Stink lines
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.55, blue: 0.3, alpha: 0.4).cgColor)
+        ctx.setLineWidth(1.2)
+        for dx in [-0.15, 0.0, 0.15] as [CGFloat] {
+            let x = cx + s * dx
+            let p = CGMutablePath()
+            p.move(to: CGPoint(x: x, y: size * 0.75))
+            p.addQuadCurve(to: CGPoint(x: x + s * 0.06, y: size * 0.92), control: CGPoint(x: x - s * 0.06, y: size * 0.83))
+            ctx.addPath(p); ctx.strokePath()
+        }
+        img.unlockFocus()
+        return img
+    }
+
+    static func pawPrint(size: CGFloat = 14) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let color = NSColor(red: 0.75, green: 0.60, blue: 0.45, alpha: 0.7)
+        ctx.setFillColor(color.cgColor)
+        let cx = size / 2, cy = size * 0.4
+        // Main pad
+        let padW = size * 0.42, padH = size * 0.32
+        ctx.addEllipse(in: CGRect(x: cx - padW/2, y: cy - padH/2, width: padW, height: padH))
+        ctx.fillPath()
+        // Toe beans (4)
+        let toeR = size * 0.1
+        let toeY = cy + padH/2 + toeR * 0.6
+        let offsets: [CGFloat] = [-0.28, -0.09, 0.09, 0.28]
+        for dx in offsets {
+            ctx.addEllipse(in: CGRect(x: cx + size * dx - toeR, y: toeY, width: toeR * 2, height: toeR * 1.8))
+            ctx.fillPath()
+        }
+        img.unlockFocus()
+        return img
+    }
+
+    static func fish(size: CGFloat = 40) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let cx = size / 2, cy = size / 2
+        let bodyW = size * 0.55, bodyH = size * 0.35
+        // Tail
+        let tail = CGMutablePath()
+        tail.move(to: CGPoint(x: cx - bodyW * 0.3, y: cy))
+        tail.addLine(to: CGPoint(x: cx - bodyW * 0.85, y: cy + bodyH * 0.6))
+        tail.addLine(to: CGPoint(x: cx - bodyW * 0.85, y: cy - bodyH * 0.6))
+        tail.closeSubpath()
+        ctx.setFillColor(NSColor(red: 1.0, green: 0.55, blue: 0.35, alpha: 1).cgColor)
+        ctx.addPath(tail); ctx.fillPath()
+        // Body
+        ctx.setFillColor(NSColor(red: 1.0, green: 0.62, blue: 0.42, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - bodyW * 0.4, y: cy - bodyH/2, width: bodyW, height: bodyH))
+        ctx.fillPath()
+        // Belly highlight
+        ctx.setFillColor(NSColor(red: 1.0, green: 0.78, blue: 0.62, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - bodyW * 0.15, y: cy - bodyH * 0.25, width: bodyW * 0.55, height: bodyH * 0.45))
+        ctx.fillPath()
+        // Eye
+        ctx.setFillColor(NSColor.white.cgColor)
+        let eyeR = size * 0.06
+        ctx.addEllipse(in: CGRect(x: cx + bodyW * 0.2, y: cy + bodyH * 0.05, width: eyeR * 2, height: eyeR * 2))
+        ctx.fillPath()
+        ctx.setFillColor(NSColor(red: 0.15, green: 0.12, blue: 0.18, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx + bodyW * 0.22, y: cy + bodyH * 0.08, width: eyeR * 1.3, height: eyeR * 1.3))
+        ctx.fillPath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func milk(size: CGFloat = 40) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let cx = size / 2
+        let boxW = size * 0.5, boxH = size * 0.6
+        let boxX = cx - boxW/2, boxY = size * 0.1
+        // Box
+        ctx.setFillColor(NSColor(red: 0.95, green: 0.95, blue: 1.0, alpha: 1).cgColor)
+        ctx.addPath(CGPath(roundedRect: CGRect(x: boxX, y: boxY, width: boxW, height: boxH),
+                           cornerWidth: 3, cornerHeight: 3, transform: nil))
+        ctx.fillPath()
+        // Red stripe
+        ctx.setFillColor(NSColor(red: 0.85, green: 0.2, blue: 0.2, alpha: 1).cgColor)
+        ctx.fill(CGRect(x: boxX, y: boxY + boxH * 0.3, width: boxW, height: boxH * 0.2))
+        // Top fold
+        let fold = CGMutablePath()
+        fold.move(to: CGPoint(x: boxX, y: boxY + boxH))
+        fold.addLine(to: CGPoint(x: cx, y: boxY + boxH + size * 0.12))
+        fold.addLine(to: CGPoint(x: boxX + boxW, y: boxY + boxH))
+        fold.closeSubpath()
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.9, blue: 0.95, alpha: 1).cgColor)
+        ctx.addPath(fold); ctx.fillPath()
+        // Outline
+        ctx.setStrokeColor(NSColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 0.5).cgColor)
+        ctx.setLineWidth(0.8)
+        ctx.addPath(CGPath(roundedRect: CGRect(x: boxX, y: boxY, width: boxW, height: boxH),
+                           cornerWidth: 3, cornerHeight: 3, transform: nil))
+        ctx.strokePath()
+        img.unlockFocus()
+        return img
+    }
+
+    static func treat(size: CGFloat = 40) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let cx = size / 2, cy = size / 2
+        let r = size * 0.3
+        // Cookie base
+        ctx.setFillColor(NSColor(red: 0.85, green: 0.65, blue: 0.38, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2))
+        ctx.fillPath()
+        // Lighter center
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.72, blue: 0.48, alpha: 1).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - r * 0.7, y: cy - r * 0.7, width: r * 1.4, height: r * 1.4))
+        ctx.fillPath()
+        // Chocolate chips
+        ctx.setFillColor(NSColor(red: 0.33, green: 0.2, blue: 0.13, alpha: 1).cgColor)
+        let chips: [(CGFloat, CGFloat)] = [(-0.3, 0.2), (0.15, 0.35), (0.3, -0.1), (-0.1, -0.3), (0.2, -0.25)]
+        for (dx, dy) in chips {
+            ctx.addEllipse(in: CGRect(x: cx + r * dx - 2, y: cy + r * dy - 2, width: 4, height: 4))
+            ctx.fillPath()
+        }
+        img.unlockFocus()
+        return img
+    }
+
+    static func medicine(size: CGFloat = 40) -> NSImage {
+        let img = NSImage(size: NSSize(width: size, height: size))
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else { img.unlockFocus(); return img }
+        ctx.setShouldAntialias(true)
+        let cx = size / 2, cy = size / 2
+        let r = size * 0.28
+        // Capsule — left half red, right half white
+        let capsuleRect = CGRect(x: cx - r * 1.4, y: cy - r, width: r * 2.8, height: r * 2)
+        // White half
+        ctx.setFillColor(NSColor(red: 0.96, green: 0.96, blue: 1.0, alpha: 1).cgColor)
+        ctx.addPath(CGPath(roundedRect: capsuleRect, cornerWidth: r, cornerHeight: r, transform: nil))
+        ctx.fillPath()
+        // Red half
+        ctx.setFillColor(NSColor(red: 0.9, green: 0.25, blue: 0.25, alpha: 1).cgColor)
+        ctx.clip(to: CGRect(x: 0, y: 0, width: cx, height: size))
+        ctx.addPath(CGPath(roundedRect: capsuleRect, cornerWidth: r, cornerHeight: r, transform: nil))
+        ctx.fillPath()
+        ctx.resetClip()
+        // Shine
+        ctx.setFillColor(NSColor(white: 1, alpha: 0.3).cgColor)
+        ctx.addEllipse(in: CGRect(x: cx - r * 0.8, y: cy + r * 0.2, width: r * 0.6, height: r * 0.4))
+        ctx.fillPath()
+        img.unlockFocus()
+        return img
+    }
+}
+
 // MARK: - Particle System
 
 struct Particle {
@@ -5019,7 +5216,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         poopWin.collectionBehavior = [.canJoinAllSpaces, .stationary]
         poopWin.ignoresMouseEvents = true
 
-        let img = Sprites.render(Sprites.poop, scale: 3)
+        let img = VectorSprites.poop(size: 30)
         let iv = NSImageView(frame: NSRect(x: 0, y: 0, width: poopSize, height: poopSize))
         iv.image = img
         iv.imageScaling = .scaleProportionallyUpOrDown
@@ -5775,7 +5972,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func spawnPawPrint(at point: NSPoint) {
         let size: CGFloat = 12
-        let img = Sprites.render(Sprites.pawPrint, scale: 2)
+        let img = VectorSprites.pawPrint(size: 14)
         let win = NSPanel(contentRect: NSRect(x: point.x, y: point.y, width: size, height: size),
                           styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         win.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.mainMenuWindow)) + 1)
@@ -6157,7 +6354,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.save()
 
         // Drop a fish sprite briefly
-        showFoodAnimation()
+        showFoodAnimation(image: VectorSprites.fish())
     }
 
     @objc func playWithPet() {
@@ -6205,7 +6402,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 5
         )
-        showFoodAnimation(sprite: Sprites.milk)
+        showFoodAnimation(image: VectorSprites.milk())
         stats.save()
     }
 
@@ -6218,7 +6415,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .star, count: 6
         )
-        showFoodAnimation(sprite: Sprites.treat)
+        showFoodAnimation(image: VectorSprites.treat())
         stats.save()
     }
 
@@ -6298,7 +6495,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .sparkle, count: 12
         )
-        showFoodAnimation(sprite: Sprites.medicine)
+        showFoodAnimation(image: VectorSprites.medicine())
         stats.addMilestone("Recovered from sickness!")
         stats.save()
     }
@@ -6567,8 +6764,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         NSSound(named: "Pop")?.play()
     }
 
-    func showFoodAnimation(sprite: [[UInt32]] = Sprites.fish) {
-        let fishImg = Sprites.render(sprite, scale: 4)
+    func showFoodAnimation(image: NSImage? = nil) {
+        let fishImg = image ?? VectorSprites.fish()
         let foodSize: CGFloat = 40
         let fx = petX + petSize / 2 - foodSize / 2
         let fy = petY + petSize + 20
