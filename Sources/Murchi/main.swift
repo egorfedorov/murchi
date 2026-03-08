@@ -4318,7 +4318,7 @@ class StatsHUDView: NSView {
 // MARK: - Main App Delegate
 
 class MurchiDelegate: NSObject, NSApplicationDelegate {
-    let currentVersion = "2.1.0"
+    let currentVersion = "2.3.1"
 
     // Windows
     var petWindow: NSPanel!
@@ -4614,6 +4614,12 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         // Start position
         petX = screenW / 2 - petSize / 2
         petY = groundYForPet()
+
+        // Set app icon for alerts/dialogs
+        if let iconPath = Bundle.main.resourceURL?.appendingPathComponent("AppIcon.icns").path,
+           let icon = NSImage(contentsOfFile: iconPath) {
+            NSApp.applicationIconImage = icon
+        }
 
         setupStatusBar()
         setupPetWindow()
@@ -5338,6 +5344,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func checkForUpdates() {
+        fetchLatestRelease(retries: 2)
+    }
+
+    private func fetchLatestRelease(retries: Int) {
         let urlString = "https://api.github.com/repos/egorfedorov/murchi/releases/latest"
         guard let url = URL(string: urlString) else { return }
         var request = URLRequest(url: url)
@@ -5346,13 +5356,14 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                if let error = error {
-                    let alert = NSAlert()
-                    alert.messageText = "Update Check Failed"
-                    alert.informativeText = "Could not connect to GitHub: \(error.localizedDescription)"
-                    alert.alertStyle = .warning
-                    alert.addButton(withTitle: "OK")
-                    alert.runModal()
+                if error != nil {
+                    if retries > 0 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            self.fetchLatestRelease(retries: retries - 1)
+                        }
+                    } else {
+                        self.showBubble("*can't check updates*")
+                    }
                     return
                 }
                 guard let data = data,
