@@ -5357,7 +5357,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         behaviorTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { [weak self] _ in
             guard let self = self else { return }
             if self.followingCursor { /* skip random behavior while following */ }
-            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy && self.behavior != .dancing && self.behavior != .hatingMusic {
+            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy && self.behavior != .dancing && self.behavior != .hatingMusic && self.behavior != .cornerTimeout {
                 self.pickRandomBehavior()
             }
             self.scheduleRandomBehavior()
@@ -5365,7 +5365,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func pickRandomBehavior() {
-        // Skip if music is playing — dancing handled in update()
+        // Skip if in corner or music playing
+        if behavior == .cornerTimeout { return }
         if isMusicPlaying { return }
 
         let mood = stats.mood
