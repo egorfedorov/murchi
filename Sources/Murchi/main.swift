@@ -2515,6 +2515,7 @@ struct PetStats: Codable {
     var totalBaths: Int = 0
     var totalHeals: Int = 0
     var totalWalks: Int = 0
+    var totalKeystrokes: Int = 0
     var xp: Int = 0
     var level: Int = 1
     var lastSeen: Date = Date()
@@ -2720,129 +2721,201 @@ enum PetBehavior: String {
 
 // MARK: - Speech Bubbles
 
+// MARK: - Localization
+
+enum AppLanguage: String, CaseIterable {
+    case en = "English"
+    case ru = "Русский"
+    case ja = "日本語"
+    case ko = "한국어"
+    case zh = "中文"
+
+    static var current: AppLanguage {
+        get {
+            if let saved = UserDefaults.standard.string(forKey: "app_language"),
+               let lang = AppLanguage(rawValue: saved) { return lang }
+            // Auto-detect from system
+            let sysLang = Locale.current.language.languageCode?.identifier ?? "en"
+            switch sysLang {
+            case "ru": return .ru
+            case "ja": return .ja
+            case "ko": return .ko
+            case "zh": return .zh
+            default: return .en
+            }
+        }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: "app_language") }
+    }
+}
+
+func L(_ en: String, ru: String? = nil, ja: String? = nil, ko: String? = nil, zh: String? = nil) -> String {
+    switch AppLanguage.current {
+    case .en: return en
+    case .ru: return ru ?? en
+    case .ja: return ja ?? en
+    case .ko: return ko ?? en
+    case .zh: return zh ?? en
+    }
+}
+
 struct SpeechBubbles {
-    static let idle = ["...", "*purrrr*", "*licks paw*", "*looks around*", "*tail swish*"]
+    static var idle: [String] { [
+        "...", "*purrrr*",
+        L("*licks paw*", ru: "*лижет лапку*", ja: "*手をなめる*", ko: "*발 핥기*", zh: "*舔爪子*"),
+        L("*looks around*", ru: "*смотрит вокруг*", ja: "*キョロキョロ*", ko: "*두리번*", zh: "*四处张望*"),
+        L("*tail swish*", ru: "*хвостик туда-сюда*", ja: "*しっぽフリフリ*", ko: "*꼬리 흔들*", zh: "*摇尾巴*"),
+    ] }
 
-    static let happy = [
-        "Mrrrow~!", "You're the best!", "I love you!", "*purrs loudly*",
-        "Best human ever!", "Play with me!", "Life is good~",
-        "*happy chirp*", "Meow meow!", "Feeling great!",
-    ]
+    static var happy: [String] { [
+        "Mrrrow~!",
+        L("You're the best!", ru: "Ты лучший!", ja: "大好き！", ko: "최고야!", zh: "你最棒了！"),
+        L("I love you!", ru: "Я тебя люблю!", ja: "愛してる！", ko: "사랑해!", zh: "我爱你！"),
+        "*purrs loudly*",
+        L("Play with me!", ru: "Поиграй со мной!", ja: "遊ぼう！", ko: "놀아줘!", zh: "和我玩！"),
+        L("Life is good~", ru: "Жизнь прекрасна~", ja: "幸せ～", ko: "행복해~", zh: "生活真好~"),
+        L("Feeling great!", ru: "Отличное настроение!", ja: "最高！", ko: "기분 좋아!", zh: "感觉棒棒的！"),
+    ] }
 
-    static let neutral = [
-        "Meow.", "*yawn*", "Hey there.", "*stretches*", "Hm...",
-        "What's up?", "*stares*", "Feed me?", "Bored...",
-    ]
+    static var neutral: [String] { [
+        L("Meow.", ru: "Мяу.", ja: "ニャー。", ko: "야옹.", zh: "喵。"),
+        "*yawn*",
+        L("Hey there.", ru: "Привет.", ja: "やあ。", ko: "안녕.", zh: "嘿。"),
+        L("*stretches*", ru: "*потягивается*", ja: "*のびーっ*", ko: "*기지개*", zh: "*伸懒腰*"),
+        L("Feed me?", ru: "Покормишь?", ja: "ご飯？", ko: "밥 줘?", zh: "喂我？"),
+        L("Bored...", ru: "Скучно...", ja: "つまんない...", ko: "심심해...", zh: "无聊..."),
+    ] }
 
-    static let sad = [
-        "I'm hungry...", "I'm lonely...", "Pay attention to me...",
-        "*sad meow*", "Don't forget me...", "I'm not okay...",
-        "*whimpers*", "Why so long...", "Miss you...",
-    ]
+    static var sad: [String] { [
+        L("I'm hungry...", ru: "Я голодный...", ja: "お腹すいた...", ko: "배고파...", zh: "我饿了..."),
+        L("I'm lonely...", ru: "Мне одиноко...", ja: "寂しい...", ko: "외로워...", zh: "好孤单..."),
+        L("Pay attention to me...", ru: "Обрати на меня внимание...", ja: "かまって...", ko: "관심 줘...", zh: "注意我..."),
+        L("*sad meow*", ru: "*грустное мяу*", ja: "*悲しいニャー*", ko: "*슬픈 야옹*", zh: "*悲伤的喵*"),
+        L("Miss you...", ru: "Скучаю...", ja: "会いたい...", ko: "보고 싶어...", zh: "想你..."),
+    ] }
 
-    static let sleepy = [
-        "So tired...", "*yawn*", "zzz...", "Sleepy...",
-        "Five more minutes...", "*nods off*", "Need nap...",
-    ]
+    static var sleepy: [String] { [
+        L("So tired...", ru: "Так устал...", ja: "眠い...", ko: "졸려...", zh: "好困..."),
+        "*yawn*", "zzz...",
+        L("Five more minutes...", ru: "Ещё пять минуточек...", ja: "あと5分...", ko: "5분만 더...", zh: "再睡五分钟..."),
+    ] }
 
-    static let eating = [
-        "Nom nom nom!", "Yummy!", "Mmmm fish!", "*happy munching*",
-        "SO GOOD!", "*crunch crunch*", "More please!",
-    ]
+    static var eating: [String] { [
+        L("Nom nom nom!", ru: "Ням ням ням!", ja: "もぐもぐ！", ko: "냠냠냠!", zh: "吃吃吃！"),
+        L("Yummy!", ru: "Вкусно!", ja: "おいしい！", ko: "맛있어!", zh: "好吃！"),
+        L("SO GOOD!", ru: "ОБАЛДЕТЬ!", ja: "最高！", ko: "너무 맛있어!", zh: "太好吃了！"),
+        L("More please!", ru: "Ещё, пожалуйста!", ja: "もっと！", ko: "더 줘!", zh: "再来一点！"),
+    ] }
 
-    static let petted = [
-        "*PURRRR*", "More pets please!", "Right there!",
-        "I love scratches!", "Mrrrow~", "Don't stop!",
-        "*melts*", "Purrfect~", "Yes yes yes!",
-    ]
+    static var petted: [String] { [
+        "*PURRRR*",
+        L("More pets please!", ru: "Ещё погладь!", ja: "もっと撫でて！", ko: "더 쓰다듬어줘!", zh: "再摸摸！"),
+        L("Right there!", ru: "Вот тут!", ja: "そこそこ！", ko: "거기!", zh: "就是那里！"),
+        "Mrrrow~",
+        L("Don't stop!", ru: "Не останавливайся!", ja: "やめないで！", ko: "멈추지 마!", zh: "别停！"),
+        L("Purrfect~", ru: "Мурррчащее~", ja: "にゃーん～", ko: "완벽해~", zh: "喵完美~"),
+    ] }
 
-    static let greeting = [
-        "You're back!!!", "I missed you!", "FINALLY!",
-        "Where were you?!", "Meow meow meow!", "DON'T LEAVE AGAIN!",
-        "*runs in circles*", "SO HAPPY!",
-    ]
+    static var greeting: [String] { [
+        L("You're back!!!", ru: "Ты вернулся!!!", ja: "おかえり！！！", ko: "돌아왔다!!!", zh: "你回来了！！！"),
+        L("I missed you!", ru: "Я скучал!", ja: "会いたかった！", ko: "보고 싶었어!", zh: "我想你了！"),
+        L("FINALLY!", ru: "НАКОНЕЦ-ТО!", ja: "やっと！", ko: "드디어!", zh: "终于！"),
+        L("Where were you?!", ru: "Ты где был?!", ja: "どこ行ってたの？！", ko: "어디 갔었어?!", zh: "你去哪了？！"),
+    ] }
 
-    static let morning = ["Good morning!", "Rise and shine!", "New day, new naps!", "Breakfast time!"]
-    static let evening = ["Good evening~", "Cozy time!", "Getting sleepy...", "Dinner?"]
-    static let lateNight = ["Go to sleep...", "It's so late...", "zzz... you too...", "Bed time?"]
+    static var morning: [String] { [
+        L("Good morning!", ru: "Доброе утро!", ja: "おはよう！", ko: "좋은 아침!", zh: "早上好！"),
+        L("Breakfast time!", ru: "Пора завтракать!", ja: "朝ごはん！", ko: "아침밥!", zh: "早餐时间！"),
+    ] }
+    static var evening: [String] { [
+        L("Good evening~", ru: "Добрый вечер~", ja: "こんばんは～", ko: "좋은 저녁~", zh: "晚上好~"),
+        L("Getting sleepy...", ru: "Засыпаю...", ja: "眠くなってきた...", ko: "졸려지는데...", zh: "困了..."),
+    ] }
+    static var lateNight: [String] { [
+        L("Go to sleep...", ru: "Иди спать...", ja: "もう寝なよ...", ko: "자러 가...", zh: "去睡觉..."),
+        L("It's so late...", ru: "Уже так поздно...", ja: "もうこんな時間...", ko: "너무 늦었어...", zh: "太晚了..."),
+    ] }
 
-    static let playing = [
-        "Wheee!", "Catch me!", "So fun!", "*zoomies*",
-        "FASTER!", "Can't catch me!", "*pounce*",
-    ]
+    static var playing: [String] { [
+        L("Wheee!", ru: "Ииих!", ja: "わーい！", ko: "와!", zh: "耶！"),
+        L("So fun!", ru: "Так весело!", ja: "楽しい！", ko: "재밌어!", zh: "好好玩！"),
+        "*zoomies*",
+        L("Can't catch me!", ru: "Не поймаешь!", ja: "捕まえてみて！", ko: "못 잡지!", zh: "抓不到我！"),
+    ] }
 
-    static let grooming = [
-        "*lick lick*", "Must stay clean!", "Looking good~",
-        "*grooms fur*", "Purrfect fur!",
-    ]
+    static var grooming: [String] { [
+        L("*lick lick*", ru: "*лижет-лижет*", ja: "*ぺろぺろ*", ko: "*핥핥*", zh: "*舔舔*"),
+        L("Must stay clean!", ru: "Надо быть чистым!", ja: "綺麗にしなきゃ！", ko: "깨끗해야 해!", zh: "要保持干净！"),
+    ] }
 
-    static let levelUp = [
-        "I LEVELED UP!", "I'm getting stronger!", "NEW POWERS!",
-        "EVOLUTION!", "Watch me grow!",
-    ]
+    static var levelUp: [String] { [
+        L("I LEVELED UP!", ru: "НОВЫЙ УРОВЕНЬ!", ja: "レベルアップ！", ko: "레벨업!", zh: "升级了！"),
+        L("I'm getting stronger!", ru: "Я становлюсь сильнее!", ja: "強くなった！", ko: "강해지고 있어!", zh: "我变强了！"),
+    ] }
 
-    static let poop = [
-        "Oops...", "I couldn't hold it!", "Sorry...",
-        "*looks embarrassed*", "Clean it please...",
-    ]
+    static var poop: [String] { [
+        L("Oops...", ru: "Упс...", ja: "あっ...", ko: "앗...", zh: "哎呀..."),
+        L("Sorry...", ru: "Простите...", ja: "ごめん...", ko: "미안...", zh: "对不起..."),
+        L("Clean it please...", ru: "Убери пожалуйста...", ja: "片付けて...", ko: "치워줘...", zh: "请清理..."),
+    ] }
 
-    static let dirty = [
-        "I need a bath...", "I'm dirty...", "Gross...",
-        "*sniffs self* ugh",
-    ]
+    static var dirty: [String] { [
+        L("I need a bath...", ru: "Мне нужна ванна...", ja: "お風呂入りたい...", ko: "목욕하고 싶어...", zh: "我需要洗澡..."),
+    ] }
 
-    static let sickBubbles = [
-        "I don't feel good...", "*cough*", "Need medicine...",
-        "My tummy hurts...", "*shivers*", "Help me...",
-        "So dizzy...", "*groan*",
-    ]
+    static var sickBubbles: [String] { [
+        L("I don't feel good...", ru: "Мне плохо...", ja: "気持ち悪い...", ko: "몸이 안 좋아...", zh: "我不舒服..."),
+        L("Need medicine...", ru: "Нужно лекарство...", ja: "薬ちょうだい...", ko: "약 줘...", zh: "需要药..."),
+        L("Help me...", ru: "Помоги...", ja: "助けて...", ko: "도와줘...", zh: "救救我..."),
+    ] }
 
-    static let bathBubbles = [
-        "*splash splash*", "Water! Nooo!", "I hate baths!",
-        "Okay... it's warm...", "*bubbles*", "Almost done?",
-    ]
+    static var bathBubbles: [String] { [
+        "*splash splash*",
+        L("Water! Nooo!", ru: "Вода! Нееет!", ja: "水！いやだ！", ko: "물! 싫어!", zh: "水！不要！"),
+        L("I hate baths!", ru: "Ненавижу ванну!", ja: "お風呂嫌い！", ko: "목욕 싫어!", zh: "讨厌洗澡！"),
+    ] }
 
-    static let promenadeBubbles = [
-        "Nice walk!", "Fresh air!", "Adventure!",
-        "Look, a bird!", "Exploring!", "This is fun!",
-        "New smells!", "What's over there?",
-    ]
+    static var promenadeBubbles: [String] { [
+        L("Nice walk!", ru: "Хорошая прогулка!", ja: "いい散歩！", ko: "좋은 산책!", zh: "散步真好！"),
+        L("Fresh air!", ru: "Свежий воздух!", ja: "新鮮な空気！", ko: "신선한 공기!", zh: "新鲜空气！"),
+        L("Adventure!", ru: "Приключение!", ja: "冒険！", ko: "모험!", zh: "冒险！"),
+    ] }
 
-    static let healBubbles = [
-        "Medicine time... *gulp*", "I feel better!",
-        "Thank you doctor!", "Bleh, but it helps!",
-    ]
+    static var healBubbles: [String] { [
+        L("I feel better!", ru: "Мне лучше!", ja: "よくなった！", ko: "나았다!", zh: "好多了！"),
+        L("Thank you doctor!", ru: "Спасибо, доктор!", ja: "先生ありがとう！", ko: "고마워 의사!", zh: "谢谢医生！"),
+    ] }
 
-    static let milkBubbles = [
-        "Milk! Yummy!", "*lap lap lap*", "Creamy!",
-        "Mmmm warm milk~",
-    ]
+    static var milkBubbles: [String] { [
+        L("Milk! Yummy!", ru: "Молоко! Вкусно!", ja: "ミルク！おいしい！", ko: "우유! 맛있어!", zh: "牛奶！好喝！"),
+        "*lap lap lap*",
+    ] }
 
-    static let treatBubbles = [
-        "A TREAT!", "Yay cookies!", "SO TASTY!",
-        "*happy crunch*", "Best snack ever!",
-    ]
+    static var treatBubbles: [String] { [
+        L("A TREAT!", ru: "ВКУСНЯШКА!", ja: "おやつ！", ko: "간식!", zh: "零食！"),
+        L("SO TASTY!", ru: "ТАК ВКУСНО!", ja: "おいしい！", ko: "너무 맛있어!", zh: "太好吃了！"),
+    ] }
 
-    static let butterflyBubbles = [
-        "A butterfly!!", "Must catch!!", "*wiggles butt*",
-        "Come here little friend!", "SO PRETTY!",
-    ]
+    static var butterflyBubbles: [String] { [
+        L("A butterfly!!", ru: "Бабочка!!", ja: "蝶々！！", ko: "나비!!", zh: "蝴蝶！！"),
+        L("Must catch!!", ru: "Надо поймать!!", ja: "捕まえる！！", ko: "잡아야 해!!", zh: "要抓住！！"),
+        L("SO PRETTY!", ru: "ТАКАЯ КРАСИВАЯ!", ja: "きれい！", ko: "예뻐!", zh: "好漂亮！"),
+    ] }
 
-    static let birdBubbles = [
-        "*stares at bird*", "Chirp?", "Must... not... pounce...",
-        "*intense staring*", "*tail twitching*", "Birdie!",
-    ]
+    static var birdBubbles: [String] { [
+        L("*stares at bird*", ru: "*пялится на птицу*", ja: "*鳥をじーっ*", ko: "*새를 쳐다봄*", zh: "*盯着鸟看*"),
+        L("Birdie!", ru: "Птичка!", ja: "鳥さん！", ko: "새!", zh: "小鸟！"),
+    ] }
 
-    static let giftBubbles = [
-        "A PRESENT!!", "What's inside?!", "For ME?!",
-        "Best day ever!", "Yay yay yay!!",
-    ]
+    static var giftBubbles: [String] { [
+        L("A PRESENT!!", ru: "ПОДАРОК!!", ja: "プレゼント！！", ko: "선물!!", zh: "礼物！！"),
+        L("For ME?!", ru: "Для МЕНЯ?!", ja: "私に？！", ko: "나한테?!", zh: "给我的？！"),
+    ] }
 
-    static let knockBubbles = [
-        "*eyes glass*", "Should I...?", "*boop*",
-        "Oops! *innocent face*", "It was like that!",
-        "*pushes slowly*", "Physics experiment!",
-    ]
+    static var knockBubbles: [String] { [
+        "*boop*",
+        L("Should I...?", ru: "А можно...?", ja: "やっちゃう...？", ko: "해도 될까...?", zh: "我可以...？"),
+        L("Physics experiment!", ru: "Физический эксперимент!", ja: "物理実験！", ko: "물리 실험!", zh: "物理实验！"),
+    ] }
 
     static func forMood(_ mood: PetStats.Mood) -> [String] {
         switch mood {
@@ -2854,25 +2927,27 @@ struct SpeechBubbles {
         }
     }
 
-    static let zoomies = [
-        "*NYOOOM*", "CAN'T STOP!", "ZOOOOM!", "*crashes into wall*",
-        "MAXIMUM SPEED!", "Turbo mode!", "WHEEEEE!",
-    ]
+    static var zoomies: [String] { [
+        "*NYOOOM*", "ZOOOOM!",
+        L("CAN'T STOP!", ru: "НЕ МОГУ ОСТАНОВИТЬСЯ!", ja: "止まれない！", ko: "멈출 수 없어!", zh: "停不下来！"),
+        L("MAXIMUM SPEED!", ru: "МАКСИМАЛЬНАЯ СКОРОСТЬ!", ja: "全速前進！", ko: "최대 속도!", zh: "最高速度！"),
+    ] }
 
-    static let scratching = [
-        "*scratch scratch*", "Gotta sharpen!", "My claws~",
-        "*shreds everything*", "DESTROY!",
-    ]
+    static var scratching: [String] { [
+        L("*scratch scratch*", ru: "*скреб скреб*", ja: "*ガリガリ*", ko: "*긁적긁적*", zh: "*抓抓*"),
+        L("Gotta sharpen!", ru: "Надо наточить!", ja: "研がなきゃ！", ko: "갈아야 해!", zh: "要磨爪子！"),
+    ] }
 
-    static let chasingToy = [
-        "MOUSE!", "I'll get it!", "Come here!", "*pounce!*",
-        "Almost got it!", "MINE!", "So fast!",
-    ]
+    static var chasingToy: [String] { [
+        L("MOUSE!", ru: "МЫШКА!", ja: "ネズミ！", ko: "쥐!", zh: "老鼠！"),
+        L("I'll get it!", ru: "Я поймаю!", ja: "捕まえる！", ko: "잡을 거야!", zh: "我要抓住！"),
+        L("MINE!", ru: "МОЁ!", ja: "私の！", ko: "내 거!", zh: "我的！"),
+    ] }
 
-    static let accessoryReaction = [
-        "Looking fancy!", "New look!", "Do I look good?",
-        "I'm fabulous~", "Style upgrade!",
-    ]
+    static var accessoryReaction: [String] { [
+        L("Looking fancy!", ru: "Выгляжу шикарно!", ja: "おしゃれ！", ko: "멋지다!", zh: "好时尚！"),
+        L("Do I look good?", ru: "Мне идёт?", ja: "似合う？", ko: "잘 어울려?", zh: "好看吗？"),
+    ] }
 
     static func timeGreeting() -> String? {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -3086,10 +3161,121 @@ struct Accessory {
         }
     }()
 
-    static let all: [Accessory] = [partyHat, bowTie, sunglasses, crown, flower, halo]
+    // Seasonal accessories
+    static let santaHat: Accessory = {
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F385} Santa Hat", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            let hatBase = cy + 14
+            let hatTop = cy + 42
+            // Red hat body
+            ctx.setFillColor(NSColor(red: 0.9, green: 0.1, blue: 0.1, alpha: 1).cgColor)
+            ctx.move(to: CGPoint(x: cx - 16, y: hatBase))
+            ctx.addCurve(to: CGPoint(x: cx + 18, y: hatTop),
+                         control1: CGPoint(x: cx - 8, y: hatTop - 5),
+                         control2: CGPoint(x: cx + 10, y: hatTop + 5))
+            ctx.addLine(to: CGPoint(x: cx + 16, y: hatBase))
+            ctx.closePath(); ctx.fillPath()
+            // White brim
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 18, y: hatBase - 4, width: 36, height: 8))
+            ctx.fillPath()
+            // White pom-pom
+            ctx.addEllipse(in: CGRect(x: cx + 14, y: hatTop - 4, width: 10, height: 10))
+            ctx.fillPath()
+        }
+    }()
+
+    static let pumpkinHat: Accessory = {
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F383} Pumpkin Hat", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            let pY = cy + 18
+            // Orange pumpkin
+            ctx.setFillColor(NSColor(red: 1, green: 0.6, blue: 0, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 14, y: pY, width: 28, height: 22))
+            ctx.fillPath()
+            // Green stem
+            ctx.setFillColor(NSColor(red: 0.2, green: 0.7, blue: 0.2, alpha: 1).cgColor)
+            ctx.fill(CGRect(x: cx - 2, y: pY + 20, width: 4, height: 8))
+            // Eyes (triangle cutouts)
+            ctx.setFillColor(NSColor(red: 1, green: 0.9, blue: 0, alpha: 1).cgColor)
+            for side in [-1.0, 1.0] as [CGFloat] {
+                let ex = cx + side * 6
+                ctx.move(to: CGPoint(x: ex, y: pY + 16))
+                ctx.addLine(to: CGPoint(x: ex - 3, y: pY + 10))
+                ctx.addLine(to: CGPoint(x: ex + 3, y: pY + 10))
+                ctx.closePath(); ctx.fillPath()
+            }
+            // Mouth
+            ctx.move(to: CGPoint(x: cx - 5, y: pY + 8))
+            ctx.addLine(to: CGPoint(x: cx, y: pY + 5))
+            ctx.addLine(to: CGPoint(x: cx + 5, y: pY + 8))
+            ctx.strokePath()
+        }
+    }()
+
+    static let heartCrown: Accessory = {
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1F496} Heart Crown", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            let hY = cy + 20
+            ctx.setFillColor(NSColor(red: 1, green: 0.2, blue: 0.4, alpha: 0.9).cgColor)
+            // 3 hearts in a row
+            for offset in [-10.0, 0.0, 10.0] as [CGFloat] {
+                let hx = cx + offset
+                let size: CGFloat = offset == 0 ? 7 : 5
+                // Simple heart shape
+                ctx.addEllipse(in: CGRect(x: hx - size, y: hY + size * 0.3, width: size, height: size))
+                ctx.addEllipse(in: CGRect(x: hx, y: hY + size * 0.3, width: size, height: size))
+                ctx.fillPath()
+                ctx.move(to: CGPoint(x: hx - size, y: hY + size * 0.6))
+                ctx.addLine(to: CGPoint(x: hx + size * 0.5, y: hY - size * 0.5))
+                ctx.addLine(to: CGPoint(x: hx + size, y: hY + size * 0.6))
+                ctx.closePath(); ctx.fillPath()
+            }
+        }
+    }()
+
+    static let witchHat: Accessory = {
+        let T: UInt32 = 0
+        let sprite: [[UInt32]] = Array(repeating: Array(repeating: T, count: 16), count: 16)
+        return Accessory(name: "\u{1FA84} Witch Hat", minLevel: 1, sprite: sprite) { ctx, cx, cy in
+            let hatBase = cy + 14
+            let hatTop = cy + 46
+            // Purple hat cone
+            ctx.setFillColor(NSColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1).cgColor)
+            ctx.move(to: CGPoint(x: cx - 18, y: hatBase))
+            ctx.addLine(to: CGPoint(x: cx + 2, y: hatTop))
+            ctx.addLine(to: CGPoint(x: cx + 18, y: hatBase))
+            ctx.closePath(); ctx.fillPath()
+            // Wide brim
+            ctx.setFillColor(NSColor(red: 0.3, green: 0.08, blue: 0.5, alpha: 1).cgColor)
+            ctx.addEllipse(in: CGRect(x: cx - 22, y: hatBase - 4, width: 44, height: 8))
+            ctx.fillPath()
+            // Gold buckle
+            ctx.setFillColor(NSColor(red: 1, green: 0.84, blue: 0, alpha: 1).cgColor)
+            ctx.fill(CGRect(x: cx - 4, y: hatBase + 2, width: 8, height: 6))
+        }
+    }()
+
+    static let all: [Accessory] = [partyHat, bowTie, sunglasses, crown, flower, halo,
+                                    santaHat, pumpkinHat, heartCrown, witchHat]
 
     static func available(for level: Int) -> [Accessory] {
         return all.filter { $0.minLevel <= level }
+    }
+
+    /// Seasonal accessories auto-suggestion
+    static func seasonalSuggestion() -> String? {
+        let month = Calendar.current.component(.month, from: Date())
+        let day = Calendar.current.component(.day, from: Date())
+        switch month {
+        case 10: return "\u{1F383} Pumpkin Hat"        // October — Halloween
+        case 12: return "\u{1F385} Santa Hat"           // December — Christmas
+        case 2 where day == 14: return "\u{1F496} Heart Crown"  // Valentine's
+        default: return nil
+        }
     }
 }
 
@@ -4318,7 +4504,7 @@ class StatsHUDView: NSView {
 // MARK: - Main App Delegate
 
 class MurchiDelegate: NSObject, NSApplicationDelegate {
-    let currentVersion = "2.3.1"
+    let currentVersion = "3.0.0"
 
     // Windows
     var petWindow: NSPanel!
@@ -4439,6 +4625,33 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         get { UserDefaults.standard.string(forKey: "gemini_api_key") ?? "" }
         set { UserDefaults.standard.set(newValue, forKey: "gemini_api_key") }
     }
+
+    // Keyboard reaction
+    var keyboardEventTap: CFMachPort?
+    var keystrokeTimestamps: [Date] = []
+    var typingSpeed: Double = 0  // keys per second
+    var lastTypingReaction = Date.distantPast
+    var isUserTyping = false
+    var idleSinceKeyboard = Date()
+
+    // Pomodoro timer
+    var pomodoroActive = false
+    var pomodoroWorkMode = true  // true=work, false=break
+    var pomodoroStart = Date()
+    var pomodoroWorkMinutes: Int = 25
+    var pomodoroBreakMinutes: Int = 5
+    var pomodoroCount = 0
+    var pomodoroMenuItem: NSMenuItem?
+
+    // GIF export
+    var gifFrames: [NSImage] = []
+    var isRecordingGif = false
+    var gifRecordStart = Date()
+
+    // Window sitting
+    var windowSittingEnabled = true
+    var currentWindowRect: NSRect? = nil
+    var lastWindowCheck = Date.distantPast
 
     // Zoomies
     var zoomiesDirection: CGFloat = 1
@@ -4589,8 +4802,27 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem!
 
     // Screen bounds
-    var screenW: CGFloat { NSScreen.main?.frame.width ?? 1440 }
-    var screenH: CGFloat { NSScreen.main?.frame.height ?? 900 }
+    /// Combined screen bounds across all monitors
+    var allScreensRect: NSRect {
+        var unionRect = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        for screen in NSScreen.screens {
+            unionRect = unionRect.union(screen.frame)
+        }
+        return unionRect
+    }
+
+    /// Current screen the pet is on
+    var currentScreen: NSScreen {
+        let petPoint = NSPoint(x: petX + petSize / 2, y: petY + petSize / 2)
+        for screen in NSScreen.screens {
+            if screen.frame.contains(petPoint) { return screen }
+        }
+        return NSScreen.main ?? NSScreen.screens[0]
+    }
+
+    var screenW: CGFloat { allScreensRect.maxX }
+    var screenH: CGFloat { currentScreen.frame.height }
+    var screenMinX: CGFloat { allScreensRect.minX }
 
     func safeRange(_ lo: CGFloat, _ hi: CGFloat) -> ClosedRange<CGFloat> {
         let l = min(lo, hi)
@@ -4629,6 +4861,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         setupAccessoryWindow()
         setupNightGlowWindow()
         setupGlobalHotkey()
+        setupKeyboardMonitor()
         requestNotificationPermission()
         updateNightMode()
         updateAccessory()
@@ -4669,7 +4902,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func setupStatusBar() {
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusBarItem.button?.title = "=^.^="
+        // Mood-based menu bar face
+        let moodFace: String
+        switch stats.mood {
+        case .happy: moodFace = "=^.^="
+        case .neutral: moodFace = "=^-^="
+        case .sad: moodFace = "=;.;="
+        case .sleepy: moodFace = "=^~^="
+        case .sick: moodFace = "=x.x="
+        }
+        statusBarItem.button?.title = moodFace
 
         let menu = NSMenu()
 
@@ -4680,45 +4922,47 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // -- Feed submenu --
         let feedMenu = NSMenu()
-        let fishItem = NSMenuItem(title: "\u{1F41F} Fish", action: #selector(feedPet), keyEquivalent: "f")
+        let fishItem = NSMenuItem(title: L("🐟 Fish", ru: "🐟 Рыбка", ja: "🐟 魚", ko: "🐟 생선", zh: "🐟 鱼"), action: #selector(feedPet), keyEquivalent: "f")
         fishItem.target = self
         feedMenu.addItem(fishItem)
-        let milkItem = NSMenuItem(title: "\u{1F95B} Milk", action: #selector(feedMilkAction), keyEquivalent: "")
+        let milkItem = NSMenuItem(title: L("🥛 Milk", ru: "🥛 Молоко", ja: "🥛 ミルク", ko: "🥛 우유", zh: "🥛 牛奶"), action: #selector(feedMilkAction), keyEquivalent: "")
         milkItem.target = self
         feedMenu.addItem(milkItem)
-        let treatItem = NSMenuItem(title: "\u{1F36A} Treat", action: #selector(feedTreatAction), keyEquivalent: "")
+        let treatItem = NSMenuItem(title: L("🍪 Treat", ru: "🍪 Вкусняшка", ja: "🍪 おやつ", ko: "🍪 간식", zh: "🍪 零食"), action: #selector(feedTreatAction), keyEquivalent: "")
         treatItem.target = self
         feedMenu.addItem(treatItem)
-        let feedMenuItem = NSMenuItem(title: "\u{1F356} Feed", action: nil, keyEquivalent: "")
+        let feedMenuItem = NSMenuItem(title: L("🍖 Feed", ru: "🍖 Покормить", ja: "🍖 ごはん", ko: "🍖 먹이주기", zh: "🍖 喂食"), action: nil, keyEquivalent: "")
         feedMenuItem.submenu = feedMenu
         menu.addItem(feedMenuItem)
 
-        let playItem = NSMenuItem(title: "\u{1F3AE} Play", action: #selector(playWithPet), keyEquivalent: "p")
+        let playItem = NSMenuItem(title: L("🎮 Play", ru: "🎮 Играть", ja: "🎮 遊ぶ", ko: "🎮 놀기", zh: "🎮 玩耍"), action: #selector(playWithPet), keyEquivalent: "p")
         playItem.target = self
         menu.addItem(playItem)
 
-        let restItem = NSMenuItem(title: "\u{1F634} Rest", action: #selector(restPet), keyEquivalent: "r")
+        let restItem = NSMenuItem(title: L("😴 Rest", ru: "😴 Спать", ja: "😴 寝る", ko: "😴 잠자기", zh: "😴 休息"), action: #selector(restPet), keyEquivalent: "r")
         restItem.target = self
         menu.addItem(restItem)
 
-        let bathItem = NSMenuItem(title: "\u{1F6C1} Bath", action: #selector(bathePet), keyEquivalent: "b")
+        let bathItem = NSMenuItem(title: L("🛁 Bath", ru: "🛁 Купаться", ja: "🛁 お風呂", ko: "🛁 목욕", zh: "🛁 洗澡"), action: #selector(bathePet), keyEquivalent: "b")
         bathItem.target = self
         menu.addItem(bathItem)
 
-        let cleanItem = NSMenuItem(title: "\u{1F9F9} Clean Poop (\(stats.poopCount))", action: #selector(cleanPoopAction), keyEquivalent: "c")
+        let cleanItem = NSMenuItem(title: L("🧹 Clean Poop", ru: "🧹 Убрать какашки", ja: "🧹 うんち掃除", ko: "🧹 똥 치우기", zh: "🧹 清理便便") + " (\(stats.poopCount))", action: #selector(cleanPoopAction), keyEquivalent: "c")
         cleanItem.target = self
         menu.addItem(cleanItem)
 
-        let healItem = NSMenuItem(title: "\u{1F48A} Medicine", action: #selector(healPet), keyEquivalent: "m")
+        let healItem = NSMenuItem(title: L("💊 Medicine", ru: "💊 Лекарство", ja: "💊 薬", ko: "💊 약", zh: "💊 药"), action: #selector(healPet), keyEquivalent: "m")
         healItem.target = self
         healItem.isEnabled = stats.isSick
         menu.addItem(healItem)
 
-        let walkItem = NSMenuItem(title: "\u{1F6B6} Walk", action: #selector(takeForWalk), keyEquivalent: "w")
+        let walkItem = NSMenuItem(title: L("🚶 Walk", ru: "🚶 Гулять", ja: "🚶 散歩", ko: "🚶 산책", zh: "🚶 散步"), action: #selector(takeForWalk), keyEquivalent: "w")
         walkItem.target = self
         menu.addItem(walkItem)
 
-        let cornerTitle = behavior == .cornerTimeout ? "\u{1F49A} Forgive" : "\u{1F6D1} Sit in Corner"
+        let cornerTitle = behavior == .cornerTimeout
+            ? L("💚 Forgive", ru: "💚 Простить", ja: "💚 許す", ko: "💚 용서하기", zh: "💚 原谅")
+            : L("🛑 Sit in Corner", ru: "🛑 В угол", ja: "🛑 お仕置き", ko: "🛑 벌서기", zh: "🛑 罚站")
         let cornerItem = NSMenuItem(title: cornerTitle, action: #selector(sendToCorner), keyEquivalent: "")
         cornerItem.target = self
         menu.addItem(cornerItem)
@@ -4727,22 +4971,22 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // -- Toys submenu --
         let toyMenu = NSMenu()
-        let mouseItem = NSMenuItem(title: "\u{1F401} Mouse Toy", action: #selector(spawnMouseToy), keyEquivalent: "")
+        let mouseItem = NSMenuItem(title: L("🐁 Mouse Toy", ru: "🐁 Мышка", ja: "🐁 ネズミ", ko: "🐁 쥐 장난감", zh: "🐁 老鼠玩具"), action: #selector(spawnMouseToy), keyEquivalent: "")
         mouseItem.target = self
         toyMenu.addItem(mouseItem)
-        let yarnItem = NSMenuItem(title: "\u{1F9F6} Yarn Ball", action: #selector(spawnYarnBall), keyEquivalent: "")
+        let yarnItem = NSMenuItem(title: L("🧶 Yarn Ball", ru: "🧶 Клубок", ja: "🧶 毛糸玉", ko: "🧶 털실 공", zh: "🧶 毛线球"), action: #selector(spawnYarnBall), keyEquivalent: "")
         yarnItem.target = self
         toyMenu.addItem(yarnItem)
-        let laserItem = NSMenuItem(title: "\u{1F534} Laser Dot", action: #selector(spawnLaserDot), keyEquivalent: "")
+        let laserItem = NSMenuItem(title: L("🔴 Laser Dot", ru: "🔴 Лазер", ja: "🔴 レーザー", ko: "🔴 레이저", zh: "🔴 激光点"), action: #selector(spawnLaserDot), keyEquivalent: "")
         laserItem.target = self
         toyMenu.addItem(laserItem)
-        let toyMenuItem = NSMenuItem(title: "\u{1F9F8} Toys", action: nil, keyEquivalent: "t")
+        let toyMenuItem = NSMenuItem(title: L("🧸 Toys", ru: "🧸 Игрушки", ja: "🧸 おもちゃ", ko: "🧸 장난감", zh: "🧸 玩具"), action: nil, keyEquivalent: "t")
         toyMenuItem.submenu = toyMenu
         menu.addItem(toyMenuItem)
 
         // -- Accessories submenu --
         let accessoryMenu = NSMenu()
-        let noneItem = NSMenuItem(title: "None", action: #selector(removeAccessory), keyEquivalent: "")
+        let noneItem = NSMenuItem(title: L("None", ru: "Нет", ja: "なし", ko: "없음", zh: "无"), action: #selector(removeAccessory), keyEquivalent: "")
         noneItem.target = self
         accessoryMenu.addItem(noneItem)
         for acc in Accessory.available(for: stats.level) {
@@ -4751,38 +4995,76 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             item.representedObject = acc.name
             accessoryMenu.addItem(item)
         }
-        let accessoryMenuItem = NSMenuItem(title: "\u{1F451} Accessories", action: nil, keyEquivalent: "")
+        let accessoryMenuItem = NSMenuItem(title: L("👑 Accessories", ru: "👑 Аксессуары", ja: "👑 アクセサリー", ko: "👑 액세서리", zh: "👑 配饰"), action: nil, keyEquivalent: "")
         accessoryMenuItem.submenu = accessoryMenu
         menu.addItem(accessoryMenuItem)
 
         menu.addItem(NSMenuItem.separator())
 
-        let summonItem = NSMenuItem(title: "\u{2728} Summon (Cmd+Shift+M)", action: #selector(summonPet), keyEquivalent: "")
+        let summonItem = NSMenuItem(title: L("✨ Summon (Cmd+Shift+M)", ru: "✨ Позвать (Cmd+Shift+M)", ja: "✨ 召喚 (Cmd+Shift+M)", ko: "✨ 소환 (Cmd+Shift+M)", zh: "✨ 召唤 (Cmd+Shift+M)"), action: #selector(summonPet), keyEquivalent: "")
         summonItem.target = self
         menu.addItem(summonItem)
 
-        let statsItem = NSMenuItem(title: "\u{1F4CA} Stats", action: #selector(showStats), keyEquivalent: "s")
+        let statsItem = NSMenuItem(title: L("📊 Stats", ru: "📊 Статистика", ja: "📊 ステータス", ko: "📊 상태", zh: "📊 状态"), action: #selector(showStats), keyEquivalent: "s")
         statsItem.target = self
         menu.addItem(statsItem)
 
-        let cameraItem = NSMenuItem(title: "\u{1F4F7} Screenshot", action: #selector(screenshotPet), keyEquivalent: "")
+        let cameraItem = NSMenuItem(title: L("📷 Screenshot", ru: "📷 Скриншот", ja: "📷 スクリーンショット", ko: "📷 스크린샷", zh: "📷 截图"), action: #selector(screenshotPet), keyEquivalent: "")
         cameraItem.target = self
         menu.addItem(cameraItem)
 
-        let diaryItem = NSMenuItem(title: "\u{1F4D3} Diary", action: #selector(showDiary), keyEquivalent: "d")
+        let diaryItem = NSMenuItem(title: L("📓 Diary", ru: "📓 Дневник", ja: "📓 日記", ko: "📓 일기", zh: "📓 日记"), action: #selector(showDiary), keyEquivalent: "d")
         diaryItem.target = self
         menu.addItem(diaryItem)
 
         menu.addItem(NSMenuItem.separator())
 
         // AI Chat
-        let chatItem = NSMenuItem(title: "\u{1F4AC} Chat with Murchi", action: #selector(openChatWindow), keyEquivalent: "g")
+        let chatItem = NSMenuItem(title: L("💬 Chat with Murchi", ru: "💬 Чат с Мурчи", ja: "💬 ムルチとチャット", ko: "💬 무르치와 채팅", zh: "💬 和Murchi聊天"), action: #selector(openChatWindow), keyEquivalent: "g")
         chatItem.target = self
         menu.addItem(chatItem)
 
-        let aiSettingsItem = NSMenuItem(title: "\u{1F527} AI Settings", action: #selector(openAISettings), keyEquivalent: "")
+        let aiSettingsItem = NSMenuItem(title: L("🔧 AI Settings", ru: "🔧 Настройки AI", ja: "🔧 AI設定", ko: "🔧 AI 설정", zh: "🔧 AI设置"), action: #selector(openAISettings), keyEquivalent: "")
         aiSettingsItem.target = self
         menu.addItem(aiSettingsItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // Pomodoro
+        let pomoTitle = pomodoroActive
+            ? L("🍅 Stop Pomodoro", ru: "🍅 Стоп Помодоро", ja: "🍅 ポモドーロ停止", ko: "🍅 뽀모도로 중지", zh: "🍅 停止番茄钟")
+            : L("🍅 Pomodoro Timer", ru: "🍅 Помодоро Таймер", ja: "🍅 ポモドーロタイマー", ko: "🍅 뽀모도로 타이머", zh: "🍅 番茄钟")
+        let pomoItem = NSMenuItem(title: pomoTitle, action: #selector(togglePomodoro), keyEquivalent: "")
+        pomoItem.target = self
+        menu.addItem(pomoItem)
+
+        // GIF Export
+        let gifItem = NSMenuItem(title: L("🎬 Record GIF (3s)", ru: "🎬 Записать GIF (3с)", ja: "🎬 GIF録画 (3秒)", ko: "🎬 GIF 녹화 (3초)", zh: "🎬 录制GIF (3秒)"), action: #selector(startGifCapture), keyEquivalent: "")
+        gifItem.target = self
+        menu.addItem(gifItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // -- Language submenu --
+        let langMenu = NSMenu()
+        for lang in AppLanguage.allCases {
+            let item = NSMenuItem(title: lang.rawValue, action: #selector(changeLanguage(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = lang.rawValue
+            if lang == AppLanguage.current {
+                item.state = .on
+            }
+            langMenu.addItem(item)
+        }
+        let langMenuItem = NSMenuItem(title: L("🌐 Language", ru: "🌐 Язык", ja: "🌐 言語", ko: "🌐 언어", zh: "🌐 语言"), action: nil, keyEquivalent: "")
+        langMenuItem.submenu = langMenu
+        menu.addItem(langMenuItem)
+
+        let soundItem = NSMenuItem(title: soundEnabled
+            ? L("🔈 Mute Sounds", ru: "🔈 Выкл. звук", ja: "🔈 ミュート", ko: "🔈 음소거", zh: "🔈 静音")
+            : L("🔊 Enable Sounds", ru: "🔊 Вкл. звук", ja: "🔊 サウンドON", ko: "🔊 소리 켜기", zh: "🔊 开启声音"),
+            action: #selector(toggleSound), keyEquivalent: "")
+        menu.addItem(soundItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -4790,7 +5072,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         websiteItem.target = self
         menu.addItem(websiteItem)
 
-        let updateItem = NSMenuItem(title: "\u{1F504} Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "u")
+        let updateItem = NSMenuItem(title: L("🔄 Check for Updates", ru: "🔄 Проверить обновления", ja: "🔄 アップデート確認", ko: "🔄 업데이트 확인", zh: "🔄 检查更新"), action: #selector(checkForUpdates), keyEquivalent: "u")
         updateItem.target = self
         menu.addItem(updateItem)
 
@@ -4803,17 +5085,29 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        // Pet selection menu hidden — only cat for now
-
-        let soundItem = NSMenuItem(title: soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds", action: #selector(toggleSound), keyEquivalent: "")
-        menu.addItem(soundItem)
-
-        menu.addItem(NSMenuItem.separator())
-
-        let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: L("Quit", ru: "Выход", ja: "終了", ko: "종료", zh: "退出"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         statusBarItem.menu = menu
+    }
+
+    @objc func changeLanguage(_ sender: NSMenuItem) {
+        guard let langName = sender.representedObject as? String,
+              let lang = AppLanguage(rawValue: langName) else { return }
+        AppLanguage.current = lang
+        // Rebuild menu with new language
+        setupStatusBar()
+        // Rebuild chat/settings windows if they exist
+        if chatWindow != nil {
+            chatWindow?.orderOut(nil)
+            chatWindow = nil
+            setupChatWindow()
+        }
+        if settingsWindow != nil {
+            settingsWindow?.orderOut(nil)
+            settingsWindow = nil
+        }
+        showBubble(L("Language changed!", ru: "Язык изменён!", ja: "言語を変更しました！", ko: "언어가 변경되었습니다!", zh: "语言已更改！"))
     }
 
     // MARK: - Windows
@@ -4964,7 +5258,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             styleMask: [.titled, .closable, .nonactivatingPanel],
             backing: .buffered, defer: false
         )
-        chatWindow?.title = "Chat with Murchi"
+        chatWindow?.title = L("Chat with Murchi", ru: "Чат с Мурчи", ja: "ムルチとチャット", ko: "무르치와 채팅", zh: "和Murchi聊天")
         chatWindow?.level = .floating
         chatWindow?.isFloatingPanel = true
         chatWindow?.appearance = NSAppearance(named: .aqua)
@@ -4994,11 +5288,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         contentView.addSubview(scrollView)
 
         // Welcome message
-        appendChatMessage(from: "Murchi", text: "Mrrrow~! I'm powered by AI now! Ask me anything! 🐱✨")
+        appendChatMessage(from: "Murchi", text: L("Mrrrow~! I'm powered by AI now! Ask me anything! 🐱✨", ru: "Мррроу~! Теперь у меня есть AI! Спрашивай что хочешь! 🐱✨", ja: "ニャー♪ AIになったよ！なんでも聞いて！🐱✨", ko: "야옹~! AI가 됐어! 뭐든 물어봐! 🐱✨", zh: "喵~！我现在有AI了！随便问吧！🐱✨"))
 
         // Input field
         let inputField = NSTextField(frame: NSRect(x: 12, y: 16, width: w - 100, height: 30))
-        inputField.placeholderString = "Type a message..."
+        inputField.placeholderString = L("Type a message...", ru: "Напиши сообщение...", ja: "メッセージを入力...", ko: "메시지를 입력하세요...", zh: "输入消息...")
         inputField.font = NSFont.systemFont(ofSize: 13)
         inputField.target = self
         inputField.action = #selector(chatSendAction)
@@ -5007,7 +5301,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Send button
         let sendBtn = NSButton(frame: NSRect(x: w - 80, y: 16, width: 68, height: 30))
-        sendBtn.title = "Send"
+        sendBtn.title = L("Send", ru: "Отправить", ja: "送信", ko: "전송", zh: "发送")
         sendBtn.bezelStyle = .rounded
         sendBtn.target = self
         sendBtn.action = #selector(chatSendAction)
@@ -5021,7 +5315,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         guard let textView = chatHistoryView else { return }
 
         let isMurchi = sender == "Murchi"
-        let prefix = isMurchi ? "🐱 Murchi: " : "👤 You: "
+        let prefix = isMurchi ? "🐱 Murchi: " : L("👤 You: ", ru: "👤 Ты: ", ja: "👤 あなた: ", ko: "👤 나: ", zh: "👤 你: ")
 
         let prefixAttrs: [NSAttributedString.Key: Any] = [
             .font: NSFont.boldSystemFont(ofSize: 13),
@@ -5169,7 +5463,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             styleMask: [.titled, .closable, .nonactivatingPanel],
             backing: .buffered, defer: false
         )
-        settingsWindow?.title = "Murchi AI Settings"
+        settingsWindow?.title = L("Murchi AI Settings", ru: "Мурчи — Настройки AI", ja: "ムルチ AI設定", ko: "무르치 AI 설정", zh: "Murchi AI设置")
         settingsWindow?.level = .floating
         settingsWindow?.appearance = NSAppearance(named: .aqua)
 
@@ -5178,13 +5472,13 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         contentView.layer?.backgroundColor = NSColor(white: 0.98, alpha: 1).cgColor
 
         // Title
-        let titleLabel = NSTextField(labelWithString: "🤖 AI Settings")
+        let titleLabel = NSTextField(labelWithString: L("🤖 AI Settings", ru: "🤖 Настройки AI", ja: "🤖 AI設定", ko: "🤖 AI 설정", zh: "🤖 AI设置"))
         titleLabel.frame = NSRect(x: 20, y: h - 45, width: w - 40, height: 25)
         titleLabel.font = NSFont.boldSystemFont(ofSize: 16)
         contentView.addSubview(titleLabel)
 
         // API Key label
-        let keyLabel = NSTextField(labelWithString: "Gemini API Key:")
+        let keyLabel = NSTextField(labelWithString: L("Gemini API Key:", ru: "Ключ Gemini API:", ja: "Gemini APIキー:", ko: "Gemini API 키:", zh: "Gemini API密钥:"))
         keyLabel.frame = NSRect(x: 20, y: h - 80, width: 120, height: 20)
         keyLabel.font = NSFont.systemFont(ofSize: 13)
         contentView.addSubview(keyLabel)
@@ -5192,14 +5486,14 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         // API Key field (visible so user can verify)
         let keyField = NSTextField(frame: NSRect(x: 20, y: h - 110, width: w - 40, height: 26))
         keyField.stringValue = geminiApiKey
-        keyField.placeholderString = "Enter your Gemini API key..."
+        keyField.placeholderString = L("Enter your Gemini API key...", ru: "Введите ваш Gemini API ключ...", ja: "Gemini APIキーを入力...", ko: "Gemini API 키를 입력하세요...", zh: "输入你的Gemini API密钥...")
         keyField.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
         keyField.textColor = NSColor(white: 0.15, alpha: 1)
         apiKeyField = keyField
         contentView.addSubview(keyField)
 
         // Hint
-        let hint = NSTextField(labelWithString: "Get a free key at ai.google.dev")
+        let hint = NSTextField(labelWithString: L("Get a free key at ai.google.dev", ru: "Бесплатный ключ: ai.google.dev", ja: "無料キーはai.google.devで取得", ko: "무료 키: ai.google.dev", zh: "免费密钥：ai.google.dev"))
         hint.frame = NSRect(x: 20, y: h - 132, width: w - 40, height: 16)
         hint.font = NSFont.systemFont(ofSize: 11)
         hint.textColor = .secondaryLabelColor
@@ -5207,7 +5501,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Save button
         let saveBtn = NSButton(frame: NSRect(x: w - 90, y: 16, width: 70, height: 30))
-        saveBtn.title = "Save"
+        saveBtn.title = L("Save", ru: "Сохранить", ja: "保存", ko: "저장", zh: "保存")
         saveBtn.bezelStyle = .rounded
         saveBtn.target = self
         saveBtn.action = #selector(saveAISettings)
@@ -5215,7 +5509,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         // Test button
         let testBtn = NSButton(frame: NSRect(x: w - 170, y: 16, width: 70, height: 30))
-        testBtn.title = "Test"
+        testBtn.title = L("Test", ru: "Тест", ja: "テスト", ko: "테스트", zh: "测试")
         testBtn.bezelStyle = .rounded
         testBtn.target = self
         testBtn.action = #selector(testAIConnection)
@@ -5227,7 +5521,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     @objc func saveAISettings() {
         if let key = apiKeyField?.stringValue, !key.isEmpty {
             geminiApiKey = key
-            showBubble("*API key saved!*")
+            showBubble(L("*API key saved!*", ru: "*Ключ сохранён!*", ja: "*APIキー保存！*", ko: "*API 키 저장됨!*", zh: "*API密钥已保存！*"))
         }
         settingsWindow?.orderOut(nil)
     }
@@ -5244,6 +5538,319 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         if settingsWindow == nil { setupSettingsWindow() }
         settingsWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // MARK: - Keyboard Reaction System
+
+    func setupKeyboardMonitor() {
+        // Monitor global key events to detect typing
+        let mask: CGEventMask = (1 << CGEventType.keyDown.rawValue)
+        guard let tap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .listenOnly,
+            eventsOfInterest: mask,
+            callback: { _, _, event, refcon -> Unmanaged<CGEvent>? in
+                guard let refcon = refcon else { return Unmanaged.passRetained(event) }
+                let delegate = Unmanaged<MurchiDelegate>.fromOpaque(refcon).takeUnretainedValue()
+                DispatchQueue.main.async {
+                    delegate.onKeyboardEvent()
+                }
+                return Unmanaged.passRetained(event)
+            },
+            userInfo: Unmanaged.passUnretained(self).toOpaque()
+        ) else {
+            print("[Keyboard] Could not create event tap — Accessibility permission needed")
+            return
+        }
+
+        keyboardEventTap = tap
+        let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
+        CGEvent.tapEnable(tap: tap, enable: true)
+        print("[Keyboard] Monitoring keyboard for typing reactions")
+    }
+
+    func onKeyboardEvent() {
+        let now = Date()
+        keystrokeTimestamps.append(now)
+
+        // Keep only last 3 seconds of keystrokes
+        keystrokeTimestamps = keystrokeTimestamps.filter { now.timeIntervalSince($0) < 3.0 }
+        typingSpeed = Double(keystrokeTimestamps.count) / 3.0
+        isUserTyping = true
+        idleSinceKeyboard = now
+
+        // Track total keystrokes for unlocks
+        stats.totalKeystrokes += 1
+        checkKeystrokeUnlocks()
+    }
+
+    func checkKeystrokeUnlocks() {
+        let k = stats.totalKeystrokes
+        // Milestone announcements at key thresholds
+        switch k {
+        case 1000:
+            stats.addMilestone(L("1,000 keystrokes! My human works hard!", ru: "1,000 нажатий! Мой человек трудяга!", ja: "1,000キーストローク！ご主人頑張ってる！", ko: "1,000번 타이핑! 주인님 열심히 일해!", zh: "1,000次按键！主人真努力！"))
+            showBubble(L("⌨️ 1K keystrokes!", ru: "⌨️ 1К нажатий!", ja: "⌨️ 1Kキー！", ko: "⌨️ 1K 타이핑!", zh: "⌨️ 1K按键！"))
+        case 10_000:
+            stats.addMilestone(L("10,000 keystrokes! Keyboard warrior unlocked!", ru: "10,000 нажатий! Воин клавиатуры разблокирован!", ja: "10,000キーストローク！キーボード戦士解放！", ko: "10,000번 타이핑! 키보드 워리어 해금!", zh: "10,000次按键！键盘战士解锁！"))
+            showBubble(L("⌨️ 10K! Keyboard warrior!", ru: "⌨️ 10К! Воин клавиатуры!", ja: "⌨️ 1万！キーボード戦士！", ko: "⌨️ 1만! 키보드 워리어!", zh: "⌨️ 1万！键盘战士！"))
+            stats.addXP(10)
+        case 100_000:
+            stats.addMilestone(L("100,000 keystrokes! You're a coding machine!", ru: "100,000 нажатий! Ты машина для кода!", ja: "100,000キーストローク！コーディングマシン！", ko: "100,000번! 코딩 머신!", zh: "100,000次按键！编码机器！"))
+            showBubble(L("⌨️ 100K!! Legend!!", ru: "⌨️ 100К!! Легенда!!", ja: "⌨️ 10万！！伝説！！", ko: "⌨️ 10만!! 레전드!!", zh: "⌨️ 10万！！传奇！！"))
+            stats.addXP(25)
+        default:
+            break
+        }
+    }
+
+    func updateTypingReaction() {
+        let now = Date()
+        let idleTime = now.timeIntervalSince(idleSinceKeyboard)
+
+        // User stopped typing for 5+ seconds
+        if isUserTyping && idleTime > 5 {
+            isUserTyping = false
+            typingSpeed = 0
+            keystrokeTimestamps.removeAll()
+        }
+
+        // React to typing (only when idle/sitting, not during other behaviors)
+        guard behavior == .idle || behavior == .sitting else { return }
+        guard now.timeIntervalSince(lastTypingReaction) > 8 else { return }
+
+        if typingSpeed > 6.0 {
+            // Fast typing — ears perk up, interested
+            lastTypingReaction = now
+            let msgs = [
+                L("*watches you type*", ru: "*наблюдает за печатью*", ja: "*タイピングを見てる*", ko: "*타이핑 구경 중*", zh: "*看你打字*"),
+                L("*ears perk up*", ru: "*ушки навострились*", ja: "*耳がピクピク*", ko: "*귀가 쫑긋*", zh: "*耳朵竖起来*"),
+                L("So busy!", ru: "Занятой!", ja: "忙しそう！", ko: "바쁘다!", zh: "好忙啊！"),
+                L("Type type type!", ru: "Тук-тук-тук!", ja: "カタカタカタ！", ko: "딸깍딸깍딸깍!", zh: "噼里啪啦！"),
+                "*fascinated*"
+            ]
+            showBubble(msgs.randomElement()!)
+        } else if idleTime > 120 && behavior == .idle {
+            // 2+ minutes idle — yawn
+            lastTypingReaction = now
+            let msgs = [
+                L("*yaaawn*", ru: "*зееевает*", ja: "*ふぁ～あ*", ko: "*하~암*", zh: "*打哈欠*"),
+                L("Bored...", ru: "Скучно...", ja: "暇だなぁ...", ko: "심심해...", zh: "无聊..."),
+                L("*stretches*", ru: "*потягивается*", ja: "*のび～*", ko: "*기지개*", zh: "*伸懒腰*"),
+                L("Play with me?", ru: "Поиграем?", ja: "遊ぼ？", ko: "놀아줘?", zh: "陪我玩？"),
+                "...zzz?"
+            ]
+            showBubble(msgs.randomElement()!)
+        }
+    }
+
+    // MARK: - Pomodoro Timer
+
+    @objc func togglePomodoro() {
+        if pomodoroActive {
+            stopPomodoro()
+        } else {
+            startPomodoro()
+        }
+        setupStatusBar()
+    }
+
+    func startPomodoro() {
+        pomodoroActive = true
+        pomodoroWorkMode = true
+        pomodoroStart = Date()
+        showBubble(L("Focus time! \(pomodoroWorkMinutes) min 💪", ru: "Время работать! \(pomodoroWorkMinutes) мин 💪", ja: "集中タイム！\(pomodoroWorkMinutes)分 💪", ko: "집중 시간! \(pomodoroWorkMinutes)분 💪", zh: "专注时间！\(pomodoroWorkMinutes)分钟 💪"))
+        stats.addMilestone(L("Started a Pomodoro focus session!", ru: "Начал сессию Помодоро!", ja: "ポモドーロセッション開始！", ko: "뽀모도로 세션 시작!", zh: "开始番茄钟专注！"))
+    }
+
+    func stopPomodoro() {
+        pomodoroActive = false
+        showBubble(L("Pomodoro stopped!", ru: "Помодоро остановлен!", ja: "ポモドーロ停止！", ko: "뽀모도로 중지!", zh: "番茄钟停止！"))
+    }
+
+    func updatePomodoro() {
+        guard pomodoroActive else { return }
+        let elapsed = Date().timeIntervalSince(pomodoroStart)
+        let targetMinutes = pomodoroWorkMode ? pomodoroWorkMinutes : pomodoroBreakMinutes
+
+        if elapsed >= Double(targetMinutes) * 60 {
+            if pomodoroWorkMode {
+                // Work done → break
+                pomodoroWorkMode = false
+                pomodoroStart = Date()
+                pomodoroCount += 1
+                showBubble(L("Break time! \(pomodoroBreakMinutes) min ☕", ru: "Перерыв! \(pomodoroBreakMinutes) мин ☕", ja: "休憩！\(pomodoroBreakMinutes)分 ☕", ko: "쉬는 시간! \(pomodoroBreakMinutes)분 ☕", zh: "休息时间！\(pomodoroBreakMinutes)分钟 ☕"))
+                SoundEngine.shared.pop()
+                particleCanvas.particleSystem.emit(
+                    at: NSPoint(x: petSize / 2 + 40, y: petSize + 20),
+                    type: .star, count: 10
+                )
+                stats.addXP(5)
+                stats.addMilestone(L("Completed Pomodoro #\(pomodoroCount)!", ru: "Завершил Помодоро #\(pomodoroCount)!", ja: "ポモドーロ #\(pomodoroCount) 完了！", ko: "뽀모도로 #\(pomodoroCount) 완료!", zh: "完成番茄钟 #\(pomodoroCount)!"))
+            } else {
+                // Break done → work
+                pomodoroWorkMode = true
+                pomodoroStart = Date()
+                showBubble(L("Back to work! Let's go! 💪", ru: "Снова за работу! 💪", ja: "仕事に戻ろう！💪", ko: "다시 일하자! 💪", zh: "继续工作！加油！💪"))
+                SoundEngine.shared.chirp()
+            }
+        }
+
+        // Update status bar with timer
+        if frameCounter % 30 == 0 {
+            let remaining = Double(targetMinutes) * 60 - elapsed
+            let mins = Int(remaining) / 60
+            let secs = Int(remaining) % 60
+            let emoji = pomodoroWorkMode ? "\u{1F345}" : "\u{2615}"
+            statusBarItem.button?.title = "\(emoji) \(mins):\(String(format: "%02d", secs))"
+        }
+    }
+
+    // MARK: - GIF Export
+
+    @objc func startGifCapture() {
+        gifFrames.removeAll()
+        isRecordingGif = true
+        gifRecordStart = Date()
+        showBubble(L("Recording GIF... 3 sec 🎬", ru: "Запись GIF... 3 сек 🎬", ja: "GIF録画中... 3秒 🎬", ko: "GIF 녹화 중... 3초 🎬", zh: "录制GIF中... 3秒 🎬"))
+    }
+
+    func updateGifCapture() {
+        guard isRecordingGif else { return }
+
+        // Capture frame every 3rd update (10fps GIF)
+        if frameCounter % 3 == 0 {
+            let sprite = getSprite(for: behavior, frame: animFrame, right: facingRight)
+            let frame = NSImage(size: NSSize(width: 160, height: 160))
+            frame.lockFocus()
+            NSColor.clear.set()
+            NSRect(x: 0, y: 0, width: 160, height: 160).fill()
+            sprite.draw(in: NSRect(x: 0, y: 0, width: 160, height: 160),
+                        from: .zero, operation: .sourceOver, fraction: 1.0)
+            frame.unlockFocus()
+            gifFrames.append(frame)
+        }
+
+        // After 3 seconds, save GIF
+        if Date().timeIntervalSince(gifRecordStart) >= 3.0 {
+            isRecordingGif = false
+            saveGif()
+        }
+    }
+
+    func saveGif() {
+        guard !gifFrames.isEmpty else { return }
+
+        let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
+        let fileName = "murchi_\(Int(Date().timeIntervalSince1970)).gif"
+        let url = desktop.appendingPathComponent(fileName)
+
+        guard let dest = CGImageDestinationCreateWithURL(url as CFURL, "com.compuserve.gif" as CFString, gifFrames.count, nil) else {
+            showBubble(L("Failed to create GIF 😿", ru: "Не удалось создать GIF 😿", ja: "GIF作成に失敗 😿", ko: "GIF 생성 실패 😿", zh: "GIF创建失败 😿"))
+            return
+        }
+
+        let gifProperties: [String: Any] = [
+            kCGImagePropertyGIFDictionary as String: [
+                kCGImagePropertyGIFLoopCount as String: 0  // loop forever
+            ]
+        ]
+        CGImageDestinationSetProperties(dest, gifProperties as CFDictionary)
+
+        let frameProps: [String: Any] = [
+            kCGImagePropertyGIFDictionary as String: [
+                kCGImagePropertyGIFDelayTime as String: 0.1  // 10fps
+            ]
+        ]
+
+        for frame in gifFrames {
+            if let tiff = frame.tiffRepresentation,
+               let bitmap = NSBitmapImageRep(data: tiff),
+               let cgImage = bitmap.cgImage {
+                CGImageDestinationAddImage(dest, cgImage, frameProps as CFDictionary)
+            }
+        }
+
+        if CGImageDestinationFinalize(dest) {
+            showBubble(L("GIF saved to Desktop! 🎬", ru: "GIF сохранён на Рабочий стол! 🎬", ja: "GIFをデスクトップに保存！🎬", ko: "GIF가 바탕화면에 저장됨! 🎬", zh: "GIF已保存到桌面！🎬"))
+            particleCanvas.particleSystem.emit(
+                at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                type: .sparkle, count: 10
+            )
+        } else {
+            showBubble(L("GIF save failed 😿", ru: "Не удалось сохранить GIF 😿", ja: "GIF保存に失敗 😿", ko: "GIF 저장 실패 😿", zh: "GIF保存失败 😿"))
+        }
+        gifFrames.removeAll()
+    }
+
+    // MARK: - Window Sitting
+
+    func findTopmostWindow() -> NSRect? {
+        guard Date().timeIntervalSince(lastWindowCheck) > 2 else { return currentWindowRect }
+        lastWindowCheck = Date()
+
+        guard let winList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else { return nil }
+
+        let screenH = NSScreen.main?.frame.height ?? 900
+        var bestRect: NSRect? = nil
+        var bestY: CGFloat = -1
+
+        for win in winList {
+            guard let owner = win[kCGWindowOwnerName as String] as? String,
+                  owner != "Dock" && owner != "Murchi" && owner != "SystemUIServer" && owner != "Window Server" && owner != "Control Center",
+                  let layer = win[kCGWindowLayer as String] as? Int, layer == 0,
+                  let bounds = win[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: bounds) else { continue }
+
+            // Convert from CG coords (top-left origin) to NS coords (bottom-left origin)
+            let nsRect = NSRect(x: rect.minX, y: screenH - rect.minY - rect.height, width: rect.width, height: rect.height)
+
+            // Only consider windows wide enough and with visible title bar area
+            guard nsRect.width > 100, nsRect.height > 60 else { continue }
+            // Window top edge should be reachable and not at very top of screen
+            let topY = nsRect.maxY
+            guard topY > 100, topY < screenH - 30 else { continue }
+
+            if topY > bestY {
+                bestY = topY
+                bestRect = nsRect
+            }
+        }
+
+        currentWindowRect = bestRect
+        return bestRect
+    }
+
+    func tryJumpToWindow() {
+        guard windowSittingEnabled,
+              behavior == .idle || behavior == .sitting,
+              Bool.random() && Bool.random(),  // ~25% chance when called
+              let winRect = findTopmostWindow() else { return }
+
+        // Cat sits on top edge of window
+        let topY = winRect.maxY
+        let targetX = winRect.minX + CGFloat.random(in: 20...(winRect.width - petSize - 20))
+
+        // Only if it's a different height than current
+        guard abs(topY - petY) > 20 else { return }
+
+        walkTargetX = targetX
+        behavior = .jumping
+        behaviorStartTime = Date()
+        behaviorDuration = 2.0
+
+        // After jump, land on window
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self else { return }
+            self.petY = topY
+            self.petX = targetX
+            self.behavior = .sitting
+            self.behaviorStartTime = Date()
+            self.behaviorDuration = Double.random(in: 8...20)
+            self.showBubble(["Nice view up here!", "*sits proudly*", "My window now!", "Comfy spot~"].randomElement()!)
+        }
     }
 
     func setupGlobalHotkey() {
@@ -5365,7 +5972,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                             self.fetchLatestRelease(retries: retries - 1)
                         }
                     } else {
-                        self.showBubble("*can't check updates*")
+                        self.showBubble(L("*can't check updates*", ru: "*не могу проверить обновления*", ja: "*更新確認できない*", ko: "*업데이트 확인 불가*", zh: "*无法检查更新*"))
                     }
                     return
                 }
@@ -5373,8 +5980,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                       let tagName = json["tag_name"] as? String else {
                     let alert = NSAlert()
-                    alert.messageText = "Update Check Failed"
-                    alert.informativeText = "Could not parse the update information."
+                    alert.messageText = L("Update Check Failed", ru: "Ошибка проверки", ja: "更新確認失敗", ko: "업데이트 확인 실패", zh: "检查更新失败")
+                    alert.informativeText = L("Could not parse the update information.", ru: "Не удалось получить данные об обновлении.", ja: "更新情報を解析できません。", ko: "업데이트 정보를 확인할 수 없습니다.", zh: "无法解析更新信息。")
                     alert.alertStyle = .warning
                     alert.addButton(withTitle: "OK")
                     alert.runModal()
@@ -5383,11 +5990,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 let remoteVersion = tagName.hasPrefix("v") ? String(tagName.dropFirst()) : tagName
                 if self.isVersion(remoteVersion, newerThan: self.currentVersion) {
                     let alert = NSAlert()
-                    alert.messageText = "Update Available!"
-                    alert.informativeText = "Version \(remoteVersion) is available. You are running v\(self.currentVersion). Would you like to download it?"
+                    alert.messageText = L("Update Available!", ru: "Доступно обновление!", ja: "アップデートあり！", ko: "업데이트 가능!", zh: "有新版本！")
+                    alert.informativeText = L("Version \(remoteVersion) is available. You are running v\(self.currentVersion). Would you like to download it?", ru: "Версия \(remoteVersion) доступна. У вас v\(self.currentVersion). Скачать?", ja: "バージョン\(remoteVersion)があります。現在v\(self.currentVersion)です。ダウンロードしますか？", ko: "버전 \(remoteVersion)이 있습니다. 현재 v\(self.currentVersion)입니다. 다운로드할까요?", zh: "版本\(remoteVersion)可用。当前为v\(self.currentVersion)。是否下载？")
                     alert.alertStyle = .informational
-                    alert.addButton(withTitle: "Download")
-                    alert.addButton(withTitle: "Later")
+                    alert.addButton(withTitle: L("Download", ru: "Скачать", ja: "ダウンロード", ko: "다운로드", zh: "下载"))
+                    alert.addButton(withTitle: L("Later", ru: "Потом", ja: "後で", ko: "나중에", zh: "稍后"))
                     if alert.runModal() == .alertFirstButtonReturn {
                         if let assets = json["assets"] as? [[String: Any]] {
                             for asset in assets {
@@ -5405,8 +6012,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                     }
                 } else {
                     let alert = NSAlert()
-                    alert.messageText = "You're up to date!"
-                    alert.informativeText = "Murchi v\(self.currentVersion) is the latest version."
+                    alert.messageText = L("You're up to date!", ru: "Всё актуально!", ja: "最新版です！", ko: "최신 버전입니다!", zh: "已是最新版！")
+                    alert.informativeText = L("Murchi v\(self.currentVersion) is the latest version.", ru: "Мурчи v\(self.currentVersion) — последняя версия.", ja: "ムルチ v\(self.currentVersion) は最新です。", ko: "무르치 v\(self.currentVersion)이 최신 버전입니다.", zh: "Murchi v\(self.currentVersion) 是最新版本。")
                     alert.alertStyle = .informational
                     alert.addButton(withTitle: "OK")
                     alert.runModal()
@@ -5434,7 +6041,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         petY = mouse.y - petSize / 2
         velocityY = 5  // little bounce on arrival
         isOnGround = false
-        showBubble("I'm here!")
+        showBubble(L("I'm here!", ru: "Я тут!", ja: "ここだよ！", ko: "여기 있어!", zh: "我来了！"))
         particleCanvas.particleSystem.emit(
             at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
             type: .poof, count: 8
@@ -5879,6 +6486,20 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             maybeStartDancing()
         }
 
+        // Keyboard reaction
+        updateTypingReaction()
+
+        // Pomodoro timer
+        updatePomodoro()
+
+        // GIF capture
+        updateGifCapture()
+
+        // Window sitting — try occasionally
+        if frameCounter % 900 == 0 { // every ~30 seconds
+            tryJumpToWindow()
+        }
+
         // Animate every 2nd frame (15fps sprite animation at 30fps loop = 2x smoother than before)
         if frameCounter % 2 == 0 {
             animFrame += 1
@@ -6023,7 +6644,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             let speed: CGFloat = 5.0
             petX += speed * zoomiesDirection
             // Bounce off walls
-            if petX <= 10 || petX >= screenW - petSize - 10 {
+            if petX <= allScreensRect.minX + 10 || petX >= allScreensRect.maxX - petSize - 10 {
                 zoomiesDirection *= -1
                 facingRight = zoomiesDirection > 0
                 zoomiesBounces += 1
@@ -6178,8 +6799,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Clamp
-        petX = max(0, min(petX, screenW - petSize))
-        petY = max(floorY, min(petY, screenH - petSize - 50))
+        petX = max(allScreensRect.minX, min(petX, allScreensRect.maxX - petSize))
+        petY = max(floorY, min(petY, currentScreen.frame.height - petSize - 50))
 
         // Idle breathing animation — subtle vertical bob
         if isOnGround && !isGentleDropping && (behavior == .idle || behavior == .sitting || behavior == .lookingAtCursor) {
@@ -6908,7 +7529,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        diaryWin.title = "\u{1F4D3} Murchi's Diary"
+        diaryWin.title = L("📓 Murchi's Diary", ru: "📓 Дневник Мурчи", ja: "📓 ムルチの日記", ko: "📓 무르치의 일기", zh: "📓 Murchi的日记")
         diaryWin.isReleasedWhenClosed = true
         diaryWin.level = .floating
 
@@ -6942,58 +7563,67 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         shortFormatter.dateFormat = "MMM d"
 
         // Header
-        addText("\u{1F431} \(stats.name)'s Blog\n", size: 20, bold: true, color: NSColor(red: 1, green: 0.85, blue: 0.3, alpha: 1))
-        addText("\(stats.evolutionStage) \u{2022} Level \(stats.level)\n\n", size: 11, color: NSColor(red: 0.7, green: 0.6, blue: 1, alpha: 0.8))
+        addText(L("🐱 \(stats.name)'s Blog\n", ru: "🐱 Блог \(stats.name)\n", ja: "🐱 \(stats.name)のブログ\n", ko: "🐱 \(stats.name)의 블로그\n", zh: "🐱 \(stats.name)的博客\n"), size: 20, bold: true, color: NSColor(red: 1, green: 0.85, blue: 0.3, alpha: 1))
+        addText("\(stats.evolutionStage) \u{2022} \(L("Level", ru: "Уровень", ja: "レベル", ko: "레벨", zh: "等级")) \(stats.level)\n\n", size: 11, color: NSColor(red: 0.7, green: 0.6, blue: 1, alpha: 0.8))
 
         // Bio card
         let age = max(1, Int(Date().timeIntervalSince(stats.birthDate) / 86400))
-        addText("\u{1F382} Born: \(shortFormatter.string(from: stats.birthDate)) (\(age) days old)\n", size: 11, color: NSColor(red: 0.6, green: 0.8, blue: 1, alpha: 1))
+        addText(L("🎂 Born: \(shortFormatter.string(from: stats.birthDate)) (\(age) days old)\n",
+                   ru: "🎂 Родился: \(shortFormatter.string(from: stats.birthDate)) (\(age) дн.)\n",
+                   ja: "🎂 誕生: \(shortFormatter.string(from: stats.birthDate)) (\(age)日)\n",
+                   ko: "🎂 태어남: \(shortFormatter.string(from: stats.birthDate)) (\(age)일)\n",
+                   zh: "🎂 出生: \(shortFormatter.string(from: stats.birthDate)) (\(age)天)\n"),
+                size: 11, color: NSColor(red: 0.6, green: 0.8, blue: 1, alpha: 1))
 
         // Stats summary as cute text
-        addText("\n\u{1F4CA} My Life in Numbers\n", size: 14, bold: true, color: NSColor(red: 0.4, green: 1, blue: 0.7, alpha: 1))
-        addText("\u{1F41F} Meals eaten: \(stats.totalFeedings)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
-        addText("\u{1F49C} Times petted: \(stats.totalPets)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
-        addText("\u{1F3AE} Play sessions: \(stats.totalPlays)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
-        addText("\u{1F6C1} Baths taken: \(stats.totalBaths) (ugh)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
-        addText("\u{1F6B6} Walks: \(stats.totalWalks)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
-        addText("\u{1F48A} Times healed: \(stats.totalHeals)\n", size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText("\n" + L("📊 My Life in Numbers\n", ru: "📊 Моя жизнь в цифрах\n", ja: "📊 数字で見る私の人生\n", ko: "📊 숫자로 보는 내 인생\n", zh: "📊 我的生活数据\n"), size: 14, bold: true, color: NSColor(red: 0.4, green: 1, blue: 0.7, alpha: 1))
+        addText(L("🐟 Meals eaten: \(stats.totalFeedings)\n", ru: "🐟 Покушал: \(stats.totalFeedings) раз\n", ja: "🐟 ごはん: \(stats.totalFeedings)回\n", ko: "🐟 식사: \(stats.totalFeedings)번\n", zh: "🐟 吃饭: \(stats.totalFeedings)次\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText(L("💜 Times petted: \(stats.totalPets)\n", ru: "💜 Погладили: \(stats.totalPets) раз\n", ja: "💜 なでなで: \(stats.totalPets)回\n", ko: "💜 쓰다듬기: \(stats.totalPets)번\n", zh: "💜 被摸: \(stats.totalPets)次\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText(L("🎮 Play sessions: \(stats.totalPlays)\n", ru: "🎮 Поиграл: \(stats.totalPlays) раз\n", ja: "🎮 遊び: \(stats.totalPlays)回\n", ko: "🎮 놀기: \(stats.totalPlays)번\n", zh: "🎮 玩耍: \(stats.totalPlays)次\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText(L("🛁 Baths taken: \(stats.totalBaths) (ugh)\n", ru: "🛁 Помылся: \(stats.totalBaths) раз (фу)\n", ja: "🛁 お風呂: \(stats.totalBaths)回 (やだ)\n", ko: "🛁 목욕: \(stats.totalBaths)번 (싫어)\n", zh: "🛁 洗澡: \(stats.totalBaths)次 (讨厌)\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText(L("🚶 Walks: \(stats.totalWalks)\n", ru: "🚶 Прогулок: \(stats.totalWalks)\n", ja: "🚶 散歩: \(stats.totalWalks)回\n", ko: "🚶 산책: \(stats.totalWalks)번\n", zh: "🚶 散步: \(stats.totalWalks)次\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        addText(L("💊 Times healed: \(stats.totalHeals)\n", ru: "💊 Лечился: \(stats.totalHeals) раз\n", ja: "💊 治療: \(stats.totalHeals)回\n", ko: "💊 치료: \(stats.totalHeals)번\n", zh: "💊 治疗: \(stats.totalHeals)次\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        if stats.totalKeystrokes > 0 {
+            let kStr = stats.totalKeystrokes > 1000 ? "\(stats.totalKeystrokes / 1000)K" : "\(stats.totalKeystrokes)"
+            addText(L("⌨️ Keystrokes observed: \(kStr)\n", ru: "⌨️ Нажатий замечено: \(kStr)\n", ja: "⌨️ キーストローク: \(kStr)\n", ko: "⌨️ 키 입력: \(kStr)\n", zh: "⌨️ 按键次数: \(kStr)\n"), size: 11, color: NSColor(white: 0.8, alpha: 1))
+        }
 
         // Current mood
-        addText("\n\u{1F4AD} Current Mood\n", size: 14, bold: true, color: NSColor(red: 1, green: 0.5, blue: 0.7, alpha: 1))
+        addText("\n" + L("💭 Current Mood\n", ru: "💭 Настроение\n", ja: "💭 今の気分\n", ko: "💭 현재 기분\n", zh: "💭 当前心情\n"), size: 14, bold: true, color: NSColor(red: 1, green: 0.5, blue: 0.7, alpha: 1))
         let moodEmoji: String
         let moodText: String
         switch stats.mood {
-        case .happy: moodEmoji = "\u{1F60A}"; moodText = "I'm feeling great! Life is good~"
-        case .neutral: moodEmoji = "\u{1F610}"; moodText = "I'm okay I guess. Could use some attention..."
-        case .sad: moodEmoji = "\u{1F622}"; moodText = "I'm not doing so well... please take care of me..."
-        case .sleepy: moodEmoji = "\u{1F634}"; moodText = "So... tired... need... nap..."
-        case .sick: moodEmoji = "\u{1F912}"; moodText = "I feel terrible... need medicine please..."
+        case .happy: moodEmoji = "😊"; moodText = L("I'm feeling great! Life is good~", ru: "Мне отлично! Жизнь прекрасна~", ja: "最高の気分！幸せ～", ko: "기분 최고! 인생 좋아~", zh: "感觉棒极了！生活真好~")
+        case .neutral: moodEmoji = "😐"; moodText = L("I'm okay I guess. Could use some attention...", ru: "Ну, нормально. Можно и повнимательнее...", ja: "まあまあかな。かまってほしい...", ko: "그냥 그래. 관심 좀 줘...", zh: "还行吧。能多关心我一下吗...")
+        case .sad: moodEmoji = "😢"; moodText = L("I'm not doing so well... please take care of me...", ru: "Мне плохо... позаботься обо мне...", ja: "元気ないよ...お世話して...", ko: "기분 안 좋아... 돌봐줘...", zh: "我不太好...请照顾我...")
+        case .sleepy: moodEmoji = "😴"; moodText = L("So... tired... need... nap...", ru: "Так... устал... хочу... спать...", ja: "眠い...昼寝...したい...", ko: "너무... 졸려... 잠이... 필요해...", zh: "好...困...想...睡觉...")
+        case .sick: moodEmoji = "🤒"; moodText = L("I feel terrible... need medicine please...", ru: "Мне плохо... дайте лекарство...", ja: "具合悪い...お薬ちょうだい...", ko: "아파... 약 주세요...", zh: "好难受...请给我药...")
         }
         addText("\(moodEmoji) \(moodText)\n", size: 12, color: NSColor(white: 0.9, alpha: 1))
 
         // Complaints / needs
         var needs: [String] = []
-        if stats.hunger < 30 { needs.append("\u{1F356} I haven't been fed in a while... my tummy is growling") }
-        if stats.happiness < 30 { needs.append("\u{1F494} I'm sad... nobody plays with me") }
-        if stats.energy < 20 { needs.append("\u{1F4A4} I'm exhausted, let me sleep...") }
-        if stats.hygiene < 30 { needs.append("\u{1F9FC} I kinda need a bath... don't tell anyone") }
-        if stats.social < 30 { needs.append("\u{1F465} I'm lonely... pet me please?") }
-        if stats.health < 40 { needs.append("\u{1F915} My health isn't great...") }
-        if stats.poopCount > 0 { needs.append("\u{1F4A9} There are \(stats.poopCount) poop(s) that need cleaning...") }
+        if stats.hunger < 30 { needs.append(L("🍖 I haven't been fed in a while... my tummy is growling", ru: "🍖 Меня давно не кормили... животик урчит", ja: "🍖 お腹ペコペコ...ぐーってなってる", ko: "🍖 배고파... 꼬르륵 소리나", zh: "🍖 好久没吃东西了...肚子在咕咕叫")) }
+        if stats.happiness < 30 { needs.append(L("💔 I'm sad... nobody plays with me", ru: "💔 Мне грустно... никто не играет со мной", ja: "💔 悲しいよ...誰も遊んでくれない", ko: "💔 슬퍼... 아무도 안 놀아줘", zh: "💔 好难过...没人陪我玩")) }
+        if stats.energy < 20 { needs.append(L("💤 I'm exhausted, let me sleep...", ru: "💤 Я устал, дайте поспать...", ja: "💤 疲れた、寝かせて...", ko: "💤 지쳤어, 재워줘...", zh: "💤 好累，让我睡觉...")) }
+        if stats.hygiene < 30 { needs.append(L("🧼 I kinda need a bath... don't tell anyone", ru: "🧼 Мне бы помыться... только никому не говори", ja: "🧼 お風呂に入りたいかも...内緒だよ", ko: "🧼 목욕이 필요해... 비밀이야", zh: "🧼 需要洗澡...别告诉别人")) }
+        if stats.social < 30 { needs.append(L("👥 I'm lonely... pet me please?", ru: "👥 Мне одиноко... погладь меня?", ja: "👥 さみしいよ...なでて？", ko: "👥 외로워... 쓰다듬어줘?", zh: "👥 好孤独...摸摸我好吗？")) }
+        if stats.health < 40 { needs.append(L("🤕 My health isn't great...", ru: "🤕 Здоровье не очень...", ja: "🤕 体調が良くない...", ko: "🤕 건강이 안 좋아...", zh: "🤕 身体不太好...")) }
+        if stats.poopCount > 0 { needs.append(L("💩 There are \(stats.poopCount) poop(s) that need cleaning...", ru: "💩 Тут \(stats.poopCount) какашек надо убрать...", ja: "💩 うんちが\(stats.poopCount)個ある...掃除して", ko: "💩 똥이 \(stats.poopCount)개 있어... 치워줘", zh: "💩 有\(stats.poopCount)坨便便需要清理...")) }
 
         if !needs.isEmpty {
-            addText("\n\u{26A0}\u{FE0F} What I Need Right Now\n", size: 14, bold: true, color: NSColor(red: 1, green: 0.4, blue: 0.4, alpha: 1))
+            addText("\n" + L("⚠️ What I Need Right Now\n", ru: "⚠️ Что мне сейчас нужно\n", ja: "⚠️ 今ほしいもの\n", ko: "⚠️ 지금 필요한 것\n", zh: "⚠️ 我现在需要\n"), size: 14, bold: true, color: NSColor(red: 1, green: 0.4, blue: 0.4, alpha: 1))
             for need in needs {
                 addText("\(need)\n", size: 11, color: NSColor(red: 1, green: 0.7, blue: 0.7, alpha: 1))
             }
         }
 
         // Diary entries (milestones)
-        addText("\n\u{1F4D6} Diary Entries\n", size: 14, bold: true, color: NSColor(red: 1, green: 0.85, blue: 0.3, alpha: 1))
+        addText("\n" + L("📖 Diary Entries\n", ru: "📖 Записи дневника\n", ja: "📖 日記のエントリー\n", ko: "📖 일기장\n", zh: "📖 日记条目\n"), size: 14, bold: true, color: NSColor(red: 1, green: 0.85, blue: 0.3, alpha: 1))
         addText("─────────────────────────────\n", size: 10, color: NSColor(white: 0.3, alpha: 1))
 
         if stats.milestones.isEmpty {
-            addText("\nNo entries yet... my story is just beginning!\n", size: 12, color: NSColor(white: 0.5, alpha: 1))
+            addText("\n" + L("No entries yet... my story is just beginning!\n", ru: "Пока пусто... моя история только начинается!\n", ja: "まだ何もない...物語はこれから！\n", ko: "아직 없어... 이야기는 이제 시작이야!\n", zh: "还没有记录...故事才刚开始！\n"), size: 12, color: NSColor(white: 0.5, alpha: 1))
         } else {
             for entry in stats.milestones.reversed() {
                 // Parse date from [YYYY-MM-DD] prefix
@@ -7145,23 +7775,36 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     @objc func showStats() {
         let age = Int(Date().timeIntervalSince(stats.birthDate) / 86400)
+        let hungerL = L("Hunger", ru: "Голод", ja: "空腹", ko: "배고픔", zh: "饥饿")
+        let happyL = L("Happiness", ru: "Счастье", ja: "幸福度", ko: "행복", zh: "幸福")
+        let energyL = L("Energy", ru: "Энергия", ja: "元気", ko: "에너지", zh: "精力")
+        let socialL = L("Social", ru: "Общение", ja: "社交", ko: "사교", zh: "社交")
+        let hygieneL = L("Hygiene", ru: "Гигиена", ja: "清潔", ko: "위생", zh: "卫生")
+        let moodL = L("Mood", ru: "Настроение", ja: "気分", ko: "기분", zh: "心情")
+        let levelL = L("Level", ru: "Уровень", ja: "レベル", ko: "레벨", zh: "等级")
+        let ageL = L("Age", ru: "Возраст", ja: "年齢", ko: "나이", zh: "年龄")
+        let daysL = L("days", ru: "дн.", ja: "日", ko: "일", zh: "天")
+        let petsL = L("Total Pets", ru: "Всего поглаживаний", ja: "なでなで回数", ko: "쓰다듬기 횟수", zh: "抚摸总数")
+        let feedsL = L("Total Feedings", ru: "Всего кормлений", ja: "ごはん回数", ko: "먹이주기 횟수", zh: "喂食总数")
+        let playsL = L("Total Plays", ru: "Всего игр", ja: "遊び回数", ko: "놀아주기 횟수", zh: "玩耍总数")
         let msg = """
-        \(stats.name)'s Stats:
+        \(stats.name):
 
-        Hunger: \(Int(stats.hunger))%
-        Happiness: \(Int(stats.happiness))%
-        Energy: \(Int(stats.energy))%
-        Social: \(Int(stats.social))%
-        Hygiene: \(Int(stats.hygiene))%
+        \(hungerL): \(Int(stats.hunger))%
+        \(happyL): \(Int(stats.happiness))%
+        \(energyL): \(Int(stats.energy))%
+        \(socialL): \(Int(stats.social))%
+        \(hygieneL): \(Int(stats.hygiene))%
 
-        Mood: \(stats.mood.rawValue.capitalized)
-        Level: \(stats.level) (\(stats.evolutionStage))
+        \(moodL): \(stats.mood.rawValue.capitalized)
+        \(levelL): \(stats.level) (\(stats.evolutionStage))
         XP: \(stats.xp)/\(stats.xpForNextLevel)
-        Age: \(age) days
+        \(ageL): \(age) \(daysL)
 
-        Total Pets: \(stats.totalPets)
-        Total Feedings: \(stats.totalFeedings)
-        Total Plays: \(stats.totalPlays)
+        \(petsL): \(stats.totalPets)
+        \(feedsL): \(stats.totalFeedings)
+        \(playsL): \(stats.totalPlays)
+        \(L("Keystrokes", ru: "Нажатий клавиш", ja: "キーストローク", ko: "키 입력", zh: "按键")): \(stats.totalKeystrokes)
         """
 
         let alert = NSAlert()
@@ -7456,6 +8099,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         cameraItem.target = self
         menu.addItem(cameraItem)
 
+        let gifItem2 = NSMenuItem(title: "\u{1F3AC} Record GIF (3s)", action: #selector(startGifCapture), keyEquivalent: "")
+        gifItem2.target = self
+        menu.addItem(gifItem2)
+
         let diaryItem = NSMenuItem(title: "\u{1F4D3} Diary", action: #selector(showDiary), keyEquivalent: "")
         diaryItem.target = self
         menu.addItem(diaryItem)
@@ -7465,6 +8112,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(statsItem)
 
         menu.addItem(NSMenuItem.separator())
+
+        let pomoTitle2 = pomodoroActive ? "\u{1F345} Stop Pomodoro" : "\u{1F345} Pomodoro Timer"
+        let pomoItem2 = NSMenuItem(title: pomoTitle2, action: #selector(togglePomodoro), keyEquivalent: "")
+        pomoItem2.target = self
+        menu.addItem(pomoItem2)
 
         let chatItem2 = NSMenuItem(title: "\u{1F4AC} Chat with Murchi", action: #selector(openChatWindow), keyEquivalent: "")
         chatItem2.target = self

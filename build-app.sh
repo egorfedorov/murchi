@@ -36,9 +36,9 @@ cat > "$CONTENTS/Info.plist" << 'PLIST'
     <key>CFBundleIdentifier</key>
     <string>com.murchi.tamagotchi</string>
     <key>CFBundleVersion</key>
-    <string>2.3.1</string>
+    <string>3.0.0</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.3.1</string>
+    <string>3.0.0</string>
     <key>CFBundleExecutable</key>
     <string>Murchi</string>
     <key>CFBundlePackageType</key>
