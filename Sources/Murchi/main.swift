@@ -4423,6 +4423,23 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var consecutivePetTime: TimeInterval = 0
     var lastPetTimestamp = Date()
 
+    // AI Chat
+    var chatWindow: NSPanel?
+    var chatInputField: NSTextField?
+    var chatSendButton: NSButton?
+    var chatResponseLabel: NSTextField?
+    var chatScrollView: NSScrollView?
+    var chatHistoryView: NSTextView?
+    var settingsWindow: NSPanel?
+    var apiKeyField: NSSecureTextField?
+    var isAIThinking = false
+    var aiThinkingFrame = 0
+
+    var geminiApiKey: String {
+        get { UserDefaults.standard.string(forKey: "gemini_api_key") ?? "AIzaSyBK2JEB6fJFMVmVcewpYk5RXSBD81JTsa8" }
+        set { UserDefaults.standard.set(newValue, forKey: "gemini_api_key") }
+    }
+
     // Zoomies
     var zoomiesDirection: CGFloat = 1
     var zoomiesBounces = 0
@@ -4752,6 +4769,17 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        // AI Chat
+        let chatItem = NSMenuItem(title: "\u{1F4AC} Chat with Murchi", action: #selector(openChatWindow), keyEquivalent: "g")
+        chatItem.target = self
+        menu.addItem(chatItem)
+
+        let aiSettingsItem = NSMenuItem(title: "\u{1F527} AI Settings", action: #selector(openAISettings), keyEquivalent: "")
+        aiSettingsItem.target = self
+        menu.addItem(aiSettingsItem)
+
+        menu.addItem(NSMenuItem.separator())
+
         let websiteItem = NSMenuItem(title: "murchi.pet", action: #selector(openWebsite), keyEquivalent: "")
         websiteItem.target = self
         menu.addItem(websiteItem)
@@ -4916,6 +4944,297 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                                    backing: .buffered, defer: false)
         nightGlowWindow.orderOut(nil)
         nightGlowView = NSView(frame: frame)
+    }
+
+    // MARK: - AI Chat with Gemini
+
+    func setupChatWindow() {
+        let w: CGFloat = 380
+        let h: CGFloat = 340
+        let screenCenter = NSPoint(x: screenW / 2 - w / 2, y: screenH / 2 - h / 2)
+
+        chatWindow = NSPanel(
+            contentRect: NSRect(x: screenCenter.x, y: screenCenter.y, width: w, height: h),
+            styleMask: [.titled, .closable, .nonactivatingPanel],
+            backing: .buffered, defer: false
+        )
+        chatWindow?.title = "Chat with Murchi"
+        chatWindow?.level = .floating
+        chatWindow?.isFloatingPanel = true
+
+        let contentView = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = NSColor(white: 0.98, alpha: 1).cgColor
+
+        // Chat history (scrollable)
+        let scrollView = NSScrollView(frame: NSRect(x: 12, y: 60, width: w - 24, height: h - 80))
+        scrollView.hasVerticalScroller = true
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .bezelBorder
+
+        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height))
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.backgroundColor = NSColor(white: 1, alpha: 1)
+        textView.textContainerInset = NSSize(width: 8, height: 8)
+        textView.font = NSFont.systemFont(ofSize: 13)
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.widthTracksTextView = true
+        scrollView.documentView = textView
+        chatHistoryView = textView
+        chatScrollView = scrollView
+        contentView.addSubview(scrollView)
+
+        // Welcome message
+        appendChatMessage(from: "Murchi", text: "Mrrrow~! I'm powered by AI now! Ask me anything! 🐱✨")
+
+        // Input field
+        let inputField = NSTextField(frame: NSRect(x: 12, y: 16, width: w - 100, height: 30))
+        inputField.placeholderString = "Type a message..."
+        inputField.font = NSFont.systemFont(ofSize: 13)
+        inputField.target = self
+        inputField.action = #selector(chatSendAction)
+        chatInputField = inputField
+        contentView.addSubview(inputField)
+
+        // Send button
+        let sendBtn = NSButton(frame: NSRect(x: w - 80, y: 16, width: 68, height: 30))
+        sendBtn.title = "Send"
+        sendBtn.bezelStyle = .rounded
+        sendBtn.target = self
+        sendBtn.action = #selector(chatSendAction)
+        chatSendButton = sendBtn
+        contentView.addSubview(sendBtn)
+
+        chatWindow?.contentView = contentView
+    }
+
+    func appendChatMessage(from sender: String, text: String) {
+        guard let textView = chatHistoryView else { return }
+
+        let isMurchi = sender == "Murchi"
+        let prefix = isMurchi ? "🐱 Murchi: " : "👤 You: "
+
+        let prefixAttrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.boldSystemFont(ofSize: 13),
+            .foregroundColor: isMurchi ? NSColor(red: 0.9, green: 0.5, blue: 0.3, alpha: 1) : NSColor.systemBlue
+        ]
+        let textAttrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 13),
+            .foregroundColor: NSColor.labelColor
+        ]
+
+        let message = NSMutableAttributedString()
+        if textView.textStorage?.length ?? 0 > 0 {
+            message.append(NSAttributedString(string: "\n"))
+        }
+        message.append(NSAttributedString(string: prefix, attributes: prefixAttrs))
+        message.append(NSAttributedString(string: text, attributes: textAttrs))
+
+        textView.textStorage?.append(message)
+        textView.scrollToEndOfDocument(nil)
+    }
+
+    @objc func chatSendAction() {
+        guard let input = chatInputField?.stringValue, !input.isEmpty else { return }
+        chatInputField?.stringValue = ""
+
+        appendChatMessage(from: "You", text: input)
+        appendChatMessage(from: "Murchi", text: "🤔 thinking...")
+        isAIThinking = true
+        showBubble("*thinking...*")
+
+        sendToGemini(prompt: input)
+    }
+
+    func sendToGemini(prompt: String) {
+        let key = geminiApiKey
+        guard !key.isEmpty else {
+            handleAIResponse("Mrrrow! I need an API key to think! Go to Settings → AI Settings 🔑")
+            return
+        }
+
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(key)"
+        guard let url = URL(string: urlString) else {
+            handleAIResponse("Mew... something went wrong with the URL 😿")
+            return
+        }
+
+        // Build the system prompt to make Murchi respond in character
+        let systemPrompt = """
+        You are Murchi, an adorable kawaii desktop cat (tamagotchi). You live on a human's desktop and they take care of you.
+        Your personality: playful, cute, a bit mischievous, loves fish and attention. You purr when happy.
+        Keep responses SHORT (1-3 sentences max). Use cat sounds like "mrrrow", "mew", "purrr".
+        Add a cute emoji at the end sometimes. Be helpful but stay in character as a cat.
+        If asked to do something technical, give a brief helpful answer but in your cat personality.
+        The user's name for you is "\(stats.name)". You are level \(stats.level) (\(stats.evolutionStage)).
+        Your current mood: \(stats.mood). Hunger: \(Int(stats.hunger))%, Happiness: \(Int(stats.happiness))%.
+        """
+
+        let body: [String: Any] = [
+            "contents": [
+                ["role": "user", "parts": [["text": systemPrompt + "\n\nUser says: " + prompt]]]
+            ],
+            "generationConfig": [
+                "maxOutputTokens": 150,
+                "temperature": 0.9
+            ]
+        ]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        request.timeoutInterval = 15
+
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+
+                if let error = error {
+                    self.handleAIResponse("Mew... I couldn't connect: \(error.localizedDescription) 😿")
+                    return
+                }
+
+                guard let data = data,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let candidates = json["candidates"] as? [[String: Any]],
+                      let first = candidates.first,
+                      let content = first["content"] as? [String: Any],
+                      let parts = content["parts"] as? [[String: Any]],
+                      let text = parts.first?["text"] as? String else {
+                    // Try to get error message
+                    if let data = data,
+                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let error = json["error"] as? [String: Any],
+                       let message = error["message"] as? String {
+                        self.handleAIResponse("Mrrrow! API error: \(message) 😿")
+                    } else {
+                        self.handleAIResponse("Mew... I got confused, no response 😿")
+                    }
+                    return
+                }
+
+                self.handleAIResponse(text.trimmingCharacters(in: .whitespacesAndNewlines))
+            }
+        }.resume()
+    }
+
+    func handleAIResponse(_ text: String) {
+        isAIThinking = false
+
+        // Remove the "thinking..." message and replace with response
+        if let textView = chatHistoryView,
+           let storage = textView.textStorage {
+            let fullText = storage.string
+            if let thinkingRange = fullText.range(of: "🤔 thinking...") {
+                let nsRange = NSRange(thinkingRange, in: fullText)
+                // Find the start of the "🐱 Murchi: 🤔 thinking..." line
+                let lineStart = (fullText as NSString).lineRange(for: nsRange).location
+                let lineEnd = NSMaxRange((fullText as NSString).lineRange(for: nsRange))
+                storage.replaceCharacters(in: NSRange(location: lineStart, length: lineEnd - lineStart), with: "")
+            }
+        }
+
+        appendChatMessage(from: "Murchi", text: text)
+
+        // Show short version in bubble above cat
+        let bubbleText = text.count > 60 ? String(text.prefix(57)) + "..." : text
+        showBubble(bubbleText)
+    }
+
+    @objc func openChatWindow() {
+        if chatWindow == nil { setupChatWindow() }
+        chatWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        chatInputField?.becomeFirstResponder()
+    }
+
+    // MARK: - AI Settings Window
+
+    func setupSettingsWindow() {
+        let w: CGFloat = 400
+        let h: CGFloat = 200
+
+        settingsWindow = NSPanel(
+            contentRect: NSRect(x: screenW / 2 - w / 2, y: screenH / 2 - h / 2, width: w, height: h),
+            styleMask: [.titled, .closable, .nonactivatingPanel],
+            backing: .buffered, defer: false
+        )
+        settingsWindow?.title = "Murchi AI Settings"
+        settingsWindow?.level = .floating
+
+        let contentView = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = NSColor(white: 0.98, alpha: 1).cgColor
+
+        // Title
+        let titleLabel = NSTextField(labelWithString: "🤖 AI Settings")
+        titleLabel.frame = NSRect(x: 20, y: h - 45, width: w - 40, height: 25)
+        titleLabel.font = NSFont.boldSystemFont(ofSize: 16)
+        contentView.addSubview(titleLabel)
+
+        // API Key label
+        let keyLabel = NSTextField(labelWithString: "Gemini API Key:")
+        keyLabel.frame = NSRect(x: 20, y: h - 80, width: 120, height: 20)
+        keyLabel.font = NSFont.systemFont(ofSize: 13)
+        contentView.addSubview(keyLabel)
+
+        // API Key field (secure)
+        let keyField = NSSecureTextField(frame: NSRect(x: 20, y: h - 110, width: w - 40, height: 26))
+        keyField.stringValue = geminiApiKey
+        keyField.placeholderString = "Enter your Gemini API key..."
+        keyField.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        apiKeyField = keyField
+        contentView.addSubview(keyField)
+
+        // Hint
+        let hint = NSTextField(labelWithString: "Get a free key at ai.google.dev")
+        hint.frame = NSRect(x: 20, y: h - 132, width: w - 40, height: 16)
+        hint.font = NSFont.systemFont(ofSize: 11)
+        hint.textColor = .secondaryLabelColor
+        contentView.addSubview(hint)
+
+        // Save button
+        let saveBtn = NSButton(frame: NSRect(x: w - 90, y: 16, width: 70, height: 30))
+        saveBtn.title = "Save"
+        saveBtn.bezelStyle = .rounded
+        saveBtn.target = self
+        saveBtn.action = #selector(saveAISettings)
+        contentView.addSubview(saveBtn)
+
+        // Test button
+        let testBtn = NSButton(frame: NSRect(x: w - 170, y: 16, width: 70, height: 30))
+        testBtn.title = "Test"
+        testBtn.bezelStyle = .rounded
+        testBtn.target = self
+        testBtn.action = #selector(testAIConnection)
+        contentView.addSubview(testBtn)
+
+        settingsWindow?.contentView = contentView
+    }
+
+    @objc func saveAISettings() {
+        if let key = apiKeyField?.stringValue, !key.isEmpty {
+            geminiApiKey = key
+            showBubble("*API key saved!*")
+        }
+        settingsWindow?.orderOut(nil)
+    }
+
+    @objc func testAIConnection() {
+        if let key = apiKeyField?.stringValue, !key.isEmpty {
+            geminiApiKey = key
+        }
+        showBubble("*testing...*")
+        sendToGemini(prompt: "Say hello in one short sentence, you're a cat!")
+    }
+
+    @objc func openAISettings() {
+        if settingsWindow == nil { setupSettingsWindow() }
+        settingsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     func setupGlobalHotkey() {
@@ -7130,6 +7449,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let statsItem = NSMenuItem(title: "\u{1F4CA} Stats", action: #selector(showStats), keyEquivalent: "")
         statsItem.target = self
         menu.addItem(statsItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let chatItem2 = NSMenuItem(title: "\u{1F4AC} Chat with Murchi", action: #selector(openChatWindow), keyEquivalent: "")
+        chatItem2.target = self
+        menu.addItem(chatItem2)
+
+        let aiSettings2 = NSMenuItem(title: "\u{1F527} AI Settings", action: #selector(openAISettings), keyEquivalent: "")
+        aiSettings2.target = self
+        menu.addItem(aiSettings2)
 
         menu.addItem(NSMenuItem.separator())
 
