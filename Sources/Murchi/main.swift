@@ -722,6 +722,10 @@ class CatRenderer {
             return .jumping
         case .playing, .tripping:
             return .playing
+        case .dancing:
+            return .musicHappy
+        case .hatingMusic:
+            return .musicAngry
         }
     }
 
@@ -2508,6 +2512,7 @@ enum PetBehavior: String {
     case chasingToy, scratching, edgeWalking, zoomies
     case sick, bathing, promenade
     case chasingButterfly, watchingBird, knockingGlass, openingGift
+    case dancing, hatingMusic
 }
 
 // MARK: - Speech Bubbles
@@ -2987,6 +2992,12 @@ class BearRenderer {
             let img = render(expression: .curious, pose: .standing, lookRight: lookR)
             cacheInsert(cursorKey, img)
             return img
+        case .dancing:
+            expression = .happy
+            pose = .standing
+        case .hatingMusic:
+            expression = .annoyed
+            pose = .sitting
         }
 
         let img = render(expression: expression, pose: pose, lookRight: right)
@@ -4153,6 +4164,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var breathOffset: CGFloat = 0  // idle breathing animation
     var isGentleDropping = false
     var gentleDropPhase: CGFloat = 0
+    var lastDragPos: NSPoint = .zero
+    var dragShakeCount = 0
+    var lastDragDirection: CGFloat = 0
+    let heldWindowHeight: CGFloat = 120
 
     // Toy state
     var currentToy: Toy? = nil
@@ -4165,6 +4180,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     // Lottie rendering (nil = CGContext fallback)
     var lottieManager: LottieCharacterManager? = nil
     var useLottie: Bool { lottieManager != nil }
+
+    // Music detection
+    var isMusicPlaying = false
+    var lastMusicCheck = Date.distantPast
+    var musicDanceNotified = false
 
     // Night glow
     var isNightMode = false
@@ -5121,7 +5141,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         behaviorTimer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { [weak self] _ in
             guard let self = self else { return }
             if self.followingCursor { /* skip random behavior while following */ }
-            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy {
+            else if !self.isDragging && self.behavior != .eating && self.behavior != .beingPet && self.behavior != .pooping && self.behavior != .chasingToy && self.behavior != .dancing && self.behavior != .hatingMusic {
                 self.pickRandomBehavior()
             }
             self.scheduleRandomBehavior()
@@ -5129,6 +5149,13 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func pickRandomBehavior() {
+        // Music detection — check and react
+        checkMusicPlaying()
+        if isMusicPlaying && (behavior == .idle || behavior == .sitting) {
+            maybeStartDancing()
+            return
+        }
+
         let mood = stats.mood
         let hour = Calendar.current.component(.hour, from: Date())
 
@@ -6526,11 +6553,85 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         alert.runModal()
     }
 
+    // MARK: - Music Detection
+
+    func checkMusicPlaying() {
+        guard Date().timeIntervalSince(lastMusicCheck) > 5 else { return }
+        lastMusicCheck = Date()
+
+        let script = """
+        set isPlaying to false
+        try
+            if application "Music" is running then
+                tell application "Music" to if player state is playing then set isPlaying to true
+            end if
+        end try
+        try
+            if application "Spotify" is running then
+                tell application "Spotify" to if player state is playing then set isPlaying to true
+            end if
+        end try
+        return isPlaying
+        """
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self = self else { return }
+            let appleScript = NSAppleScript(source: script)
+            var error: NSDictionary?
+            let result = appleScript?.executeAndReturnError(&error)
+            let playing = result?.booleanValue ?? false
+
+            DispatchQueue.main.async {
+                let wasPlaying = self.isMusicPlaying
+                self.isMusicPlaying = playing
+
+                if self.isMusicPlaying && !wasPlaying {
+                    self.musicDanceNotified = false
+                }
+                if !self.isMusicPlaying && wasPlaying {
+                    if self.behavior == .dancing || self.behavior == .hatingMusic {
+                        self.startBehavior(.idle, duration: 2.0)
+                    }
+                }
+            }
+        }
+    }
+
+    func maybeStartDancing() {
+        guard isMusicPlaying,
+              !isDragging,
+              behavior == .idle || behavior == .sitting || behavior == .lookingAtCursor else { return }
+
+        let hatesIt = Int.random(in: 0..<4) == 0
+
+        if !musicDanceNotified {
+            musicDanceNotified = true
+            if hatesIt {
+                let hateBubbles = ["Ugh...", "Not this...", "My ears!", "Turn it off!", "Terrible..."]
+                showBubble(hateBubbles.randomElement()!)
+            } else {
+                let danceBubbles = ["Music!", "Vibes~", "My jam!", "Dance time!", "Bop bop!"]
+                showBubble(danceBubbles.randomElement()!)
+                particleCanvas.particleSystem.emit(
+                    at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                    type: .note, count: 5
+                )
+            }
+        }
+
+        if hatesIt {
+            startBehavior(.hatingMusic, duration: 6.0)
+        } else {
+            startBehavior(.dancing, duration: 8.0)
+        }
+    }
+
     // MARK: - Mouse handling
 
     func handleMouseDown(_ event: NSEvent) {
         dismissLaserDotIfNeeded()
         isDragging = true
+        statsWindow.orderOut(nil)
         didDragPet = false
         isGentleDropping = false
         gentleDropPhase = 0
@@ -6540,6 +6641,13 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             y: event.locationInWindow.y
         )
         dragStartScreenPoint = NSEvent.mouseLocation
+
+        // Resize window to tall held format (body hangs below cursor)
+        let newFrame = NSRect(x: petWindow.frame.origin.x, y: petWindow.frame.origin.y,
+                              width: petSize, height: heldWindowHeight)
+        petWindow.setFrame(newFrame, display: false)
+        petImageView.frame = NSRect(x: 0, y: 0, width: petSize, height: heldWindowHeight)
+        (petWindow.contentView as? PetView)?.frame = NSRect(x: 0, y: 0, width: petSize, height: heldWindowHeight)
     }
 
     func handleMouseDragged(_ event: NSEvent) {
@@ -6547,10 +6655,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let screenPoint = NSEvent.mouseLocation
         let moved = abs(screenPoint.x - dragStartScreenPoint.x) + abs(screenPoint.y - dragStartScreenPoint.y)
         if moved > 4 {
+            if !didDragPet {
+                let grabBubbles = ["Mew?!", "*grabbed!*", "Hey!", "Wah!", "Eep!"]
+                showBubble(grabBubbles.randomElement()!)
+            }
             didDragPet = true
         }
-        petX = screenPoint.x - dragOffset.x
-        petY = screenPoint.y - dragOffset.y
+        // Position: cursor is at the scruff (top), body hangs below
+        let scruffOffsetY = heldWindowHeight * 0.8
+        petX = screenPoint.x - petSize / 2
+        petY = screenPoint.y - scruffOffsetY
         let dragOrigin = NSPoint(x: petX.rounded(), y: petY.rounded())
         petWindow.setFrameOrigin(dragOrigin)
         if currentAccessory != nil {
@@ -6559,10 +6673,46 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         updateBubblePosition()
         updateParticleWindow()
 
-        // Show cat reaction when dragged
-        if behavior != .beingPet {
-            petImageView.image = getSprite(for: .jumping, frame: animFrame, right: facingRight)
+        // Detect shaking
+        let dx = screenPoint.x - lastDragPos.x
+        if abs(dx) > 8 {
+            let newDir: CGFloat = dx > 0 ? 1.0 : -1.0
+            if newDir != lastDragDirection && lastDragDirection != 0 {
+                dragShakeCount += 1
+                if dragShakeCount >= 4 {
+                    let shakeBubbles = ["AAAA!", "*dizzy*", "Stop shaking!", "Meooow!", "I'm gonna hurl!"]
+                    showBubble(shakeBubbles.randomElement()!)
+                    particleCanvas.particleSystem.emit(
+                        at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+                        type: .star, count: 6
+                    )
+                    stats.happiness = max(0, stats.happiness - 2)
+                    dragShakeCount = 0
+                }
+            }
+            lastDragDirection = newDir
         }
+        lastDragPos = screenPoint
+
+        // Show cat held by scruff when dragged
+        petImageView.image = getSprite(for: .beingPet, frame: animFrame, right: facingRight)
+
+        // Dangling sparkle trail while dragged
+        if frameCounter % 5 == 0 {
+            particleCanvas.particleSystem.emit(
+                at: NSPoint(x: petSize / 2 + CGFloat.random(in: 10...50), y: CGFloat.random(in: 5...20)),
+                type: .sparkle, count: 1
+            )
+        }
+    }
+
+    private func restoreSquareWindow() {
+        let restoreFrame = NSRect(x: petWindow.frame.origin.x,
+                                   y: petWindow.frame.origin.y,
+                                   width: petSize, height: petSize)
+        petWindow.setFrame(restoreFrame, display: false)
+        petImageView.frame = NSRect(x: 0, y: 0, width: petSize, height: petSize)
+        (petWindow.contentView as? PetView)?.frame = NSRect(x: 0, y: 0, width: petSize, height: petSize)
     }
 
     func handleMouseUp(_ event: NSEvent) {
@@ -6571,8 +6721,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             let screenPoint = NSEvent.mouseLocation
             let moved = abs(screenPoint.x - dragStartScreenPoint.x) + abs(screenPoint.y - dragStartScreenPoint.y)
             if !didDragPet || moved < 5 {
+                restoreSquareWindow()
                 petTapped()
             } else {
+                restoreSquareWindow()
                 showBubble("Wheee!")
                 // Cat falls after being dropped
                 if petY > groundYForPet() + 5 {
@@ -6582,6 +6734,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                     gentleDropPhase = 0
                 }
             }
+            dragShakeCount = 0
+            lastDragDirection = 0
         }
     }
 

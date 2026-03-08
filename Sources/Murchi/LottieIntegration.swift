@@ -142,7 +142,7 @@ class LottieCharacterManager {
         case .idle, .sitting, .watchingBird, .eating, .beingPet,
              .greeting, .playing, .jumping, .stretching, .tripping,
              .grooming, .bathing, .scratching, .pooping, .sick,
-             .openingGift, .lookingAtCursor:
+             .openingGift, .lookingAtCursor, .dancing, .hatingMusic:
             playSegment(.idle, loop: true)
         }
     }
