@@ -4436,7 +4436,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var aiThinkingFrame = 0
 
     var geminiApiKey: String {
-        get { UserDefaults.standard.string(forKey: "gemini_api_key") ?? "AIzaSyBK2JEB6fJFMVmVcewpYk5RXSBD81JTsa8" }
+        get { UserDefaults.standard.string(forKey: "gemini_api_key") ?? "" }
         set { UserDefaults.standard.set(newValue, forKey: "gemini_api_key") }
     }
 
