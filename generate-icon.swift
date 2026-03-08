@@ -1,7 +1,97 @@
 import AppKit
 import Foundation
 
-// Generate Murchi app icon — peach kawaii cat matching the in-app SVG cat.
+// Generate Murchi app icon using the actual in-app sitting SVG cat.
+
+// The exact same sitting SVG from CatRenderer in main.swift
+let sittingSVG = """
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" fill="none" viewBox="0 0 250 250">
+<!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
+  <path d="m161.5 33.27c15.41-13.14 34.6-21.99 52.49-22.26 8.22-0.13 11.32 2.97 12.91 11.05 3.67 19.2 1.44 46-5.14 69.55l-60.26-58.34z" fill="url(#paint0_linear_2043_11400)"/>
+  <path d="m179.1 41.12c11.74-7.16 20.74-12.94 27.1-11.85 10.74 1.96 5.45 26.07 2.05 38.45l-29.15-26.6z" fill="#FFE4CC"/>
+  <path d="m87.17 32.92c-15.56-13.06-34.69-21.61-51.76-21.64-7.55-0.01-10.64 2.59-12.6 10.67-4.06 17.06-2.78 43.34 4.14 69.12l60.22-58.15z" fill="url(#paint1_linear_2043_11400)"/>
+  <path d="m70.01 40.63c-11.63-6.4-20.65-10.61-27-11.5-10.74-1.45-7.4 21.05-3.4 38.73l30.4-27.23z" fill="#FFE4CC"/>
+  <path d="m226.4 117.7h13c3.33 0 3.97 2.36 3.97 3.99 0 1.96-1.44 3.55-3.97 3.62l-13 0.49c-4.44 0.27-6.26-0.93-6.26-3.9 0-2.68 1.59-4.2 6.26-4.2z" fill="url(#paint2_linear_2043_11400)"/>
+  <path d="m222.7 135 13.21 4.44c2.9 1.06 2.83 3.08 2.26 4.9-0.69 2.23-2.71 2.79-5.25 2.03l-13.48-3.77c-3.4-1.13-4.74-2.88-3.92-5.42 0.89-2.74 3.43-3.38 7.18-2.18z" fill="url(#paint3_linear_2043_11400)"/>
+  <path d="m175.1 198.6c16.19-2.24 23.89-17.58 34.9-24.3 13.07-7.16 21.62 3.48 23.64 11.03 3.75 13.89-8.82 27.78-25.01 32.28-12.16 4.12-21.16 4.61-30.98 4.61l-2.55-23.62z" fill="url(#paint4_linear_2043_11400)"/>
+  <path d="m82.92 178.1c-10.09 17.68-13.84 37.89-10.87 48.19 2.67 9.35 12.36 9.35 27.7 7.9l4.51-1.45 41.65 0.96c11.01 2.4 27.07 1.94 30.28-4.41 4.51-9-0.51-32.07-8.48-51.6l-39.53-5.85-45.26 6.26z" fill="url(#paint5_linear_2043_11400)"/>
+  <path d="m72.71 225.8c2.02-8.69 10-10.71 19.82-9.64l0.42-6.07c0.42 7.98 2.96 18.21 8.8 24.06-10.5 2.02-26.64 3.01-29.04-8.35z" fill="url(#paint6_linear_2043_11400)"/>
+  <path d="m156.7 216.1c8.41-0.42 17.23 1.6 20.13 8.83 0.89 8.44-6.66 10.33-19.72 9.77-3.4-0.14-6.93-0.77-9.61-2.08 5.42-4.51 8.17-11.37 9.61-23.53l-0.41 7.01z" fill="url(#paint7_linear_2043_11400)"/>
+  <path d="m82.03 180.2c0.76-1.59 1.52-3.03 2.35-4.55l83.33 1.31 1.13 3.59c-20.73 6.49-60.98 7.62-86.81-0.35z" fill="url(#paint8_linear_2043_11400)"/>
+  <path d="m123.7 26.71c-58.47 0-101.4 39.02-101.4 90.51 0 36.44 25.83 57.64 68.02 60.38 9.69 1.23 23.79 1.51 33.88 1.51 11.22 0 22.82-0.92 32.51-2.05 41.11-3.9 69.91-22.2 69.91-59.84 0-45.77-40.02-90.51-102.9-90.51z" fill="url(#paint9_linear_2043_11400)"/>
+  <path d="m171.8 82.11c-14.8 0-25.47 14.8-25.47 28.21 0 14.39 10.87 24.62 24.92 24.62 14.46 0 25.6-12.02 25.6-26.14 0-13.89-11-26.69-25.05-26.69z" fill="#fff"/>
+  <path d="m166.9 89.41c-11.6 0-20.15 11-20.15 21.5 0 11.4 8.69 20.54 19.69 20.54 11.15 0 19.7-11.01 19.7-21.37 0-10.77-8.41-20.67-19.24-20.67z" fill="#2D2D2D"/>
+  <path d="m161.5 95.12c-4.3 0-5.75 3.21-5.75 5.51 0 3.53 2.81 5.62 5.34 5.62 3.68 0 5.85-2.9 5.85-5.44 0-3.1-2.4-5.69-5.44-5.69z" fill="#fff"/>
+  <path d="m76.41 82.11c14.53-0.9 26.3 12.66 26.3 26.69 0 13.89-11.15 26.35-25.61 26.35-14.05 0-25.05-12.02-25.05-26.14 0-13.41 9.86-26.9 24.36-26.9z" fill="#fff"/>
+  <path d="m82.92 89.27c11.01 0 19.24 10.77 19.24 21.78 0 11.4-8.69 20.54-19.24 20.54s-20.15-10.16-20.15-20.99c0-11.54 9.35-21.33 20.15-21.33z" fill="#2D2D2D"/>
+  <path d="m87.84 95.12c4.3 0 5.75 3.21 5.75 5.51 0 3.53-2.81 5.62-5.34 5.62-3.68 0-5.85-2.9-5.85-5.44 0-3.1 2.4-5.69 5.44-5.69z" fill="#fff"/>
+  <path d="m124.4 117.2c-7.16 0-10.62 1.45-10.62 5.09 0 3.71 6.36 9.42 10.62 9.42 4.58 0 10.8-6.72 10.8-9.42 0-3.64-4-5.09-10.8-5.09z" fill="#FF91A4"/>
+  <path d="m107.1 133.8c-1.66 0.49-1.66 2.31-1.03 3.86 2.68 5.56 10.44 7.58 15.46 5.56 1.3-0.56 2.33-1.31 3.09-2.31 1.69 2.55 4.53 3.28 7.57 2.96 5.78-0.65 10.66-4.91 11.15-7.76 0.21-1.37-0.78-2.65-2.23-2.45-1.75 0.28-1.89 2.03-3.02 3.3-1.89 2.16-4.29 2.61-6.72 2.16-3.33-0.69-3.75-3.01-3.75-6.41h-4.85c0 2.67-0.14 5.41-3.11 6.41-3.04 1.06-6.93-0.14-9.1-3.46-0.83-1.38-1.82-2.34-3.46-1.86z" fill="url(#paint10_linear_2043_11400)"/>
+  <path d="m20.51 117.7h-9.95c-3.33 0-4.53 2.02-4.56 3.92-0.04 2.23 1.55 4.11 4.56 4.11l14.15-0.21c4.23 0 5.3-2.16 4.95-4.7-0.35-2.4-2.01-3.39-9.15-3.12z" fill="url(#paint11_linear_2043_11400)"/>
+  <path d="m26.43 135.4-12.71 3.89c-2.9 1.06-2.83 3.74-2.27 5.05 1 2.43 3.02 2.64 5.28 2.08l13.76-3.97c3.4-1.13 3.82-3.37 2.92-5.7-1.06-2.54-3.9-2.4-6.98-1.35z" fill="url(#paint12_linear_2043_11400)"/>
+  <path d="m196 130.1c-9 1.24-13.92 6.7-13.92 10.59 0 5.09 5.35 6.98 10.2 6.49 6.8-0.69 14.1-5.02 14.1-9.89 0-4.51-3.54-7.84-10.38-7.19z" fill="#FFE4CC"/>
+  <path d="m49.81 130.6c-6.49 0.35-7.8 4.25-7.66 7.15 0.38 6.36 7.31 9.44 15.28 9.79 6.46 0.27 9.43-3.29 9.29-7.19-0.21-5.78-9.5-10.17-16.91-9.75z" fill="#FFE4CC"/>
+  <path d="m121.7 211.5h5.6c-0.42 5.85-0.7 14.53 0.99 20.1 1.44 5.21 5.95 6.04 9.98 6.04 11.4 0 17.76-13.21 18.79-28.54l-0.89 7.01c-1.03 6.72-5.3 16.04-8.72 18.57-3.14 2.33-5.57 3.03-9.83 2.96-5.85-0.14-8.95-2.68-10.04-6.04h-5.38c-1.52 4.26-3.92 6.21-10.13 6.21-11.01 0-17.36-10.71-19.38-28.71l0.49 7.01c0.56 6 3.03 12.72 7.88 18 3.16 2.97 6.52 3.6 9.95 3.53 5.71-0.14 8.67-2.3 9.86-9.6 0.69-4.26 0.83-10.23 0.83-16.54z" fill="url(#paint13_linear_2043_11400)"/>
+  <defs>
+    <linearGradient id="paint0_linear_2043_11400" x1="173" x2="222.6" y1="17.31" y2="85.12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint1_linear_2043_11400" x1="30.6" x2="77.19" y1="16.07" y2="83.28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0A878" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint2_linear_2043_11400" x1="231.8" x2="231.8" y1="117.7" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint3_linear_2043_11400" x1="227.1" x2="227.1" y1="134.2" y2="146.9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint4_linear_2043_11400" x1="192.8" x2="192.8" y1="172.2" y2="222.2" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint5_linear_2043_11400" x1="125.3" x2="125.3" y1="171.9" y2="236.2" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/>
+      <stop stop-color="#FFC8A2" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint6_linear_2043_11400" x1="87" x2="87" y1="209.1" y2="235.3" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint7_linear_2043_11400" x1="162.5" x2="162.5" y1="209.1" y2="235" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint8_linear_2043_11400" x1="125.4" x2="125.4" y1="175.7" y2="186.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D07848" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint9_linear_2043_11400" x1="109.9" x2="130.3" y1="26.71" y2="178.9" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC8A2" offset="0"/>
+      <stop stop-color="#FFC8A2" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint10_linear_2043_11400" x1="124.6" x2="124.6" y1="128.9" y2="144" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A0522D" offset="0"/>
+      <stop stop-color="#8B4513" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint11_linear_2043_11400" x1="17.86" x2="17.86" y1="117.6" y2="125.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint12_linear_2043_11400" x1="22.44" x2="22.44" y1="134.4" y2="146.8" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#D07848" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint13_linear_2043_11400" x1="124.6" x2="124.6" y1="209.1" y2="237.7" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E08858" offset="0"/>
+      <stop stop-color="#E08858" offset="1"/>
+    </linearGradient>
+  </defs>
+</svg>
+"""
 
 func generateIcon() {
     let sizes: [(Int, String)] = [
@@ -43,6 +133,19 @@ func generateIcon() {
     print("Created AppIcon.icns")
 }
 
+func renderSVGToImage(_ svg: String, size: Int) -> NSImage? {
+    guard let data = svg.data(using: .utf8),
+          let image = NSImage(data: data) else { return nil }
+    // Re-render at exact target size
+    let target = NSImage(size: NSSize(width: size, height: size))
+    target.lockFocus()
+    image.draw(in: NSRect(x: 0, y: 0, width: size, height: size),
+               from: NSRect(origin: .zero, size: image.size),
+               operation: .sourceOver, fraction: 1.0)
+    target.unlockFocus()
+    return target
+}
+
 func renderIcon(size: Int) -> NSImage {
     let image = NSImage(size: NSSize(width: size, height: size))
     image.lockFocus()
@@ -55,332 +158,56 @@ func renderIcon(size: Int) -> NSImage {
     }
 
     let s = CGFloat(size)
-    let lw = max(1.5, s * 0.016)
-    let small = size <= 32
 
-    // — Background: warm peach-to-pink gradient —
+    // — Background: warm peach gradient with rounded corners —
     let bgRect = NSRect(x: 0, y: 0, width: s, height: s)
     let corner = s * 0.22
     let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: corner, yRadius: corner)
 
     let bgGrad = NSGradient(colors: [
-        NSColor(red: 1.0, green: 0.88, blue: 0.78, alpha: 1.0),
-        NSColor(red: 1.0, green: 0.78, blue: 0.72, alpha: 1.0),
-        NSColor(red: 0.98, green: 0.68, blue: 0.68, alpha: 1.0),
+        NSColor(red: 1.0, green: 0.90, blue: 0.82, alpha: 1.0),  // warm cream top
+        NSColor(red: 1.0, green: 0.82, blue: 0.74, alpha: 1.0),  // peach middle
+        NSColor(red: 0.98, green: 0.75, blue: 0.68, alpha: 1.0),  // deeper peach bottom
     ])!
     bgGrad.draw(in: bgPath, angle: -50)
 
-    // Soft light blobs
+    // Soft light blobs for depth
     NSGraphicsContext.saveGraphicsState()
     bgPath.addClip()
-    NSColor(white: 1.0, alpha: 0.18).setFill()
-    NSBezierPath(ovalIn: NSRect(x: s * 0.5, y: s * 0.5, width: s * 0.45, height: s * 0.4)).fill()
-    NSColor(white: 1.0, alpha: 0.10).setFill()
-    NSBezierPath(ovalIn: NSRect(x: -s * 0.05, y: s * 0.6, width: s * 0.4, height: s * 0.25)).fill()
-    NSGraphicsContext.restoreGraphicsState()
-
-    // Colors matching the SVG cat
-    let peach = NSColor(red: 1.0, green: 0.784, blue: 0.635, alpha: 1.0)       // #FFC8A2
-    let darkPeach = NSColor(red: 0.878, green: 0.533, blue: 0.345, alpha: 1.0)  // #E08858
-    let lightPeach = NSColor(red: 1.0, green: 0.894, blue: 0.800, alpha: 1.0)   // #FFE4CC
-    let outline = NSColor(red: 0.60, green: 0.38, blue: 0.22, alpha: 1.0)
-    let eyeBlack = NSColor(red: 0.176, green: 0.176, blue: 0.176, alpha: 1.0)   // #2D2D2D
-    let noseColor = NSColor(red: 1.0, green: 0.569, blue: 0.643, alpha: 1.0)    // #FF91A4
-    let blushColor = NSColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 0.35)
-
-    // Head center
-    let cx = s * 0.5
-    let headCY = s * 0.42
-    let headW = s * 0.58
-    let headH = s * 0.52
-
-    // — Ears (behind head) —
-    let earW = s * 0.20
-    let earH = s * 0.22
-
-    for side in [-1.0, 1.0] as [CGFloat] {
-        let earCX = cx + side * s * 0.22
-        let earBase = headCY + headH * 0.32
-
-        let ear = NSBezierPath()
-        ear.move(to: NSPoint(x: earCX - earW * 0.5, y: earBase))
-        ear.curve(
-            to: NSPoint(x: earCX, y: earBase + earH),
-            controlPoint1: NSPoint(x: earCX - earW * 0.45, y: earBase + earH * 0.7),
-            controlPoint2: NSPoint(x: earCX - earW * 0.15, y: earBase + earH * 0.95)
-        )
-        ear.curve(
-            to: NSPoint(x: earCX + earW * 0.5, y: earBase),
-            controlPoint1: NSPoint(x: earCX + earW * 0.15, y: earBase + earH * 0.95),
-            controlPoint2: NSPoint(x: earCX + earW * 0.45, y: earBase + earH * 0.7)
-        )
-        ear.close()
-
-        // Outer ear
-        darkPeach.setFill()
-        ear.fill()
-
-        // Inner ear
-        let inner = NSBezierPath()
-        let inset: CGFloat = 0.35
-        inner.move(to: NSPoint(x: earCX - earW * (0.5 - inset), y: earBase + earH * 0.15))
-        inner.curve(
-            to: NSPoint(x: earCX, y: earBase + earH * 0.82),
-            controlPoint1: NSPoint(x: earCX - earW * 0.25, y: earBase + earH * 0.6),
-            controlPoint2: NSPoint(x: earCX - earW * 0.05, y: earBase + earH * 0.78)
-        )
-        inner.curve(
-            to: NSPoint(x: earCX + earW * (0.5 - inset), y: earBase + earH * 0.15),
-            controlPoint1: NSPoint(x: earCX + earW * 0.05, y: earBase + earH * 0.78),
-            controlPoint2: NSPoint(x: earCX + earW * 0.25, y: earBase + earH * 0.6)
-        )
-        inner.close()
-        noseColor.withAlphaComponent(0.6).setFill()
-        inner.fill()
-
-        // Ear outline
-        strokePath(ear, color: outline, width: lw)
-    }
-
-    // — Shadow under head —
-    NSColor(red: 0.6, green: 0.35, blue: 0.2, alpha: 0.12).setFill()
-    NSBezierPath(ovalIn: NSRect(x: cx - headW * 0.45, y: headCY - headH * 0.52, width: headW * 0.9, height: headH * 0.2)).fill()
-
-    // — Paws (in front, bottom) —
-    if !small {
-        let pawW = s * 0.13, pawH = s * 0.09
-        let pawY = headCY - headH * 0.42
-        for side in [-1.0, 1.0] as [CGFloat] {
-            let px = cx + side * s * 0.11 - pawW / 2
-            let pawRect = NSRect(x: px, y: pawY, width: pawW, height: pawH)
-            let pawPath = NSBezierPath(ovalIn: pawRect)
-            peach.setFill()
-            pawPath.fill()
-            strokePath(pawPath, color: outline, width: lw * 0.8)
-
-            // Toe beans
-            if size >= 128 {
-                let beanColor = NSColor(red: 1.0, green: 0.72, blue: 0.76, alpha: 0.85)
-                beanColor.setFill()
-                let beanR = s * 0.012
-                for dx in [-0.6, -0.2, 0.2, 0.6] as [CGFloat] {
-                    NSBezierPath(ovalIn: NSRect(
-                        x: px + pawW / 2 + pawW * dx * 0.35 - beanR,
-                        y: pawY + pawH * 0.55,
-                        width: beanR * 2, height: beanR * 1.6
-                    )).fill()
-                }
-            }
-        }
-    }
-
-    // — Head — large oval —
-    let headRect = NSRect(x: cx - headW / 2, y: headCY - headH / 2, width: headW, height: headH)
-    let headPath = NSBezierPath(ovalIn: headRect)
-
-    // Shadow
-    NSGraphicsContext.saveGraphicsState()
-    let shadow = NSShadow()
-    shadow.shadowColor = NSColor(red: 0.4, green: 0.25, blue: 0.15, alpha: 0.15)
-    shadow.shadowBlurRadius = s * 0.04
-    shadow.shadowOffset = NSSize(width: 0, height: -s * 0.015)
-    shadow.set()
-    peach.setFill()
-    headPath.fill()
-    NSGraphicsContext.restoreGraphicsState()
-
-    // Head fill
-    peach.setFill()
-    headPath.fill()
-
-    // Light upper area
-    lightPeach.setFill()
-    NSBezierPath(ovalIn: NSRect(
-        x: cx - headW * 0.35, y: headCY + headH * 0.02, width: headW * 0.7, height: headH * 0.4
-    )).fill()
-
-    // Highlight spot
     NSColor(white: 1.0, alpha: 0.15).setFill()
-    NSBezierPath(ovalIn: NSRect(
-        x: cx - s * 0.08, y: headCY + headH * 0.15, width: s * 0.16, height: s * 0.1
-    )).fill()
+    NSBezierPath(ovalIn: NSRect(x: s * 0.55, y: s * 0.55, width: s * 0.4, height: s * 0.35)).fill()
+    NSColor(white: 1.0, alpha: 0.08).setFill()
+    NSBezierPath(ovalIn: NSRect(x: -s * 0.05, y: s * 0.6, width: s * 0.35, height: s * 0.2)).fill()
+    NSGraphicsContext.restoreGraphicsState()
 
-    // Head outline
-    strokePath(headPath, color: outline, width: lw)
+    // — Render the actual SVG cat —
+    // The SVG viewBox is 250x250, cat is centered-ish around (125, 130)
+    // We want to fill most of the icon area, with some padding
+    let padding = s * 0.08
+    let catArea = s - padding * 2
+    let catSize = Int(catArea * 2) // render at 2x for quality
 
-    // — Blush cheeks —
-    blushColor.setFill()
-    NSBezierPath(ovalIn: NSRect(x: cx - headW * 0.48, y: headCY - headH * 0.12, width: s * 0.09, height: s * 0.06)).fill()
-    NSBezierPath(ovalIn: NSRect(x: cx + headW * 0.48 - s * 0.09, y: headCY - headH * 0.12, width: s * 0.09, height: s * 0.06)).fill()
+    NSGraphicsContext.saveGraphicsState()
+    bgPath.addClip()
 
-    // — Eyes — white sclera + dark pupils + highlight (matching SVG cat) —
-    let eyeW = s * 0.11
-    let eyeH = s * 0.13
-    let eyeY = headCY + headH * 0.04
-    let eyeGap = s * 0.04
-
-    for side in [-1.0, 1.0] as [CGFloat] {
-        let ex = cx + side * (eyeGap / 2 + eyeW / 2) - eyeW / 2
-        let eyeRect = NSRect(x: ex, y: eyeY, width: eyeW, height: eyeH)
-
-        // White sclera
-        NSColor.white.setFill()
-        NSBezierPath(ovalIn: eyeRect).fill()
-
-        // Dark iris
-        let irisW = eyeW * 0.72, irisH = eyeH * 0.72
-        let irisRect = NSRect(x: ex + (eyeW - irisW) / 2, y: eyeY + (eyeH - irisH) / 2, width: irisW, height: irisH)
-        eyeBlack.setFill()
-        NSBezierPath(ovalIn: irisRect).fill()
-
-        // Big highlight
-        NSColor.white.setFill()
-        let hlSize = irisW * 0.38
-        NSBezierPath(ovalIn: NSRect(
-            x: irisRect.minX + irisW * 0.12, y: irisRect.maxY - hlSize - irisH * 0.1,
-            width: hlSize, height: hlSize
-        )).fill()
-
-        // Small highlight
-        let shSize = irisW * 0.18
-        NSBezierPath(ovalIn: NSRect(
-            x: irisRect.maxX - shSize - irisW * 0.12, y: irisRect.minY + irisH * 0.1,
-            width: shSize, height: shSize
-        )).fill()
+    if let catImage = renderSVGToImage(sittingSVG, size: catSize) {
+        // Draw centered, shifted slightly down so the cat sits nicely
+        let drawSize = catArea
+        let x = (s - drawSize) / 2
+        let y = (s - drawSize) / 2 - s * 0.02  // slightly lower
+        catImage.draw(in: NSRect(x: x, y: y, width: drawSize, height: drawSize),
+                      from: NSRect(origin: .zero, size: catImage.size),
+                      operation: .sourceOver, fraction: 1.0)
     }
+    NSGraphicsContext.restoreGraphicsState()
 
-    // — Nose —
-    let noseY = headCY - headH * 0.08
-    let noseW = s * 0.04, noseH = s * 0.03
-    let nosePath = NSBezierPath()
-    nosePath.move(to: NSPoint(x: cx, y: noseY + noseH))
-    nosePath.line(to: NSPoint(x: cx - noseW, y: noseY))
-    nosePath.line(to: NSPoint(x: cx + noseW, y: noseY))
-    nosePath.close()
-    nosePath.lineJoinStyle = .round
-    noseColor.setFill()
-    nosePath.fill()
-
-    // — Mouth —
-    let mouthY = noseY - s * 0.01
-    let smilePath = NSBezierPath()
-    smilePath.move(to: NSPoint(x: cx, y: mouthY))
-    smilePath.line(to: NSPoint(x: cx, y: mouthY - s * 0.025))
-    smilePath.lineCapStyle = .round
-    outline.setStroke()
-    smilePath.lineWidth = max(1.0, lw * 0.7)
-    smilePath.stroke()
-
-    // Smile curves
-    let smileW = s * 0.045
-    let smileCurve = NSBezierPath()
-    smileCurve.move(to: NSPoint(x: cx - smileW, y: mouthY - s * 0.015))
-    smileCurve.curve(
-        to: NSPoint(x: cx, y: mouthY - s * 0.035),
-        controlPoint1: NSPoint(x: cx - smileW * 0.4, y: mouthY - s * 0.04),
-        controlPoint2: NSPoint(x: cx - smileW * 0.1, y: mouthY - s * 0.04)
-    )
-    smileCurve.move(to: NSPoint(x: cx + smileW, y: mouthY - s * 0.015))
-    smileCurve.curve(
-        to: NSPoint(x: cx, y: mouthY - s * 0.035),
-        controlPoint1: NSPoint(x: cx + smileW * 0.4, y: mouthY - s * 0.04),
-        controlPoint2: NSPoint(x: cx + smileW * 0.1, y: mouthY - s * 0.04)
-    )
-    smileCurve.lineCapStyle = .round
-    smileCurve.lineWidth = max(1.0, lw * 0.7)
-    outline.setStroke()
-    smileCurve.stroke()
-
-    // — Whiskers —
-    if size >= 64 {
-        let whiskerColor = NSColor(red: 0.65, green: 0.45, blue: 0.30, alpha: 0.7)
-        whiskerColor.setStroke()
-        let wLW = max(1.0, lw * 0.6)
-        let wY = headCY - headH * 0.06
-        for side in [-1.0, 1.0] as [CGFloat] {
-            let baseX = cx + side * headW * 0.28
-            let endX = cx + side * headW * 0.58
-            // Upper whisker
-            let w1 = NSBezierPath()
-            w1.move(to: NSPoint(x: baseX, y: wY + s * 0.02))
-            w1.line(to: NSPoint(x: endX, y: wY + s * 0.04))
-            w1.lineWidth = wLW; w1.lineCapStyle = .round; w1.stroke()
-            // Lower whisker
-            let w2 = NSBezierPath()
-            w2.move(to: NSPoint(x: baseX, y: wY - s * 0.015))
-            w2.line(to: NSPoint(x: endX, y: wY - s * 0.03))
-            w2.lineWidth = wLW; w2.lineCapStyle = .round; w2.stroke()
-        }
-    }
-
-    // — Heart decoration —
-    drawHeart(
-        center: NSPoint(x: s * 0.82, y: s * 0.80),
-        size: s * 0.10,
-        color: NSColor(red: 1.0, green: 0.35, blue: 0.50, alpha: 0.9)
-    )
-
-    // — Sparkles —
-    if size >= 64 {
-        drawSparkle(center: NSPoint(x: s * 0.16, y: s * 0.78), radius: s * 0.028, color: NSColor(white: 1.0, alpha: 0.75))
-        drawSparkle(center: NSPoint(x: s * 0.75, y: s * 0.18), radius: s * 0.02, color: NSColor(white: 1.0, alpha: 0.55))
-    }
+    // — Subtle border —
+    NSColor(red: 0.75, green: 0.50, blue: 0.35, alpha: 0.15).setStroke()
+    bgPath.lineWidth = max(1.0, s * 0.006)
+    bgPath.stroke()
 
     image.unlockFocus()
     return image
-}
-
-func drawHeart(center: NSPoint, size: CGFloat, color: NSColor) {
-    let heart = NSBezierPath()
-    heart.move(to: NSPoint(x: center.x, y: center.y - size * 0.48))
-    heart.curve(
-        to: NSPoint(x: center.x - size * 0.55, y: center.y + size * 0.06),
-        controlPoint1: NSPoint(x: center.x - size * 0.34, y: center.y - size * 0.10),
-        controlPoint2: NSPoint(x: center.x - size * 0.58, y: center.y - size * 0.16)
-    )
-    heart.curve(
-        to: NSPoint(x: center.x, y: center.y + size * 0.48),
-        controlPoint1: NSPoint(x: center.x - size * 0.58, y: center.y + size * 0.44),
-        controlPoint2: NSPoint(x: center.x - size * 0.10, y: center.y + size * 0.62)
-    )
-    heart.curve(
-        to: NSPoint(x: center.x + size * 0.55, y: center.y + size * 0.06),
-        controlPoint1: NSPoint(x: center.x + size * 0.10, y: center.y + size * 0.62),
-        controlPoint2: NSPoint(x: center.x + size * 0.58, y: center.y + size * 0.44)
-    )
-    heart.curve(
-        to: NSPoint(x: center.x, y: center.y - size * 0.48),
-        controlPoint1: NSPoint(x: center.x + size * 0.58, y: center.y - size * 0.16),
-        controlPoint2: NSPoint(x: center.x + size * 0.34, y: center.y - size * 0.10)
-    )
-    heart.close()
-    color.setFill()
-    heart.fill()
-    NSColor(white: 1.0, alpha: 0.35).setFill()
-    NSBezierPath(ovalIn: NSRect(
-        x: center.x - size * 0.17, y: center.y + size * 0.15,
-        width: size * 0.16, height: size * 0.10
-    )).fill()
-}
-
-func drawSparkle(center: NSPoint, radius: CGFloat, color: NSColor) {
-    let sparkle = NSBezierPath()
-    sparkle.move(to: NSPoint(x: center.x, y: center.y + radius))
-    sparkle.line(to: NSPoint(x: center.x, y: center.y - radius))
-    sparkle.move(to: NSPoint(x: center.x - radius, y: center.y))
-    sparkle.line(to: NSPoint(x: center.x + radius, y: center.y))
-    sparkle.lineCapStyle = .round
-    sparkle.lineWidth = max(1.0, radius * 0.55)
-    color.setStroke()
-    sparkle.stroke()
-}
-
-func strokePath(_ path: NSBezierPath, color: NSColor, width: CGFloat) {
-    path.lineJoinStyle = .round
-    path.lineCapStyle = .round
-    path.lineWidth = width
-    color.setStroke()
-    path.stroke()
 }
 
 generateIcon()

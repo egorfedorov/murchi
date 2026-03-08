@@ -4431,7 +4431,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var chatScrollView: NSScrollView?
     var chatHistoryView: NSTextView?
     var settingsWindow: NSPanel?
-    var apiKeyField: NSSecureTextField?
+    var apiKeyField: NSTextField?
     var isAIThinking = false
     var aiThinkingFrame = 0
 
@@ -4967,6 +4967,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         chatWindow?.title = "Chat with Murchi"
         chatWindow?.level = .floating
         chatWindow?.isFloatingPanel = true
+        chatWindow?.appearance = NSAppearance(named: .aqua)
 
         let contentView = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
         contentView.wantsLayer = true
@@ -5061,7 +5062,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(key)"
+        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=\(key)"
         guard let url = URL(string: urlString) else {
             handleAIResponse("Mew... something went wrong with the URL 😿")
             return
@@ -5170,6 +5171,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         )
         settingsWindow?.title = "Murchi AI Settings"
         settingsWindow?.level = .floating
+        settingsWindow?.appearance = NSAppearance(named: .aqua)
 
         let contentView = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
         contentView.wantsLayer = true
@@ -5187,11 +5189,12 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         keyLabel.font = NSFont.systemFont(ofSize: 13)
         contentView.addSubview(keyLabel)
 
-        // API Key field (secure)
-        let keyField = NSSecureTextField(frame: NSRect(x: 20, y: h - 110, width: w - 40, height: 26))
+        // API Key field (visible so user can verify)
+        let keyField = NSTextField(frame: NSRect(x: 20, y: h - 110, width: w - 40, height: 26))
         keyField.stringValue = geminiApiKey
         keyField.placeholderString = "Enter your Gemini API key..."
         keyField.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        keyField.textColor = NSColor(white: 0.15, alpha: 1)
         apiKeyField = keyField
         contentView.addSubview(keyField)
 
@@ -7572,6 +7575,22 @@ class PetView: NSView {
 
 let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
+
+// Add Edit menu so Cmd+C/V/X/A work in text fields
+let mainMenu = NSMenu()
+let editMenuItem = NSMenuItem(title: "Edit", action: nil, keyEquivalent: "")
+let editMenu = NSMenu(title: "Edit")
+editMenu.addItem(withTitle: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
+editMenu.addItem(withTitle: "Redo", action: Selector(("redo:")), keyEquivalent: "Z")
+editMenu.addItem(NSMenuItem.separator())
+editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+editMenuItem.submenu = editMenu
+mainMenu.addItem(editMenuItem)
+app.mainMenu = mainMenu
+
 let delegate = MurchiDelegate()
 app.delegate = delegate
 app.run()
