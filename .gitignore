@@ -1,10 +1,10 @@
-# Build artifacts
-Murchi
-Murchi.app/
+# Build artifacts (root-only binaries)
+/Murchi
+/murchi
+/Murchi.app/
 Murchi.dmg
-murchi
-gen-icon
-generate-icon
+/gen-icon
+/generate-icon
 .dmg-staging/
 AppIcon.iconset/
 
@@ -23,7 +23,6 @@ DerivedData/
 .build/
 .swiftpm/
 Package.resolved
-Package.swift
 
 # Temp / preview files
 *.html
