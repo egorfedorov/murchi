@@ -17,18 +17,11 @@ rm -rf "$APP_DIR"
 mkdir -p "$MACOS"
 mkdir -p "$RESOURCES"
 
-# Compile
+# Compile via Swift Package Manager
 echo "Compiling..."
-swiftc "$DIR/Murchi.swift" \
-    -framework AppKit \
-    -framework Foundation \
-    -framework AVFoundation \
-    -framework Carbon \
-    -framework UserNotifications \
-    -o "$MACOS/$APP_NAME" \
-    -swift-version 5 \
-    -O \
-    2>&1
+cd "$DIR"
+swift build -c release 2>&1
+cp "$(swift build -c release --show-bin-path)/$APP_NAME" "$MACOS/$APP_NAME"
 
 # Create Info.plist
 cat > "$CONTENTS/Info.plist" << 'PLIST'
@@ -43,9 +36,9 @@ cat > "$CONTENTS/Info.plist" << 'PLIST'
     <key>CFBundleIdentifier</key>
     <string>com.murchi.tamagotchi</string>
     <key>CFBundleVersion</key>
-    <string>2.3.0</string>
+    <string>2.3.1</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.3.0</string>
+    <string>2.3.1</string>
     <key>CFBundleExecutable</key>
     <string>Murchi</string>
     <key>CFBundlePackageType</key>
