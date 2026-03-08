@@ -726,6 +726,8 @@ class CatRenderer {
             return .musicHappy
         case .hatingMusic:
             return .musicAngry
+        case .cornerTimeout:
+            return .lonelySitting
         }
     }
 
@@ -2184,7 +2186,7 @@ struct Particle {
     var type: ParticleType
 
     enum ParticleType {
-        case heart, star, sparkle, note, poof
+        case heart, star, sparkle, note, poof, tear
     }
 }
 
@@ -2216,14 +2218,18 @@ class ParticleSystem {
             case .poof:
                 color = NSColor(white: 0.8, alpha: 0.7)
                 size = CGFloat.random(in: 4...8)
+            case .tear:
+                color = NSColor(red: 0.5, green: 0.7, blue: 1.0, alpha: 0.9)
+                size = CGFloat.random(in: 3...5)
             }
+            let isTear = type == .tear
             particles.append(Particle(
-                x: point.x + CGFloat.random(in: -10...10),
-                y: point.y + CGFloat.random(in: -5...15),
-                vx: cos(angle) * speed,
-                vy: sin(angle) * speed + 2,  // upward bias
+                x: point.x + CGFloat.random(in: isTear ? -2...2 : -10...10),
+                y: point.y + CGFloat.random(in: isTear ? -2...2 : -5...15),
+                vx: isTear ? CGFloat.random(in: -0.3...0.3) : cos(angle) * speed,
+                vy: isTear ? -CGFloat.random(in: 1...2.5) : sin(angle) * speed + 2,
                 life: 1.0,
-                decay: CGFloat.random(in: 0.015...0.035),
+                decay: CGFloat.random(in: isTear ? 0.025...0.045 : 0.015...0.035),
                 color: color,
                 size: size,
                 type: type
@@ -2512,7 +2518,7 @@ enum PetBehavior: String {
     case chasingToy, scratching, edgeWalking, zoomies
     case sick, bathing, promenade
     case chasingButterfly, watchingBird, knockingGlass, openingGift
-    case dancing, hatingMusic
+    case dancing, hatingMusic, cornerTimeout
 }
 
 // MARK: - Speech Bubbles
@@ -2997,6 +3003,9 @@ class BearRenderer {
             pose = .standing
         case .hatingMusic:
             expression = .annoyed
+            pose = .sitting
+        case .cornerTimeout:
+            expression = .sick
             pose = .sitting
         }
 
@@ -4186,6 +4195,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var lastMusicCheck = Date.distantPast
     var musicDanceNotified = false
 
+    // Corner timeout
+    var cornerTimeoutStart: Date?
+    var cornerCryingStarted = false
+    var cornerPending = false
+
     // Night glow
     var isNightMode = false
 
@@ -4483,6 +4497,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let walkItem = NSMenuItem(title: "\u{1F6B6} Walk", action: #selector(takeForWalk), keyEquivalent: "w")
         walkItem.target = self
         menu.addItem(walkItem)
+
+        let cornerTitle = behavior == .cornerTimeout ? "\u{1F49A} Forgive" : "\u{1F6D1} Sit in Corner"
+        let cornerItem = NSMenuItem(title: cornerTitle, action: #selector(sendToCorner), keyEquivalent: "")
+        cornerItem.target = self
+        menu.addItem(cornerItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -5149,12 +5168,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func pickRandomBehavior() {
-        // Music detection — check and react
-        checkMusicPlaying()
-        if isMusicPlaying && (behavior == .idle || behavior == .sitting) {
-            maybeStartDancing()
-            return
-        }
+        // Skip if music is playing — dancing handled in update()
+        if isMusicPlaying { return }
 
         let mood = stats.mood
         let hour = Calendar.current.component(.hour, from: Date())
@@ -5302,6 +5317,10 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let elapsed = Date().timeIntervalSince(behaviorStartTime)
         if followingCursor && behavior == .chasingCursor {
             // Keep following — don't timeout
+        } else if behavior == .cornerTimeout {
+            // Corner timeout — never expires, only via "Forgive" menu
+            behaviorStartTime = Date()
+            behaviorDuration = 999999
         } else if elapsed > behaviorDuration && !isDragging && behavior != .idle {
             // Clean up event windows on behavior timeout
             if behavior == .openingGift, let gw = giftWindow, gw.isVisible {
@@ -5318,6 +5337,15 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             }
             behavior = .idle
             animFrame = 0
+        }
+
+        // Music detection — check periodically and dance
+        checkMusicPlaying()
+        if isMusicPlaying && (behavior == .idle || behavior == .sitting) {
+            maybeStartDancing()
+        }
+        if isMusicPlaying && behavior == .idle && musicDanceNotified {
+            maybeStartDancing()
         }
 
         // Animate every 2nd frame (15fps sprite animation at 30fps loop = 2x smoother than before)
@@ -5376,7 +5404,17 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
                 if abs(petX - target) < speed * 2 {
                     petX = target
                     walkTargetX = nil
-                    behavior = .idle
+                    if cornerPending {
+                        cornerPending = false
+                        cornerTimeoutStart = Date()
+                        behavior = .cornerTimeout
+                        behaviorStartTime = Date()
+                        behaviorDuration = 999999
+                        facingRight = false
+                        showBubble("...")
+                    } else {
+                        behavior = .idle
+                    }
                 } else {
                     petX += (target > petX) ? speed : -speed
                     facingRight = target > petX
@@ -5581,6 +5619,28 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
             // Slight vibration
             if frameCounter % 3 == 0 {
                 petX += CGFloat.random(in: -1...1)
+            }
+        case .cornerTimeout:
+            facingRight = false
+            if let start = cornerTimeoutStart {
+                let cornerElapsed = Date().timeIntervalSince(start)
+                if cornerElapsed > 10 && !cornerCryingStarted {
+                    cornerCryingStarted = true
+                    showBubble("I'm sorry... *sniff*")
+                }
+                if cornerCryingStarted && frameCounter % 15 == 0 {
+                    let padX: CGFloat = 40
+                    let padY: CGFloat = 20
+                    let eyeY = padY + petSize * 0.60
+                    let lx = padX + petSize * 0.47
+                    let rx = padX + petSize * 0.66
+                    particleCanvas.particleSystem.emit(at: NSPoint(x: lx, y: eyeY), type: .tear, count: 1)
+                    particleCanvas.particleSystem.emit(at: NSPoint(x: rx, y: eyeY), type: .tear, count: 1)
+                }
+                if frameCounter % 200 == 0 {
+                    let sadBubbles = ["*sniff*", "I'll be good...", "Sorry...", "*whimper*", "Please forgive me...", "Don't be mad...", "*sobs quietly*"]
+                    showBubble(sadBubbles.randomElement()!)
+                }
             }
         default:
             break
@@ -6253,6 +6313,34 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         stats.save()
     }
 
+    @objc func sendToCorner() {
+        if behavior == .cornerTimeout {
+            forgiveFromCorner()
+            return
+        }
+        showBubble("But I didn't do anything!...")
+        cornerCryingStarted = false
+        cornerTimeoutStart = nil
+        startBehavior(.walking, duration: 30.0)
+        walkTargetX = screenW - petSize - 15
+        facingRight = true
+        cornerPending = true
+        stats.happiness = max(0, stats.happiness - 5)
+    }
+
+    func forgiveFromCorner() {
+        cornerTimeoutStart = nil
+        cornerCryingStarted = false
+        cornerPending = false
+        showBubble("I'll be good now! *purr*")
+        particleCanvas.particleSystem.emit(
+            at: NSPoint(x: petSize / 2 + 40, y: petSize + 10),
+            type: .heart, count: 5
+        )
+        stats.happiness = min(100, stats.happiness + 3)
+        startBehavior(.idle, duration: 2.0)
+    }
+
     @objc func screenshotPet() {
         // Render current sprite at high res and copy to clipboard
         let sprite = getSprite(for: behavior, frame: animFrame, right: facingRight)
@@ -6782,6 +6870,11 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
         let walkItem = NSMenuItem(title: "\u{1F6B6} Walk", action: #selector(takeForWalk), keyEquivalent: "")
         walkItem.target = self
         menu.addItem(walkItem)
+
+        let cornerTitle2 = behavior == .cornerTimeout ? "\u{1F49A} Forgive" : "\u{1F6D1} Sit in Corner"
+        let cornerItem2 = NSMenuItem(title: cornerTitle2, action: #selector(sendToCorner), keyEquivalent: "")
+        cornerItem2.target = self
+        menu.addItem(cornerItem2)
 
         if stats.isSick {
             let healItem = NSMenuItem(title: "\u{1F48A} Medicine", action: #selector(healPet), keyEquivalent: "")
