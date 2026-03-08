@@ -2526,6 +2526,37 @@ struct PetStats: Codable {
     var accessory: String? = nil
     var milestones: [String] = []
 
+    // Custom decoder to handle missing keys from older save files
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        hunger = (try? c.decode(Double.self, forKey: .hunger)) ?? 80
+        happiness = (try? c.decode(Double.self, forKey: .happiness)) ?? 80
+        energy = (try? c.decode(Double.self, forKey: .energy)) ?? 80
+        social = (try? c.decode(Double.self, forKey: .social)) ?? 80
+        hygiene = (try? c.decode(Double.self, forKey: .hygiene)) ?? 80
+        health = (try? c.decode(Double.self, forKey: .health)) ?? 100
+        isSick = (try? c.decode(Bool.self, forKey: .isSick)) ?? false
+        sickSince = try? c.decode(Date.self, forKey: .sickSince)
+        totalPets = (try? c.decode(Int.self, forKey: .totalPets)) ?? 0
+        totalFeedings = (try? c.decode(Int.self, forKey: .totalFeedings)) ?? 0
+        totalPlays = (try? c.decode(Int.self, forKey: .totalPlays)) ?? 0
+        totalBaths = (try? c.decode(Int.self, forKey: .totalBaths)) ?? 0
+        totalHeals = (try? c.decode(Int.self, forKey: .totalHeals)) ?? 0
+        totalWalks = (try? c.decode(Int.self, forKey: .totalWalks)) ?? 0
+        totalKeystrokes = (try? c.decode(Int.self, forKey: .totalKeystrokes)) ?? 0
+        xp = (try? c.decode(Int.self, forKey: .xp)) ?? 0
+        level = (try? c.decode(Int.self, forKey: .level)) ?? 1
+        lastSeen = (try? c.decode(Date.self, forKey: .lastSeen)) ?? Date()
+        birthDate = (try? c.decode(Date.self, forKey: .birthDate)) ?? Date()
+        name = (try? c.decode(String.self, forKey: .name)) ?? "Murchi"
+        poopCount = (try? c.decode(Int.self, forKey: .poopCount)) ?? 0
+        lastPoopClean = (try? c.decode(Date.self, forKey: .lastPoopClean)) ?? Date()
+        accessory = try? c.decode(String.self, forKey: .accessory)
+        milestones = (try? c.decode([String].self, forKey: .milestones)) ?? []
+    }
+
+    init() {}
+
     var mood: Mood {
         if isSick { return .sick }
         let avg = (hunger + happiness + energy + social) / 4.0
@@ -5667,7 +5698,25 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
     func stopPomodoro() {
         pomodoroActive = false
+        restoreStatusBarMoodFace()
         showBubble(L("Pomodoro stopped!", ru: "Помодоро остановлен!", ja: "ポモドーロ停止！", ko: "뽀모도로 중지!", zh: "番茄钟停止！"))
+    }
+
+    func restoreStatusBarMoodFace() {
+        let emoji: String
+        switch stats.mood {
+        case .happy: emoji = "=^.^="
+        case .neutral: emoji = "=^-^="
+        case .sad: emoji = "=;.;="
+        case .sleepy: emoji = "=^~^="
+        case .sick: emoji = "=x.x="
+        }
+        if stats.needsAttention {
+            let blink = frameCounter % 30 < 15
+            statusBarItem.button?.title = blink ? "⚠️ \(emoji)" : emoji
+        } else {
+            statusBarItem.button?.title = emoji
+        }
     }
 
     func updatePomodoro() {
@@ -7268,23 +7317,16 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateStatusBar() {
-        let mood = stats.mood
-        let emoji: String
-        switch mood {
-        case .happy: emoji = "=^.^="
-        case .neutral: emoji = "=^-^="
-        case .sad: emoji = "=;.;="
-        case .sleepy: emoji = "=^~^="
-        case .sick: emoji = "=x.x="
+        // Don't overwrite Pomodoro timer display
+        guard !pomodoroActive else {
+            // Still update menu header
+            if let menu = statusBarItem.menu, let header = menu.items.first {
+                header.title = "Murchi - Lv.\(stats.level) \(stats.evolutionStage)"
+            }
+            return
         }
 
-        // Blink attention indicator when pet needs care
-        if stats.needsAttention {
-            let blink = frameCounter % 30 < 15
-            statusBarItem.button?.title = blink ? "\u{26A0}\u{FE0F} \(emoji)" : emoji
-        } else {
-            statusBarItem.button?.title = emoji
-        }
+        restoreStatusBarMoodFace()
 
         // Update menu header
         if let menu = statusBarItem.menu, let header = menu.items.first {
