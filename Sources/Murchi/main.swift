@@ -3190,8 +3190,8 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
     var isHoveringPet = false
     var lastLevel = 1
     var soundEnabled = true
-    var petType: String = "cat"  // "cat", "bear", or "bird"
-    let petTypes = ["cat", "bear", "bird"]
+    var petType: String = "cat"
+    let petTypes = ["cat"]
     var followingCursor = false
     var lastPetOrigin = NSPoint(x: -9999, y: -9999)
     var hadParticlesLastFrame = false
@@ -3580,18 +3580,7 @@ class MurchiDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let petMenu = NSMenu()
-        let petEmojis = ["cat": "🐱", "bear": "🐻", "bird": "🐦"]
-        let petNames = ["cat": "Cat", "bear": "Bear", "bird": "Bird"]
-        for pt in petTypes {
-            let item = NSMenuItem(title: "\(petEmojis[pt]!) \(petNames[pt]!)", action: #selector(selectPetType(_:)), keyEquivalent: "")
-            item.representedObject = pt
-            if pt == petType { item.state = .on }
-            petMenu.addItem(item)
-        }
-        let petMenuItem = NSMenuItem(title: "🐾 Pet's", action: nil, keyEquivalent: "")
-        petMenuItem.submenu = petMenu
-        menu.addItem(petMenuItem)
+        // Pet selection menu hidden — only cat for now
 
         let soundItem = NSMenuItem(title: soundEnabled ? "\u{1F508} Mute Sounds" : "\u{1F50A} Enable Sounds", action: #selector(toggleSound), keyEquivalent: "")
         menu.addItem(soundItem)
